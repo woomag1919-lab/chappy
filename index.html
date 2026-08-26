@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>あこりんガルβ</title>
+<style>
+:root{
+  --pink:#e94f78;--pink2:#d9487a;--pink-soft:#fff1f5;--ink:#30343b;--muted:#6f7680;
+  --line:#e5e8ed;--bg:#fafbfc;--card:#fff;--green:#41966f;
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Hiragino Kaku Gothic ProN",sans-serif
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink)}
+.app{max-width:760px;margin:auto;min-height:100vh;padding-bottom:32px}
+header{background:linear-gradient(110deg,#ef6585,#d94788);color:#fff;padding:15px 20px 16px;box-shadow:0 3px 12px #0002}
+.headrow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+h1{font-size:23px;margin:0;font-weight:800;letter-spacing:.02em}.beta{font-size:12px;background:#ffffff30;border:1px solid #fff6;padding:6px 12px;border-radius:999px}
+.subtitle{margin:5px 0 0;font-size:13px;opacity:.9}
+main{padding:12px 18px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:#f0f2f6;border-radius:28px;padding:3px;margin-bottom:14px}
+.tab{border:0;background:transparent;color:#5e6670;padding:12px 7px;border-radius:25px;font-size:14px;font-weight:700}
+.tab.active{background:#fff;color:#c74369;box-shadow:0 2px 8px #00000010}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:0 2px 8px #00000008}
+.section-title{font-size:16px;font-weight:800;margin:2px 0 10px}.hint{font-size:12px;color:var(--muted);line-height:1.65}
+.modebox{border:2px dashed #d7dce3;border-radius:18px;padding:18px;text-align:center;margin-bottom:12px}
+.modebox .ok{color:var(--green);font-weight:800;margin-bottom:8px}
+.btnlink{border:0;background:none;color:#d94b70;text-decoration:underline;font-weight:700;padding:4px;cursor:pointer}
+textarea{width:100%;border:1px solid #dfe3e9;border-radius:13px;padding:12px;font:inherit;min-height:76px;resize:vertical;outline:none}
+textarea:focus,select:focus{border-color:#df6483;box-shadow:0 0 0 3px #df64831a}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.action{padding:13px;border-radius:14px;border:1px solid var(--line);background:#fff;font-weight:800;color:#4d5661}
+.action.active{border-color:#df6684;background:var(--pink-soft);color:#c94569}
+.upload-label{display:block;text-align:center;border:2px dashed #cfd6df;border-radius:17px;padding:17px 10px;cursor:pointer;background:#fff}
+.upload-label strong{display:block;color:#c7476c;margin-bottom:4px}.upload-label small{color:#7b8490}
+#imageInput{display:none}.thumbs{display:flex;gap:8px;overflow-x:auto;margin-top:10px}.thumb{width:74px;height:74px;object-fit:cover;border-radius:10px;border:1px solid #ddd;flex:0 0 auto}
+.traits{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{font-size:12px;font-weight:800;display:block;margin-bottom:6px}
+select{width:100%;border:1px solid #dfe3e9;border-radius:12px;padding:10px;background:#fff;font:inherit}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.chip{border:1px solid #e0e3e8;background:#fff;border-radius:999px;padding:7px 9px;font-size:12px;cursor:pointer}.chip.on{background:#ffeaf0;border-color:#df6684;color:#bf3e62;font-weight:800}
+.primary{width:100%;border:0;border-radius:15px;padding:15px;background:linear-gradient(100deg,#e64f72,#d94488);color:#fff;font-size:16px;font-weight:900;box-shadow:0 4px 12px #d94d7830;cursor:pointer}.primary:disabled{opacity:.55}
+.result{margin-top:18px}.result-title{color:#b33c5d;font-size:16px;font-weight:900;margin:0 0 10px}.card{background:#fff;border:1px solid #f0dce2;border-radius:17px;padding:15px;margin-bottom:10px;box-shadow:0 2px 8px #00000008}.card h3{font-size:14px;color:#b53d5e;margin:0 0 7px}.card p{font-size:14px;line-height:1.75;margin:0;white-space:pre-wrap}.fact{background:#f5faf7;border-color:#d9eee3}.fact h3{color:#34825e}.caution{background:#fff9ef;border-color:#f5e4c3}.caution h3{color:#9b6d20}
+.loader{text-align:center;padding:20px;color:#bd4262;font-weight:800}.error{background:#fff0f0;border:1px solid #f0b6b6;color:#a33b3b;border-radius:14px;padding:12px;font-size:13px;white-space:pre-wrap}
+@media(max-width:600px){main{padding:10px 12px}.traits{grid-template-columns:1fr}.actions{grid-template-columns:1fr 1fr}.headrow h1{font-size:21px}}
+.free-note{width:100%;min-height:70px;margin-top:8px}.diagnosis-intro{background:#fff7fa;border:1px solid #f0dce2;border-radius:15px;padding:13px;font-size:13px;line-height:1.7;margin-bottom:12px}.question{padding:13px 0;border-top:1px solid #edf0f3}.qtext{font-size:13px;font-weight:700;line-height:1.6;margin-bottom:8px}.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.scale label{font-size:10px;text-align:center;color:#68717b}.scale input{display:block;margin:0 auto 3px}.diagnosis-result{display:none;margin-top:12px}</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="headrow"><h1>💬 あこりんガルβ</h1><span class="beta">shared edition</span></div>
+  <div class="subtitle">お互いの特性理解と、会話のすれ違い整理をサポート</div>
+</header>
+
+<main><div class="tabs"><button class="tab active" data-page="analyze">💬 会話を読み解く</button><button class="tab" data-page="diagnosis">🧩 特性チェック</button></div>
+  <section id="analyzePage">
+
+  <section class="panel">
+    <div class="section-title" id="inputTitle">相手から届いたメッセージや気になった言動</div>
+    <div class="actions">
+      <button class="action active" id="textMode">⌨️ テキスト入力</button>
+      <button class="action" id="imageMode">🖼️ スクショ送信</button>
+    </div>
+
+    <div id="textArea">
+      <textarea id="message" placeholder="気になったメッセージや会話を入力…"></textarea>
+    </div>
+
+    <div id="imageArea" style="display:none">
+      <label class="upload-label" for="imageInput">
+        <strong>🖼️ スクショを追加</strong>
+        <small>複数枚選択できます。会話の前後関係が分かる順番で追加してください。</small>
+      </label>
+      <input id="imageInput" type="file" accept="image/*" multiple>
+      <div class="thumbs" id="thumbs"></div>
+      <div class="hint" style="margin-top:8px">最大5枚。端末内で縮小してからAIへ送ります。</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="section-title">自分と相手の特性</div>
+    <div class="hint">分からないものは無理に選ばなくてOK。ここは診断ではなく、会話を考えるための参考情報です。</div>
+    <div class="traits" style="margin-top:10px">
+      <div class="field"><label>自分</label><select id="myMbti"><option value="">MBTI未設定</option></select></div>
+      <div class="field"><label>相手</label><select id="partnerMbti"><option value="">MBTI未設定</option></select></div>
+    </div>
+    <div class="traits" style="margin-top:10px">
+      <div class="field"><label>自分の補助特性</label><div id="myChips" class="chips"></div><textarea id="myFree" class="free-note" placeholder="自分について自由に記入（任意）"></textarea></div>
+      <div class="field"><label>相手の補助特性</label><div id="partnerChips" class="chips"></div><textarea id="partnerFree" class="free-note" placeholder="相手について自由に記入（任意）"></textarea></div>
+    </div>
+  </section>
+
+  <button class="primary" id="analyze">✨ 分析・アドバイスを表示する</button>
+
+  <section class="result" id="result" style="display:none">
+    <div class="result-title">🔍 特性アナライズ</div>
+    <div id="cards"></div>
+  </section>
+
+  </section>
+
+  <section class="panel" id="diagnosisPage" style="display:none">
+    <div class="section-title">🧩 特性チェック</div>
+    <div class="diagnosis-intro">これは医療的な診断ではなく、会話や日常での傾向を振り返るための簡易チェックです。「こういう傾向があるかも」という参考として使ってください。</div>
+    <div id="questions"></div><button class="primary" id="runDiagnosis">📊 チェック結果を見る</button><div id="diagnosisResult" class="diagnosis-result"></div>
+  </section>
+</main>
+</div>
+
+<script>
+const MBTI=["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP","ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP"];
+const TRAITS=["HSP","HSS型HSP","ASD傾向","ADHD傾向","恋愛: 不安型","恋愛: 回避型","恋愛: 安定型","文字のニュアンスに敏感","シングルタスク思考","こだわりが強め","考えを言葉にするのに時間がかかる"];
+const mbtiSelects=[document.querySelector("#myMbti"),document.querySelector("#partnerMbti")];
+mbtiSelects.forEach(s=>MBTI.forEach(x=>{const o=document.createElement("option");o.value=x;o.textContent=x;s.appendChild(o)}));
+
+function chips(id){
+  const box=document.querySelector(id);
+  TRAITS.forEach(t=>{
+    const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=t;
+    b.onclick=()=>b.classList.toggle("on");box.appendChild(b);
+  });
+}
+chips("#myChips");chips("#partnerChips");
+
+let inputMode="text", files=[];
+
+document.querySelector("#textMode").onclick=()=>setInputMode("text");
+document.querySelector("#imageMode").onclick=()=>setInputMode("image");
+function setInputMode(m){
+  inputMode=m;
+  document.querySelector("#textMode").classList.toggle("active",m==="text");
+  document.querySelector("#imageMode").classList.toggle("active",m==="image");
+  document.querySelector("#textArea").style.display=m==="text"?"block":"none";
+  document.querySelector("#imageArea").style.display=m==="image"?"block":"none";
+}
+document.querySelector("#imageInput").onchange=e=>{
+  files=[...e.target.files].slice(0,5);
+  const thumbs=document.querySelector("#thumbs");thumbs.innerHTML="";
+  files.forEach(f=>{const img=document.createElement("img");img.className="thumb";img.src=URL.createObjectURL(f);thumbs.appendChild(img)});
+};
+
+function selectedTraits(id){return [...document.querySelectorAll(id+" .chip.on")].map(x=>x.textContent)}
+
+function resizeImage(file,max=1600){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();r.onload=()=>{
+      const img=new Image();img.onload=()=>{
+        const scale=Math.min(1,max/Math.max(img.width,img.height));
+        const c=document.createElement("canvas");c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);
+        c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+        resolve(c.toDataURL("image/jpeg",.76).split(",")[1]);
+      };img.onerror=reject;img.src=r.result;
+    };r.onerror=reject;r.readAsDataURL(file);
+  });
+}
+
+function card(title,text,cls=""){
+  const d=document.createElement("div");d.className="card "+cls;
+  const h=document.createElement("h3");h.textContent=title;
+  const p=document.createElement("p");p.textContent=text;
+  d.append(h,p);return d;
+}
+function renderResult(data){
+  const cards=document.querySelector("#cards");cards.innerHTML="";
+  if(data.observed) cards.appendChild(card("🧾 会話から確認できること",data.observed,"fact"));
+  if(data.likely) cards.appendChild(card("🌸 考えられる解釈",data.likely));
+  if(data.alternatives) cards.appendChild(card("🔎 別の可能性",data.alternatives));
+  if(data.mismatch) cards.appendChild(card("🧩 すれ違いポイント",data.mismatch));
+  if(data.reply) cards.appendChild(card("💬 返し方・伝え方の例",data.reply));
+  if(data.caution) cards.appendChild(card("⚠️ まだ分からないこと",data.caution,"caution"));
+  document.querySelector("#result").style.display="block";
+}
+document.querySelector("#analyze").onclick=async()=>{
+  const btn=document.querySelector("#analyze");btn.disabled=true;btn.textContent="分析中…";
+  const result=document.querySelector("#result"),cards=document.querySelector("#cards");
+  result.style.display="block";cards.innerHTML='<div class="loader">🪄 会話の流れを整理しています…</div>';
+  try{
+    const message=document.querySelector("#message").value.trim();
+    if(inputMode==="text"&&!message) throw new Error("分析する文章を入力してください。");
+    if(inputMode==="image"&&!files.length) throw new Error("スクリーンショットを1枚以上選択してください。");
+    const images=inputMode==="image"?await Promise.all(files.map(resizeImage)):[];
+    const payload={
+      inputMode,message,images,
+      myMbti:document.querySelector("#myMbti").value,
+      partnerMbti:document.querySelector("#partnerMbti").value,
+      myTraits:selectedTraits("#myChips"),
+      partnerTraits:selectedTraits("#partnerChips"),
+      myFree:document.querySelector("#myFree").value.trim(),
+      partnerFree:document.querySelector("#partnerFree").value.trim()
+    };
+    const r=await fetch("/api/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+    const data=await r.json();
+    if(!r.ok) throw new Error(data.error||"APIエラー");
+    renderResult(data);
+  }catch(e){
+    cards.innerHTML="";const d=document.createElement("div");d.className="error";d.textContent="エラー："+e.message;cards.appendChild(d);
+  }finally{btn.disabled=false;btn.textContent="✨ 分析・アドバイスを表示する";}
+};
+
+// ページ切替
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelector("#analyzePage").style.display=b.dataset.page==="analyze"?"block":"none";document.querySelector("#diagnosisPage").style.display=b.dataset.page==="diagnosis"?"block":"none"});
+// 簡易特性チェック（診断ではありません）
+const qs=["人の言葉のニュアンスや表情の変化が気になりやすい","刺激が多い場所や人が多い環境で疲れやすい","新しいことや刺激のある体験にワクワクしやすい","興味を持つと一気に集中し、切り替えが難しいことがある","予定変更や急な割り込みを負担に感じやすい","曖昧な説明より、具体的で明確な情報を好む","一度気になったことを何度も考え続けることがある","人との距離感や関係の変化に敏感になりやすい"];
+const qb=document.querySelector("#questions");
+if(qb){
+  qs.forEach((q,i)=>{
+    const d=document.createElement("div");
+    d.className="question";
+    d.innerHTML=`<div class="qtext">${i+1}. ${q}</div><div class="scale">${[1,2,3,4,5].map(v=>`<label><input type="radio" name="q${i}" value="${v}">${v}</label>`).join("")}</div>`;
+    qb.appendChild(d);
+  });
+  document.querySelector("#runDiagnosis").onclick=()=>{
+    let sum=0;
+    for(let i=0;i<qs.length;i++){
+      const x=document.querySelector(`input[name="q${i}"]:checked`);
+      if(!x){alert("8問すべて回答してから結果を見てください。");return;}
+      sum+=Number(x.value);
+    }
+    const avg=sum/qs.length;
+    const r=document.querySelector("#diagnosisResult");
+    r.style.display="block";
+    r.innerHTML=`<div class="card"><h3>📋 結果は傾向の目安</h3><p>回答の平均は ${avg.toFixed(1)} / 5 でした。これは診断名や病名を示すものではありません。気になる傾向があれば、会話で困っている場面を具体的に振り返る材料として使ってください。</p></div>`;
+  };
+}
+</script>
+</body>
+</html>
