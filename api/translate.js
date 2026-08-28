@@ -9,7 +9,10 @@ export default async function handler(req,res){
 入力:${b.inputMode==="text"?`発言者=${b.speaker||"me"}（me=自分、partner=相手、unknown=不明）\n${b.message}`:`複数スクショを確認してください。\nスクショについての質問=${b.imageQuestion||"特になし"}`}
 プロフィール: 自分MBTI=${b.myMbti||"未設定"};自分特性=${(b.myTraits||[]).join(",")};相手MBTI=${b.partnerMbti||"未設定"};相手特性=${(b.partnerTraits||[]).join(",")};自分メモ=${b.myFree||""};相手メモ=${b.partnerFree||""}`;
     const parts=[{text:prompt}];
-    for(const x of (b.images||[]))parts.push({inline_data:{mime_type:"image/jpeg",data:x}});
+    for(const x of (b.images||[])){
+      const image=typeof x==="string"?{data:x,mime_type:"image/jpeg"}:x;
+      if(image?.data)parts.push({inline_data:{mime_type:image.mime_type||"image/jpeg",data:image.data}});
+    }
     const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key="+encodeURIComponent(key),{
       method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({contents:[{role:"user",parts}],generationConfig:{responseMimeType:"application/json"}})
@@ -19,5 +22,8 @@ export default async function handler(req,res){
     const raw=d.candidates?.[0]?.content?.parts?.map(x=>x.text||"").join("")||"";
     if(!raw)throw Error("Geminiから結果が返りませんでした。");
     return res.status(200).json(JSON.parse(raw.replace(/^```json\s*/i,"").replace(/```$/,"").trim()));
-  }catch(e){return res.status(500).json({error:e.message||"サーバーエラー"})}
+  }catch(e){
+    console.error("CoreLingual API error:",e);
+    return res.status(500).json({error:e.message||"サーバーエラー"})
+  }
 }
