@@ -9,7 +9,7 @@ export default async function handler(req,res){
 
 自分=利用者、相手=もう一人。スクショでは右側を自分、左側を相手として扱う。複数画像は順序を保って読む。
 会話にない本心を断定しない。実際の発言・流れを最優先し、プロフィールの特性は「なぜその言葉が出たのか／なぜそう受け取ったのか」を考える補助材料として使う。
-MBTI、HSP、HSS型HSP、ASD傾向、ADHD傾向、愛着パターンなどは診断名として断定しない。
+プロフィールにある傾向は診断名として断定せず、会話の受け取り方・考え方・感情の扱い方・距離感・変化への反応・コミュニケーションの好みを補助材料として使う。
 
 【出力の考え方】
 「この人はこういう性格だから」で終わらせず、必ず「今回の発言→その人が伝えたかった可能性→相手がどう受け取った可能性→特性の組み合わせによるズレ→次に使えそうな言葉」までつなげる。
@@ -34,7 +34,7 @@ MBTI、HSP、HSS型HSP、ASD傾向、ADHD傾向、愛着パターンなどは診
 言い換えアドバイスは、今回の会話から実際に役立ちそうなものを1〜3個。単なる一般論ではなく、元の言葉のどこをどう変えると伝わりやすいかを書く。
 入力:${b.inputMode==="text"?`発言者=${b.speaker||"me"}（me=自分、partner=相手、unknown=不明）\n${b.message}`:`複数スクショを確認してください。\nスクショについての質問=${b.imageQuestion||"特になし"}`}
 詳細チェック参考情報: 自分=${b.myExtra?JSON.stringify(b.myExtra):"なし"}; 相手=${b.partnerExtra?JSON.stringify(b.partnerExtra):"なし"}
-プロフィール: 自分MBTI=${b.myMbti||"未設定"};自分特性=${(b.myTraits||[]).join(",")};相手MBTI=${b.partnerMbti||"未設定"};相手特性=${(b.partnerTraits||[]).join(",")};自分メモ=${b.myFree||""};相手メモ=${b.partnerFree||""}`
+プロフィール: 自分の傾向=${(b.myTraits||[]).join(",")};相手の傾向=${(b.partnerTraits||[]).join(",")};自分メモ=${b.myFree||""};相手メモ=${b.partnerFree||""}`
     const parts=[{text:prompt}];
     for(const x of (b.images||[])){
       const image=typeof x==="string"?{data:x,mime_type:"image/jpeg"}:x;
