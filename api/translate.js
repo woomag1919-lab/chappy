@@ -6,7 +6,7 @@ export default async function handler(req,res){
     const b=req.body||{};
     const prompt=`あなたはCoreLingual。自分=利用者、相手=もう一人。スクショでは右側を自分、左側を相手として扱う。複数画像は順序を保って読む。会話にない本心を断定せず、事実と推測を分ける。MBTI/HSP/HSS型HSP/ASD/ADHD/愛着パターンは診断ではなく参考情報。特性だけで会話を説明せず実際の発言を最優先。JSONだけ返す。
 {"observed":"","likely":"","alternatives":"","mismatch":"","reply":"","caution":""}
-入力:${b.inputMode==="text"?`発言者=${b.speaker||"me"}（me=自分、partner=相手、unknown=不明）\n${b.message}`:"複数スクショを確認してください。"}
+入力:${b.inputMode==="text"?`発言者=${b.speaker||"me"}（me=自分、partner=相手、unknown=不明）\n${b.message}`:`複数スクショを確認してください。\nスクショについての質問=${b.imageQuestion||"特になし"}`}
 プロフィール: 自分MBTI=${b.myMbti||"未設定"};自分特性=${(b.myTraits||[]).join(",")};相手MBTI=${b.partnerMbti||"未設定"};相手特性=${(b.partnerTraits||[]).join(",")};自分メモ=${b.myFree||""};相手メモ=${b.partnerFree||""}`;
     const parts=[{text:prompt}];
     for(const x of (b.images||[]))parts.push({inline_data:{mime_type:"image/jpeg",data:x}});
