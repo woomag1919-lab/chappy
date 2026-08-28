@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CoreLingual</title>
+<style>
+body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
+.spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-note{text-align:center;font-size:12px;color:#737b85;margin-top:8px}.ad-slot{border:1px dashed #cfd5dc;background:#f7f8fa;border-radius:12px;padding:12px;text-align:center;color:#7b838d;font-size:12px;margin:12px 0}.ad-slot strong{display:block;color:#59616b;margin-bottom:4px}.ad-slot.small{padding:9px;margin:10px 0}.ad-countdown{font-size:11px;margin-top:5px}.ad-gate{border:1px dashed #e5a6b7;background:#fff8fa}.ad-gate button{margin-top:8px;padding:8px 12px;border:1px solid #df6684;border-radius:10px;background:#fff;color:#c74369}.friendly-note{font-size:12px;color:#717983;line-height:1.7}.extra-free{margin-top:12px}.profile.active{background:#ffeaf0;border-color:#df6684;font-weight:bold}.profile-delete-hint{font-size:10px;color:#8a919a;margin-top:5px}.action{flex:1;padding:11px;border:1px solid #ddd;border-radius:12px;background:#fff}.action.on{background:#fff0f5;border-color:#df6684}textarea,select,input[type=text]{width:100%;padding:10px;border:1px solid #dfe3e9;border-radius:10px;box-sizing:border-box}textarea{min-height:75px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.small{display:block;font-size:11px;font-weight:bold;margin:7px 0 5px}.chips,.profiles{display:flex;flex-wrap:wrap;gap:6px}.chip,.profile{padding:7px 9px;border:1px solid #ddd;border-radius:999px;background:#fff;font-size:11px}.chip.on{background:#ffeaf0;border-color:#df6684}.savebar{display:flex;gap:7px;margin-top:8px}.save{background:#343b44;color:white;border:0;border-radius:10px;padding:10px}.primary{width:100%;padding:14px;border:0;border-radius:13px;color:#fff;background:linear-gradient(100deg,#e84f78,#d94788);font-weight:bold}.upload{display:block;text-align:center;padding:18px;border:2px dashed #ccd4dd;border-radius:14px}.thumbs{display:flex;gap:7px;overflow:auto;margin-top:8px}.thumb{width:65px;height:65px;object-fit:cover;border-radius:8px}.q{padding:12px 0;border-top:1px solid #eee}.scale{display:flex;justify-content:space-between;font-size:11px}.badge{display:inline-block;padding:7px 10px;margin:3px;background:#fff0f5;border:1px solid #efcbd7;border-radius:999px;font-size:12px;font-weight:bold}@media(max-width:600px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div class="app">
+<header><h1>CoreLingual</h1><div class="sub">会話と「特性」の違いを読み解くサポートアプリ</div></header>
+<nav><button id="talkTab" class="on">💬 会話を読み解く</button><button id="diagTab">🧩 特性チェック</button></nav>
+<main>
+<section id="talk">
+<div class="panel"><b>会話を入力</b><p style="font-size:12px;color:#717983">スクショは <b>右側＝自分</b>、<b>左側＝相手</b> として扱います。</p>
+<div class="actions"><button id="textMode" class="action on">⌨️ テキスト入力</button><button id="imageMode" class="action">🖼️ スクショ送信</button></div>
+<div id="textArea"><label class="small">この文章は誰の発言？</label><div class="actions"><button id="speakerMe" class="action on">👤 自分</button><button id="speakerPartner" class="action">👥 相手</button><button id="speakerUnknown" class="action">❓ 不明</button></div><textarea id="message" placeholder="気になったメッセージや会話を入力…"></textarea></div>
+<div id="imageArea" style="display:none"><label class="upload" for="images">🖼️ <b>スクショを追加</b><br><small>LINE・DM・SMSなど、最大5枚</small></label><input id="images" type="file" accept="image/*" multiple style="display:none"><div id="thumbs" class="thumbs"></div><div id="imageControls" style="display:none;margin-top:8px"><button id="clearImages" class="action">🗑️ 選択したスクショを全部削除</button></div><label class="small">このスクショについて聞きたいこと</label><textarea id="imageQuestion" placeholder="例：最後の「了解」はどういうニュアンスに見える？"></textarea><div class="ad-slot small" id="imageAd"><strong>📺 スクショ分析前の広告枠</strong>短い広告を表示する場所です。現在は広告未接続。<div class="ad-countdown" id="imageAdCountdown"></div></div></div></div>
+<div class="panel"><b>特性プロフィール</b><p style="font-size:12px;color:#717983">自分・相手を分けて保存できます。</p>
+<div class="person"><h3>👤 自分</h3><div class="grid"><div><label class="small">MBTI</label><select id="myMbti"><option value="">未設定</option></select></div><div><label class="small">特性</label><div id="myTraits" class="chips"></div></div></div><label class="small">自由記入</label><textarea id="myFree" placeholder="自分について…"></textarea><div class="savebar"><input id="myName" type="text" placeholder="プロフィール名"><button id="saveMy" class="save">保存</button></div><div id="myProfiles" class="profiles"></div><div class="profile-delete-hint">タップで使用中に切り替え。長押しで削除確認。</div></div>
+<div class="person"><h3>👥 相手</h3><div class="grid"><div><label class="small">MBTI</label><select id="partnerMbti"><option value="">未設定</option></select></div><div><label class="small">特性</label><div id="partnerTraits" class="chips"></div></div></div><label class="small">自由記入</label><textarea id="partnerFree" placeholder="相手について…"></textarea><div class="savebar"><input id="partnerName" type="text" placeholder="例：友達A、恋人"><button id="savePartner" class="save">保存</button></div><div id="partnerProfiles" class="profiles"></div><div class="profile-delete-hint">タップで使用中に切り替え。長押しで削除確認。</div></div></div>
+<button id="analyze" class="primary">✨ 分析・アドバイスを表示する</button><div class="ad-slot" id="bannerAd"><strong>📢 広告バナー予定エリア</strong>将来ここに常時バナー広告を表示します。現在は広告未接続。</div><div id="result"></div>
+</section>
+<section id="diag" style="display:none"><div class="panel"><b>🧩 特性チェック</b><p style="font-size:12px;color:#717983">医療的な診断ではなく、自己理解のための「〇〇傾向」チェックです。</p>
+<div class="actions"><button id="selfDiag" class="action on">👤 自分をチェック</button><button id="otherDiag" class="action">👥 相手をチェック</button></div><div id="targetNote" style="font-size:12px;color:#717983">自分自身について回答してください。</div><div id="questions"></div><button id="runDiag" class="primary">📊 結果を見る</button><div id="diagResult"></div><div id="moreDiag" style="display:none"><div class="card"><b>🔍 もっと詳しく</b><p style="font-size:12px;color:#717983">気になった傾向を選んで、追加の10問＋自由記入でじっくり見ていきます。</p><div id="diagChoices" class="chips"></div></div><div id="ad30" class="ad-slot" style="display:none"><strong>📺 30秒広告予定エリア</strong><div>追加診断へ進む前に表示する広告枠です。現在は広告なし。</div><div class="ad-countdown" id="ad30Countdown"></div></div><div id="extraDiag" style="display:none" class="card"><b id="extraTitle">追加診断</b><p id="extraIntro" style="font-size:12px;color:#717983"></p><div id="extraQuestions"></div><button id="runExtra" class="primary">🔎 追加診断の結果を見る</button><div id="extraResult"></div></div></div></div></section>
+</main></div>
+<script>
+const MBTI=["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP","ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP"];
+const TRAITS=["HSP","HSS型HSP","ASD傾向","ADHD傾向","恋愛：不安型","恋愛：回避型","恋愛：安定型","文字のニュアンスに敏感","こだわりが強め","切り替えが苦手"];
+["myMbti","partnerMbti"].forEach(id=>MBTI.forEach(x=>document.getElementById(id).insertAdjacentHTML("beforeend",`<option>${x}</option>`)));
+function makeTraits(id){const e=document.getElementById(id);TRAITS.forEach(t=>{const b=document.createElement("button");b.className="chip";b.type="button";b.textContent=t;b.onclick=()=>b.classList.toggle("on");e.appendChild(b)})}makeTraits("myTraits");makeTraits("partnerTraits");
+textMode.onclick=()=>setMode("text");imageMode.onclick=()=>setMode("image");function setMode(x){textMode.classList.toggle("on",x==="text");imageMode.classList.toggle("on",x==="image");textArea.style.display=x==="text"?"block":"none";imageArea.style.display=x==="image"?"block":"none"}
+talkTab.onclick=()=>{talk.style.display="block";diag.style.display="none";talkTab.classList.add("on");diagTab.classList.remove("on")};diagTab.onclick=()=>{talk.style.display="none";diag.style.display="block";diagTab.classList.add("on");talkTab.classList.remove("on")};
+let selectedImages=[];
+let compressedImages=[];
+function drawImages(){
+  thumbs.innerHTML="";
+  selectedImages.forEach((f,idx)=>{
+    let wrap=document.createElement("div");wrap.style.cssText="position:relative;flex:0 0 auto";
+    let i=document.createElement("img");i.className="thumb";i.src=URL.createObjectURL(f);
+    let x=document.createElement("button");x.type="button";x.textContent="×";x.title="この画像を削除";
+    x.style.cssText="position:absolute;right:-5px;top:-5px;width:23px;height:23px;border:0;border-radius:50%;background:#333;color:#fff;font-weight:bold;padding:0";
+    x.onclick=()=>{selectedImages.splice(idx,1);drawImages()};
+    wrap.appendChild(i);wrap.appendChild(x);thumbs.appendChild(wrap);
+  });
+  imageControls.style.display=selectedImages.length?"block":"none";
+}
+async function compressImage(file){
+  const bitmap=await createImageBitmap(file);
+  const maxSide=2200;
+  const scale=Math.min(1,maxSide/Math.max(bitmap.width,bitmap.height));
+  const w=Math.max(1,Math.round(bitmap.width*scale)),h=Math.max(1,Math.round(bitmap.height*scale));
+  const canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;
+  const ctx=canvas.getContext("2d",{alpha:false});
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h);ctx.drawImage(bitmap,0,0,w,h);
+  bitmap.close();
+  const blob=await new Promise(ok=>canvas.toBlob(ok,"image/jpeg",0.72));
+  if(!blob)throw Error("スクショの圧縮に失敗しました。");
+  return blob;
+}
+images.onchange=async()=>{
+  const incoming=[...images.files].slice(0,5-selectedImages.length);
+  if(!incoming.length){images.value="";return}
+  const oldText=imageMode.innerHTML;imageMode.disabled=true;imageMode.innerHTML="🖼️ 圧縮中…";
+  try{
+    for(const f of incoming){
+      const blob=await compressImage(f);
+      const compressed=new File([blob],(f.name||"screenshot").replace(/\.[^.]+$/i,".jpg"),{type:"image/jpeg"});
+      selectedImages.push(compressed);
+    }
+    drawImages();
+  }catch(e){alert(e.message||"スクショを処理できませんでした。");}
+  finally{imageMode.disabled=false;imageMode.innerHTML=oldText;images.value=""}
+};
+clearImages.onclick=()=>{selectedImages=[];drawImages()};
+let currentSpeaker="me";
+function setSpeaker(x){currentSpeaker=x;speakerMe.classList.toggle("on",x==="me");speakerPartner.classList.toggle("on",x==="partner");speakerUnknown.classList.toggle("on",x==="unknown")}
+speakerMe.onclick=()=>setSpeaker("me");speakerPartner.onclick=()=>setSpeaker("partner");speakerUnknown.onclick=()=>setSpeaker("unknown");
+function state(p){return{mbti:document.getElementById(p+"Mbti").value,traits:[...document.querySelectorAll("#"+p+"Traits .on")].map(x=>x.textContent),free:document.getElementById(p+"Free").value}}
+function apply(p,s){document.getElementById(p+"Mbti").value=s.mbti||"";document.getElementById(p+"Free").value=s.free||"";document.querySelectorAll("#"+p+"Traits .chip").forEach(x=>x.classList.toggle("on",(s.traits||[]).includes(x.textContent)))}
+function list(p){try{return JSON.parse(localStorage.getItem("cl_"+p)||"[]")}catch{return[]}}
+function activeProfile(p){try{return JSON.parse(localStorage.getItem("cl_"+p+"_active")||"null")}catch{return null}}
+function setActiveProfile(p,name){localStorage.setItem("cl_"+p+"_active",JSON.stringify(name))}
+function apply(p,s){document.getElementById(p+"Mbti").value=s.mbti||"";document.getElementById(p+"Free").value=s.free||"";document.querySelectorAll("#"+p+"Traits .chip").forEach(x=>x.classList.toggle("on",(s.traits||[]).includes(x.textContent)))}
+function draw(p){const e=document.getElementById(p+"Profiles");e.innerHTML="";const active=activeProfile(p);list(p).forEach((x,idx)=>{let b=document.createElement("button");b.className="profile"+(active===x.name?" active":"");b.type="button";b.textContent=(active===x.name?"● ":"")+x.name;let timer=null,longPressed=false;const cancel=()=>{if(timer){clearTimeout(timer);timer=null}};b.addEventListener("pointerdown",()=>{longPressed=false;timer=setTimeout(()=>{longPressed=true;if(confirm("「"+x.name+"」を削除しますか？")){let a=list(p);a.splice(idx,1);localStorage.setItem("cl_"+p,JSON.stringify(a));if(active===x.name)localStorage.removeItem("cl_"+p+"_active");draw(p)}},650)});b.addEventListener("pointerup",cancel);b.addEventListener("pointercancel",cancel);b.addEventListener("pointerleave",cancel);b.addEventListener("click",()=>{if(longPressed)return;setActiveProfile(p,x.name);apply(p,x.state);draw(p)});e.appendChild(b)})}
+function save(p){let name=document.getElementById(p+"Name").value.trim()||"プロフィール "+(list(p).length+1),a=list(p);const existing=a.findIndex(x=>x.name===name);const item={name,state:state(p)};if(existing>=0)a[existing]=item;else a.push(item);a=a.slice(-5);localStorage.setItem("cl_"+p,JSON.stringify(a));setActiveProfile(p,name);document.getElementById(p+"Name").value="";draw(p)}
+
+saveMy.onclick=()=>save("my");savePartner.onclick=()=>save("partner");draw("my");draw("partner");
+function render(d){result.innerHTML="";for(const [title,key] of [["🧾 まず、会話で起きていたこと","observed"],["🌸 こういうことだったのかも","likely"],["🔎 ほかにも、こんな見方ができそう","alternatives"],["🧩 ここでズレちゃったのかも","mismatch"],["💬 こんな言い方なら伝わりやすそう","reply"],["🌱 まだ分からないところ","caution"]])if(d[key]){let c=document.createElement("div");c.className="card";c.innerHTML="<b>"+title+"</b><p></p>";c.querySelector("p").textContent=d[key];result.appendChild(c)}}
+async function waitAd(seconds, slot, countdownEl, label){
+  slot.style.display="block";
+  let c=seconds; countdownEl.textContent=label+"（"+c+"秒）";
+  await new Promise(resolve=>{const t=setInterval(()=>{c--;countdownEl.textContent=c>0?label+"（"+c+"秒）":"広告枠終了。分析を開始します…";if(c<=0){clearInterval(t);setTimeout(resolve,250)}},1000)});
+}
+analyze.onclick=async()=>{analyze.disabled=true;const originalText=analyze.innerHTML;analyze.innerHTML='<span class="spinner"></span>準備中…';let note=document.getElementById("loadingNote");if(!note){note=document.createElement("div");note.id="loadingNote";note.className="loading-note";analyze.after(note)}note.textContent="会話を読み込んでいます…";try{let body={inputMode:textArea.style.display!=="none"?"text":"image",message:message.value,speaker:currentSpeaker,imageQuestion:(document.getElementById("imageQuestion")||{}).value||"",myMbti:myMbti.value,partnerMbti:partnerMbti.value,myTraits:state("my").traits,partnerTraits:state("partner").traits,myFree:myFree.value,partnerFree:partnerFree.value,images:[]};
+  if(body.inputMode==="image"){
+    if(!selectedImages.length)throw Error("スクショを1枚以上追加してね。");
+    analyze.innerHTML='<span class="spinner"></span>広告を表示中…';
+    await waitAd(5,imageAd,imageAdCountdown,"短い広告のあと分析します");
+    for(const f of selectedImages){const r=await new Promise(ok=>{let fr=new FileReader();fr.onload=()=>ok(fr.result.split(",")[1]);fr.readAsDataURL(f)});body.images.push({data:r,mime_type:f.type||"image/jpeg"})}
+  }
+  const myExtra=JSON.parse(localStorage.getItem("cl_extra_my")||"null");const partnerExtra=JSON.parse(localStorage.getItem("cl_extra_partner")||"null");body.myExtra=myExtra;body.partnerExtra=partnerExtra;
+  const requestBody=JSON.stringify(body);
+  if(requestBody.length>3900000)throw Error("スクショの容量がまだ大きすぎます。枚数を減らして、もう一度試してください。");
+  analyze.innerHTML='<span class="spinner"></span>分析中…';
+  note.textContent="会話を読み込んでいます。スクショが多い場合は少し時間がかかります…";
+  let r=await fetch("/api/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:requestBody});
+  const responseText=await r.text();let d;try{d=JSON.parse(responseText)}catch{throw Error(r.status===413?"スクショの容量が大きすぎます。枚数を減らして、もう一度試してください。":"サーバーから正常な応答を受け取れませんでした（HTTP "+r.status+"）。")}
+  if(!r.ok)throw Error(d.error||"APIエラー");render(d);note.textContent="分析が完了しました。"}
+  catch(e){result.innerHTML='<div class="card"><b>エラー</b><p></p></div>';result.querySelector("p").textContent=e.message;note.textContent="分析に失敗しました。"}
+  finally{analyze.disabled=false;analyze.innerHTML=originalText;imageAdCountdown.textContent=""}};
+
+const EXTRA={
+  "HSP傾向":[
+    "人の表情や声の変化にすぐ気づくほうだ","相手の機嫌が変わると自分まで落ち着かなくなる","音や人の多さなど、刺激が重なると疲れやすい","一人になって静かに過ごすと回復しやすい","言われたことをあとから何度も考えることがある","映画や音楽、誰かの話に強く感情移入することがある","人に合わせすぎて、あとでどっと疲れることがある","強い言い方をされると内容以上にダメージを受けることがある","相手の言葉の裏にある気持ちを考えがちだ","自分の気持ちより先に相手の気持ちを気にしてしまうことがある"],
+  "HSS傾向":[
+    "新しい場所や初めてのことを試すのが好きだ","同じことが続くと退屈しやすい","思い立ったらすぐ動いてみたくなる","刺激のある予定が続くと楽しい反面、疲れもたまりやすい","興味が変わると次のことに目が向きやすい","安全だと分かっていても、ちょっと冒険してみたくなる","人と話すことや新しい出会いから元気をもらうことがある","予定を詰め込みすぎて後から疲れることがある","静かな時間も必要なのに、刺激が欲しくなることがある","『やってみたい』と『ちょっと休みたい』が同時に起こることがある"],
+  "ASD傾向":[
+    "曖昧な説明より、具体的な説明のほうが分かりやすい","話の前提が省かれると『どういう意味？』となりやすい","予定や手順が急に変わると負担に感じやすい","自分なりのやり方や順番があると安心する","興味のあることは細かいところまで調べたくなる","話の途中で話題が飛ぶと追いにくいことがある","言葉の定義や事実関係が気になって確認したくなる","相手が当然だと思っている前提に気づきにくいことがある","一度納得すると、そのルールや考え方を保ちやすい","人の気持ちより、まず『何が起きたのか』を整理したくなることがある"],
+  "ADHD傾向":[
+    "興味のあることには時間を忘れて集中することがある","やることが多いと、どれから手をつけるか迷いやすい","思いついたことをその場ですぐ話したり行動したりすることがある","細かい確認を後回しにしてしまうことがある","時間の見積もりが難しいと感じることがある","通知や周りの音などで気がそれやすいことがある","締切が近づくと急に集中力が上がることがある","途中までやっていたことを別のことに切り替えてしまうことがある","頭の中にアイデアが次々浮かぶことがある","気分や興味によって行動しやすさが大きく変わることがある"],
+  "愛着：不安型傾向":[
+    "返信が遅いと、相手の気持ちが変わったのではと考えやすい","関係が少し不安定になると、そのことが頭から離れにくい","相手の気持ちを確かめたくなることがある","ちょっとした言葉の変化を『嫌われた？』と受け取りやすい","距離が近い関係ほど安心しやすい","相手からの反応がないと、自分から確認したくなることがある","喧嘩や気まずさのあと、早く関係を戻したくなる","相手の気持ちを考えすぎて自分の行動を決めることがある","『大丈夫』と言われても、少し不安が残ることがある","関係がはっきりしない状態が続くのは苦手だ"],
+  "愛着：回避型傾向":[
+    "距離が近くなりすぎると、一人の時間が欲しくなる","気持ちは自分の中で整理してから話したい","感情的な話が続くと、少し距離を置きたくなる","頼られることが続くと負担に感じることがある","喧嘩になると、まず一人になりたくなる","自分の問題は自分で解決したいと思いやすい","相手から気持ちを強く求められると、どう返せばいいか困ることがある","親しくても自分の領域は残しておきたい","気持ちを言葉にするより、行動で示したいことがある","関係が重たく感じると、少し離れたくなることがある"],
+  "愛着：安定型傾向":[
+    "不安なことでも、落ち着いて話せば解決できると思いやすい","一人の時間と人と過ごす時間の両方を大切にできる","意見が違っても、関係そのものは続けられると思いやすい","相手がすぐ返事をしなくても、必要以上に悪く考えないことが多い","困ったときは相手に相談したり助けを求めたりできる","相手の気持ちと自分の気持ちを分けて考えられることがある","喧嘩のあとも、落ち着けば話し直せると思える","相手を信じつつ、自分の境界線も守れる","相手の考えが自分と違っても、すぐ否定されたとは感じにくい","関係の中で無理に我慢し続けなくてもいいと思える"],
+  "コミュニケーション傾向":[
+    "結論を先に聞けると話を理解しやすい","理由や背景まで説明してもらうと納得しやすい","相手の話を聞くとき、まず共感することを意識する","『それってどういう意味？』と確認することが多い","言い方より内容そのものを重視するほうだ","内容よりも言い方や空気感が気になることがある","短い返事でも相手の気持ちを読み取ろうとする","自分の意図を誤解されたときは、すぐ説明したくなる","話が噛み合わないと、質問を増やして整理したくなる","相手が話しやすいように、自分の言い方を変えることがある"],
+  "感情・ストレス傾向":[
+    "嫌なことがあると、頭の中で何度も考えてしまう","感情が強くなると、一度距離を置いたほうが落ち着く","怒りや悲しさをその場で言葉にするのは難しいことがある","自分の気持ちを整理してから人に話したい","相手の感情に引っ張られやすいと感じることがある","ストレスがたまると、普段より言葉が少なくなることがある","何がつらいのか分からないままモヤモヤすることがある","気持ちを言葉にすると、少し楽になることがある","相手に分かってもらえないと、孤立した感じがすることがある","落ち着いたあとなら、さっきより冷静に話せることが多い"],
+  "変化・こだわり傾向":[
+    "急な予定変更があると、頭の切り替えに時間がかかる","予定が決まっていると安心する","自分なりの順番やルールがあるとやりやすい","一度決めたことを途中で変えるのは少し苦手だ","細かいところが気になって先に進みにくいことがある","納得できないまま進むより、理由を確認したくなる","新しい方法より、慣れた方法を選びやすい","逆に、同じことが続くと新しい方法を試したくなることがある","変更そのものより、突然知らされることが負担に感じることがある","『なぜそうするのか』が分かると変更を受け入れやすい" ]
+};
+let extraType="";
+function showExtraChoices(){
+  diagChoices.innerHTML="";
+  Object.keys(EXTRA).forEach(k=>{let b=document.createElement("button");b.type="button";b.className="chip";b.textContent=k.replace("傾向","");b.onclick=()=>startExtra(k);diagChoices.appendChild(b)})
+}
+function startExtra(type){
+  extraType=type; ad30.style.display="block"; extraDiag.style.display="none";
+  let c=30; ad30Countdown.textContent="詳細診断の広告枠を準備しています… 30秒";
+  let t=setInterval(()=>{c--;ad30Countdown.textContent="追加診断へ進めます（"+Math.max(c,0)+"秒）";if(c<=0){clearInterval(t);showExtra(type)}},1000)
+}
+function showExtra(type){
+  ad30.style.display="none"; extraDiag.style.display="block";
+  extraTitle.textContent="🔎 "+type.replace("傾向","")+"をもう少し詳しく";
+  extraIntro.textContent="ここからは追加の10問です。答えにくいものは『今は分からない』くらいの気持ちで、近いものを選べばOK。医療的な診断ではありません。";
+  extraQuestions.innerHTML="";
+  EXTRA[type].forEach((q,i)=>extraQuestions.insertAdjacentHTML("beforeend",`<div class="q"><b>${i+1}. ${q}</b><div class="scale">${[1,2,3,4,5].map(v=>`<label><input type="radio" name="ex${i}" value="${v}">${v}</label>`).join("")}</div><div class="scale"><span>あまり当てはまらない</span><span>かなり当てはまる</span></div></div>`));
+  extraQuestions.insertAdjacentHTML("beforeend",`<div class="extra-free"><label class="small">📝 もう少し教えてください（任意）</label><textarea id="extraFree" placeholder="自分ではこう思う、こういう場面で困る…など自由にどうぞ"></textarea></div>`);
+  extraResult.innerHTML=""
+}
+runExtra.onclick=()=>{
+  let total=0;
+  for(let i=0;i<EXTRA[extraType].length;i++){let x=document.querySelector(`input[name="ex${i}"]:checked`);if(!x){alert("追加の10問にも全問回答してください。1〜5で選んでね。");return}total+=Number(x.value)}
+  let avg=total/EXTRA[extraType].length;
+  let level=avg>=4?"かなり当てはまりやすそう":avg>=3?"少し当てはまるところがありそう":"今回は強くは出ていなさそう";
+  let free=(document.getElementById("extraFree")||{}).value||"";
+  const answers=EXTRA[extraType].map((q,i)=>Number(document.querySelector(`input[name="ex${i}"]:checked`).value));
+  localStorage.setItem("cl_extra_"+target,JSON.stringify({type:extraType,average:avg,answers,free,updatedAt:Date.now()}));
+  extraResult.innerHTML='<div class="card"><b>🔎 もう少し詳しく見てみると</b><p>このテーマは「'+level+'」という結果だったよ。</p>'+(free?'<p>📝 自由記入も保存したよ。次の会話分析でも参考情報として使えるよ。</p>':'')+'<p class="friendly-note">これは診断結果ではなく、自分や相手のことを考えるためのヒント。プロフィール設定を見直す材料として使ってね。</p></div>'
+};
+
+const Q=[
+ ["人の表情や声の変化など、相手のちょっとした変化に気づきやすい","HSP傾向"],
+ ["音・人混み・情報量など、刺激が重なると疲れやすい","HSP傾向"],
+ ["新しいことや少し刺激のあることを試してみたくなる","HSS傾向"],
+ ["興味を持ったことには、一気に集中しやすい","ADHD傾向"],
+ ["予定変更や話の途中の急な方向転換が負担になりやすい","ASD傾向"],
+ ["曖昧な説明より、具体的な説明や前提があるほうが分かりやすい","ASD傾向"],
+ ["相手の返信や態度が少し変わると、その理由を気にしやすい","愛着：不安型傾向"],
+ ["人との距離が近くなりすぎると、少し一人になりたくなる","愛着：回避型傾向"],
+ ["意見が違っても、落ち着いて話せば関係は続けられると思いやすい","愛着：安定型傾向"],
+ ["自分の気持ちより先に、まず『何が起きたのか』を整理したくなる","コミュニケーション傾向"],
+ ["言葉そのものより、言い方や空気感が気になってしまうことがある","感情・ストレス傾向"]
+];
+Q.forEach((q,i)=>questions.insertAdjacentHTML("beforeend",`<div class="q"><b>${i+1}. ${q[0]}</b><div class="scale">${[1,2,3,4,5].map(v=>`<label><input type="radio" name="q${i}" value="${v}">${v}</label>`).join("")}</div></div>`));
+let target="my";selfDiag.onclick=()=>{target="my";selfDiag.classList.add("on");otherDiag.classList.remove("on");targetNote.textContent="自分自身について回答してください。"};otherDiag.onclick=()=>{target="partner";otherDiag.classList.add("on");selfDiag.classList.remove("on");targetNote.textContent="相手について、分かる範囲で回答してください。本人の回答ではないため参考程度に。"};
+runDiag.onclick=()=>{let s={};for(let i=0;i<Q.length;i++){let x=document.querySelector(`input[name="q${i}"]:checked`);if(!x){alert("全11問に回答してください。");return}s[Q[i][1]]=(s[Q[i][1]]||0)+Number(x.value)}let a=Object.entries(s).sort((x,y)=>y[1]-x[1]);document.getElementById("moreDiag").style.display="block";showExtraChoices();diagResult.innerHTML='<div class="card"><b>今回のチェック結果</b><p>比較的高かった傾向：</p><div id="badges"></div><p>これは診断ではなく、プロフィール設定の参考情報です。</p><button id="apply" class="action">選んだ傾向をプロフィールへ反映</button></div>';a.slice(0,5).filter(x=>x[1]>=7).forEach(x=>{let b=document.createElement("span");b.className="badge";b.textContent=x[0];badges.appendChild(b)});document.getElementById("apply").onclick=()=>{let id=target==="my"?"myTraits":"partnerTraits";a.slice(0,5).filter(x=>x[1]>=7).forEach(x=>{document.querySelectorAll("#"+id+" .chip").forEach(c=>{let k=x[0].replace("傾向","");if(c.textContent===k||c.textContent.includes(k)||(x[0]==="HSS傾向"&&c.textContent==="HSS型HSP"))c.classList.add("on")})});alert("プロフィールに反映しました。必要なら保存してください。")}}
+</script></body></html>
