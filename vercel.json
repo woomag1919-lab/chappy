@@ -1,5 +1,8 @@
 {
-  "rewrites":[
+  "rewrites": [
     {"source":"/share/:token","destination":"/?sharedToken=:token"}
+  ],
+  "crons": [
+    {"path":"/api/cleanup","schedule":"0 18 * * *"}
   ]
 }
