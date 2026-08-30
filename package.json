@@ -1,5 +1,5 @@
 {
-  "name":"corelingual-v13",
+  "name":"corelingual-v23",
   "private":true,
   "dependencies":{
     "@neondatabase/serverless":"^1.0.0"
