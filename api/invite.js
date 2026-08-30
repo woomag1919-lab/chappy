@@ -14,7 +14,9 @@ function cleanProfile(p){
       before:Array.isArray(p.extraRadar.before)?p.extraRadar.before.slice(0,6):null,
       after:Array.isArray(p.extraRadar.after)?p.extraRadar.after.slice(0,6):null
     } : null,
-    traits: Array.isArray(p.traits) ? p.traits.slice(0,20).map(x=>String(x).slice(0,80)) : []
+    traits: Array.isArray(p.traits) ? p.traits.slice(0,20).map(x=>String(x).slice(0,80)) : [],
+    answers: Array.isArray(p.answers) ? p.answers.slice(0,24).map(v=>Math.max(1,Math.min(5,Number(v)||1))) : [],
+    extraAnswers: Array.isArray(p.extraAnswers) ? p.extraAnswers.slice(0,36).map(v=>Math.max(1,Math.min(5,Number(v)||1))) : []
   };
 }
 
