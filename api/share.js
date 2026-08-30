@@ -23,7 +23,7 @@ function cleanPayload(payload) {
   if (payload.kind === "diagnosis") {
     return { kind:"diagnosis", version:1,
       targetLabel:payload.targetLabel === "相手" ? "相手" : "自分",
-      scores:Array.isArray(payload.scores) ? payload.scores.slice(0,8).map(x=>({key:typeof x?.key === "string"?x.key.slice(0,80):"",score:Number.isFinite(Number(x?.score))?Math.max(1,Math.min(5,Number(x.score))):0})).filter(x=>x.key&&x.score):[],
+      scores:Array.isArray(payload.scores) ? payload.scores.slice(0,8).map(x=>({key:typeof x?.key === "string"?x.key.slice(0,80):"",score:Number.isFinite(Number(x?.score))?Math.max(0,Math.min(100,Number(x.score))):0})).filter(x=>x.key&&Number.isFinite(x.score)):[],
       hints:Array.isArray(payload.hints) ? payload.hints.slice(0,6).map(h=>({name:typeof h?.name === "string"?h.name.slice(0,160):"",text:typeof h?.text === "string"?h.text.slice(0,1500):""})).filter(x=>x.name||x.text):[]
     };
   }
