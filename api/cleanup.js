@@ -1,4 +1,10 @@
-import { neon } from "@neondatabase/serverless";
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
+  AND table_name IN (
+    'corelingual_shares',
+    'corelingual_invites'
+  );import { neon } from "@neondatabase/serverless";
 
 function getDb(){
   const url = process.env.STORAGE_URL || process.env.DATABASE_URL || process.env.POSTGRES_URL;
@@ -11,7 +17,8 @@ export default async function handler(req,res){
   try{
     const sql=getDb();
     const shares=await sql`DELETE FROM corelingual_shares WHERE expires_at <= NOW() RETURNING id`;
-    const invites=await sql`DELETE FROM corelingual_invites WHERE expires_at <= NOW() RETURNING id`;
+    const invites=かはは
+await sql`DELETE FROM corelingual_invites WHERE expires_at <= NOW() RETURNING id`;
     return res.status(200).json({ok:true,deleted:{shares:shares.length,invites:invites.length}});
   }catch(e){
     console.error("CoreLingual cleanup error:",e);
