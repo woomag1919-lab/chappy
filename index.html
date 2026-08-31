@@ -1,10 +1,10 @@
-<!-- CoreLingual_v36 -->
+<!-- CoreLingual_v37 -->
 <!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CoreLingual v36</title>
+<title>CoreLingual v38</title>
 <style>
 body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
 .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
@@ -570,30 +570,60 @@ function showRadar(before,after,caption){
   renderTwoPersonComparison();
 }
 
+// v38: 追加チェックの広告ゲート状態を明示的に初期化し、DOM参照を明示化。
+let extraTimer=null;
+let extraTarget="my";
+let extraPlan=[];
+const ad30=document.getElementById("ad30");
+const extraDiag=document.getElementById("extraDiag");
+const ad30Countdown=document.getElementById("ad30Countdown");
+const extraTitle=document.getElementById("extraTitle");
+const extraIntro=document.getElementById("extraIntro");
+const extraQuestions=document.getElementById("extraQuestions");
+const extraResult=document.getElementById("extraResult");
+
 function startExtra(){
-  extraTarget=target;
-  ad30.style.display="block";
-  extraDiag.style.display="none";
-  const btn=document.getElementById("startMore");
-  if(btn)btn.disabled=true;
-  if(extraTimer)clearInterval(extraTimer);
-  let c=3;
-  ad30Countdown.textContent=`広告終了まで ${c}秒`;
-  extraTimer=setInterval(()=>{
-    c--;
-    if(c>0){
-      ad30Countdown.textContent=`広告終了まで ${c}秒`;
-      return;
-    }
-    clearInterval(extraTimer);
-    extraTimer=null;
-    ad30Countdown.textContent="広告枠終了。後半18問を開始します…";
+  try{
+    extraTarget=target;
+    if(!ad30||!extraDiag||!ad30Countdown)throw new Error("追加チェックの広告ゲート要素が見つかりません。");
+    ad30.style.display="block";
+    extraDiag.style.display="none";
+    const btn=document.getElementById("startMore");
+    if(btn)btn.disabled=true;
+    if(extraTimer)clearInterval(extraTimer);
+    let c=3;
+    ad30Countdown.textContent=`広告終了まで ${c}秒`;
+    extraTimer=setInterval(()=>{
+      try{
+        c--;
+        if(c>0){
+          ad30Countdown.textContent=`広告終了まで ${c}秒`;
+          return;
+        }
+        clearInterval(extraTimer);
+        extraTimer=null;
+        ad30Countdown.textContent="広告枠終了。後半18問を開始します…";
+        if(btn)btn.disabled=false;
+        setTimeout(()=>{try{showExtra()}catch(e){console.error(e);alert(e.message||"後半18問の表示に失敗しました。")}},350);
+      }catch(e){
+        clearInterval(extraTimer);
+        extraTimer=null;
+        console.error(e);
+        if(btn)btn.disabled=false;
+        alert(e.message||"追加チェックの開始に失敗しました。");
+      }
+    },1000);
+  }catch(e){
+    console.error(e);
+    const btn=document.getElementById("startMore");
     if(btn)btn.disabled=false;
-    setTimeout(showExtra,350);
-  },1000);
+    alert(e.message||"追加チェックの開始に失敗しました。");
+  }
 }
 
 function showExtra(){
+  try{
+  if(!ad30||!extraDiag||!ad30Countdown||!extraTitle||!extraIntro||!extraQuestions||!extraResult)throw new Error("後半18問の表示要素が見つかりません。");
   ad30.style.display="none";
   extraDiag.style.setProperty("display","block","important");
   extraTitle.textContent="🔎 深掘りチェック（後半18問）";
@@ -610,6 +640,10 @@ function showExtra(){
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     window.scrollTo({top:extraDiag.getBoundingClientRect().top+window.scrollY-20,behavior:"smooth"});
   }));
+  }catch(e){
+    console.error(e);
+    alert(e.message||"後半18問の表示に失敗しました。");
+  }
 }
 function extraScore(){
  const sums={};Object.keys(DEEP_AXES).forEach(k=>sums[k]=[]);
