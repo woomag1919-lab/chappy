@@ -1,7 +1,8 @@
 {
-  "name":"corelingual-v23",
-  "private":true,
-  "dependencies":{
-    "@neondatabase/serverless":"^1.0.0"
+  "name": "CoreLingual_v33",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0"
   }
 }
