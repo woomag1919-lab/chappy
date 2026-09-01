@@ -89,47 +89,45 @@ body.shared-mode #result{display:block!important}
 
 
 <script>
+/* v46: canonical 6-axis radar. Accepts either score arrays or keyed maps. */
 window.CoreLingual_v36 = {
   axes: [
-    {id:"input",label:"情報の受け取り方",left:"具体的・明確",right:"文脈・全体像"},
+    {id:"language",label:"情報の受け取り方",left:"具体的・明確",right:"文脈・全体像"},
     {id:"thinking",label:"考え方",left:"分析・整理",right:"直感・発想"},
-    {id:"decision",label:"意思決定",left:"慎重に検討",right:"まず試してみる"},
-    {id:"emotion",label:"感情の扱い方",left:"言葉にして共有",right:"自分の中で整理"},
-    {id:"social",label:"人との距離感",left:"早めに共有",right:"少し時間を置く"},
-    {id:"communication",label:"伝え方",left:"共感・受容",right:"結論・具体策"}
+    {id:"emotion",label:"感情の扱い方",left:"言葉にして整理",right:"時間を置いて整理"},
+    {id:"distance",label:"人との距離感",left:"共有・相談",right:"自分の時間"},
+    {id:"change",label:"変化への対応",left:"見通し・慣れ",right:"新しい方法"},
+    {id:"communication",label:"伝え方・受け止め方",left:"共感・気持ち",right:"具体策・結論"}
   ],
-  direction(id,v){
-    const a=this.axes.find(x=>x.id===id), n=Number(v??50);
-    if(n>=67)return a.left;
-    if(n<=33)return a.right;
-    return "中間・状況に応じて使い分ける";
-  },
-  sentence(id,v){
-    const a=this.axes.find(x=>x.id===id), n=Number(v??50);
-    if(n>=67)return `「${a.left}」のほうが自然に感じやすい傾向があります。`;
-    if(n<=33)return `「${a.right}」のほうが自然に感じやすい傾向があります。`;
-    return "場面や相手によって、両方のやり方を使い分けやすい傾向があります。";
+  normalize(v){ const n=Number(v); return Math.max(0,Math.min(100,Number.isFinite(n)?n:50)); },
+  toValues(vals){
+    if(Array.isArray(vals)){
+      const by=Object.fromEntries(vals.map(x=>[x.key,Number(x.score)]));
+      return this.axes.map(a=>this.normalize(by[a.id]??50));
+    }
+    return this.axes.map(a=>this.normalize(vals?.[a.id]??50));
   },
   render(canvas,vals){
     if(!canvas)return;
-    const ctx=canvas.getContext("2d"), dpr=devicePixelRatio||1;
-    const rct=canvas.getBoundingClientRect(), w=Math.max(280,rct.width||320),h=320;
-    canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
-    ctx.clearRect(0,0,w,h);
-    const cx=w/2,cy=h/2+4,r=Math.min(w,h)*.29,n=this.axes.length;
-    const pts=s=>this.axes.map((_,i)=>{let a=-Math.PI/2+i*2*Math.PI/n;return[cx+Math.cos(a)*r*s,cy+Math.sin(a)*r*s]});
-    const poly=p=>{ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(...q):ctx.moveTo(...q));ctx.closePath()};
-    ctx.globalAlpha=.18;[.25,.5,.75,1].forEach(s=>{poly(pts(s));ctx.stroke()});
-    pts(1).forEach(q=>{ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(...q);ctx.stroke()});
-    const vals2=this.axes.map(a=>Math.max(0,Math.min(100,Number(vals?.[a.id]??50))));
-    const data=vals2.map((v,i)=>{let a=-Math.PI/2+i*2*Math.PI/n,s=.25+.75*v/100;return[cx+Math.cos(a)*r*s,cy+Math.sin(a)*r*s]});
-    ctx.globalAlpha=.15;poly(data);ctx.fill();ctx.globalAlpha=1;ctx.lineWidth=2;poly(data);ctx.stroke();
+    const values=this.toValues(vals), ctx=canvas.getContext("2d"), dpr=window.devicePixelRatio||1;
+    const rect=canvas.getBoundingClientRect(),w=Math.max(280,rect.width||320),h=Math.max(280,rect.height||300);
+    canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+    const cx=w/2,cy=h/2+4,r=Math.min(w,h)*.30,n=6;
+    const pts=(scale=1)=>this.axes.map((_,i)=>{const a=-Math.PI/2+i*2*Math.PI/n;return[cx+Math.cos(a)*r*scale,cy+Math.sin(a)*r*scale]});
+    const poly=p=>{ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath()};
+    ctx.globalAlpha=.18;ctx.lineWidth=1;[.25,.5,.75,1].forEach(k=>{poly(pts(k));ctx.stroke()});
+    pts(1).forEach(q=>{ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(q[0],q[1]);ctx.stroke()});
+    const data=values.map((v,i)=>{const a=-Math.PI/2+i*2*Math.PI/n;const rr=r*(.25+.75*v/100);return[cx+Math.cos(a)*rr,cy+Math.sin(a)*rr]});
+    ctx.globalAlpha=.14;poly(data);ctx.fill();ctx.globalAlpha=1;ctx.lineWidth=2.5;poly(data);ctx.stroke();
+    data.forEach(q=>{ctx.beginPath();ctx.arc(q[0],q[1],3,0,Math.PI*2);ctx.fill()});
     ctx.font="12px system-ui,sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";
-    pts(1).forEach((q,i)=>{let a=-Math.PI/2+i*2*Math.PI/n;ctx.fillText(this.axes[i].label,cx+Math.cos(a)*(r+30),cy+Math.sin(a)*(r+30))});
+    pts(1).forEach((q,i)=>{const a=-Math.PI/2+i*2*Math.PI/n;ctx.fillText(this.axes[i].label,cx+Math.cos(a)*(r+30),cy+Math.sin(a)*(r+30))});
   }
 };
 </script>
-</head>
+<style>
+.v46-partner-result,.v46-pair-card{margin-top:12px;border:1px solid #eadfe4;border-radius:14px;background:#fff;padding:12px}.v46-result-head,.v46-pair-head{font-size:18px;font-weight:800;color:#c74369}.v46-result-note,.v46-pair-note{font-size:12px;line-height:1.65;color:#717983;margin-top:5px}.v46-result-trait{margin-top:10px;padding:11px;border:1px solid #edf0f2;border-radius:12px;background:#fafbfc}.v46-result-trait h4{margin:0 0 6px;font-size:15px}.v46-result-trait p{margin:4px 0;line-height:1.7;font-size:13px}.v46-result-trait .use{margin-top:7px;padding:9px;background:#fff;border-radius:10px;line-height:1.65;font-size:12px}.v46-subhead{margin:14px 0 6px;color:#c74369}.v46-pair-radar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.v46-pair-person{border:1px solid #eadfe4;border-radius:12px;padding:8px;text-align:center;font-size:13px}.v46-pair-person canvas{width:100%;height:190px;display:block}.v46-side-by-side{margin-top:10px}.v46-compare-row{border-top:1px solid #eee;padding:10px 0}.v46-compare-axis{font-weight:800;font-size:14px;margin-bottom:6px}.v46-two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px}.v46-two-col>div{background:#fafbfc;border-radius:10px;padding:8px}.v46-two-col b{font-size:12px;color:#c74369}.v46-two-col p{font-size:12px;line-height:1.6;margin:4px 0}.v46-pair-insights{margin-top:10px}.v46-insight{padding:10px;border-radius:11px;background:#fff7fa;border:1px solid #f0dce3;margin-top:7px;font-size:12px;line-height:1.65}.v46-insight p{margin:5px 0}@media(max-width:600px){.v46-pair-person canvas{height:170px}}
+</style></head>
 <body>
 <div class="app">
 <header><h1>CoreLingual</h1><div class="sub">会話と「特性」の違いを読み解くサポートアプリ</div></header>
@@ -567,7 +565,7 @@ function buildAiProfileText(scores,label,extraScores,free){
   const top=sorted.slice(0,4).map(x=>{const a=AXES[x.key],n=traitNarrative(x.key,x.score);return `・${a.label}: ${n.main}`}).join('\n');
   const deep=(extraScores||[]).filter(x=>DEEP_AXES[x.key]).sort((a,b)=>Math.abs(b.score-50)-Math.abs(a.score-50)).slice(0,3).map(x=>`・${DEEP_AXES[x.key].label}: ${deepNarrative(x.key,x.score).main}`).join('\n');
   const overlap=extraScores&&extraScores.length?buildTraitOverlapData(scores,extraScores):null;
-  return `【特性チェック v45：${label}の会話プロフィール】
+  return `【特性チェック v46：${label}の会話プロフィール】
 【基本18問】
 ${top}${deep?`
 
@@ -597,28 +595,65 @@ function renderDiagResult(scores){
 }
 
 function renderSharedAnswers(container,profile,label){
-  const answers=Array.isArray(profile?.answers)?profile.answers:[];
-  const deepAnswers=Array.isArray(profile?.extraAnswers)?profile.extraAnswers:[];
-  const deepRadar=profile?.extraRadar?.deep||profile?.extraRadar?.scores||[];
-  if(answers.length){
-    const wrap=document.createElement('div');wrap.className='v36-answer-box';
-    const h=document.createElement('h4');h.textContent=`📝 ${label}の前半18問`;wrap.appendChild(h);
-    answers.slice(0,18).forEach((v,i)=>{const row=document.createElement('div');row.className='v36-answer-row';const q=Q[i]?.q||`基本チェックの質問 ${i+1}`;row.innerHTML=`<span class="v36-answer-no">${i+1}</span><span>${escapeHtml(q)}</span><span class="v36-answer-score">${escapeHtml(v)}</span>`;wrap.appendChild(row)});
-    container.appendChild(wrap);
+  const baseScores=Array.isArray(profile?.scores)?profile.scores:[];
+  const deepScores=Array.isArray(profile?.deepScores)?profile.deepScores:[];
+  if(!baseScores.length && !deepScores.length)return;
+  const sec=document.createElement('section');sec.className='v46-partner-result';
+  sec.innerHTML=`<div class="v46-result-head">🧩 ${escapeHtml(label)}の特性チェック結果</div><div class="v46-result-note">回答内容そのものではなく、36問から整理した「会話で出やすい傾向」を表示しています。</div>`;
+  const overview=buildTraitSummary(baseScores,label);
+  if(overview){
+    overview.querySelectorAll('.v36-trait').forEach(t=>{
+      const c=document.createElement('div');c.className='v46-result-trait';
+      c.innerHTML=`<h4>${escapeHtml(t.querySelector('.v36-trait-title')?.textContent||'')}</h4><p>${escapeHtml((t.querySelector('.v36-trait-main')?.textContent||'').replace(/^傾向：/,''))}</p><div class="use">${escapeHtml(t.querySelector('.v36-trait-use')?.textContent||'')}</div>`;
+      sec.appendChild(c);
+    });
   }
-  if(deepAnswers.length){
-    const wrap=document.createElement('div');wrap.className='v36-answer-box';
-    const h=document.createElement('h4');h.textContent=`🔎 ${label}の後半18問`;wrap.appendChild(h);
-    deepAnswers.slice(0,18).forEach((v,i)=>{const row=document.createElement('div');row.className='v36-answer-row';const item=Q_DEEP[i];const q=item?.q||`深掘りチェックの質問 ${i+1}`;row.innerHTML=`<span class="v36-answer-no">${i+1}</span><span>${escapeHtml(q)}</span><span class="v36-answer-score">${escapeHtml(v)}</span>`;wrap.appendChild(row)});
-    container.appendChild(wrap);
+  if(deepScores.length){
+    const h=document.createElement('h4');h.className='v46-subhead';h.textContent='🔎 後半18問で見えた3つの方向';sec.appendChild(h);
+    deepScores.forEach(x=>{const a=DEEP_AXES[x.key];if(!a)return;const n=deepNarrative(x.key,x.score);const c=document.createElement('div');c.className='v46-result-trait';c.innerHTML=`<h4>${escapeHtml(a.icon+' '+a.label)}</h4><p>${escapeHtml(n.main)}。</p><div class="use"><b>会話では：</b>${escapeHtml(n.use)}</div>`;sec.appendChild(c)});
+    buildTraitOverlapCards(baseScores,deepScores).forEach(c=>sec.appendChild(c.cloneNode(true)));
+    const attachment=buildAttachmentOverlapCard(deepScores);if(attachment)sec.appendChild(attachment.cloneNode(true));
   }
-  if(deepRadar.length){
-    const sec=document.createElement('section');sec.className='v36-shared-deep';
-    const h=document.createElement('h3');h.textContent='🔎 後半18問で見えた3つの方向';sec.appendChild(h);
-    deepRadar.forEach(x=>{const a=DEEP_AXES[x.key];if(!a)return;const n=deepNarrative(x.key,x.score);const c=document.createElement('div');c.className='v36-shared-trait';c.innerHTML=`<h4>${escapeHtml(a.icon+' '+a.label)}</h4><p>${escapeHtml(n.main)}。</p><div class="use"><b>会話では：</b>${escapeHtml(n.use)}</div>`;sec.appendChild(c)});
-    container.appendChild(sec);
-  }
+  container.appendChild(sec);
 }
+function savePartnerSharedProfile(profile){
+  if(!profile)return;
+  const scores=Array.isArray(profile.scores)?profile.scores:[];
+  const deep=Array.isArray(profile.deepScores)?profile.deepScores:[];
+  if(scores.length){
+    localStorage.setItem('cl_diag_result_partner',JSON.stringify({scores,answers:Array.isArray(profile.answers)?profile.answers:[],updatedAt:Date.now()}));
+    localStorage.setItem('cl_diag_radar_partner',JSON.stringify(axisValuesFromScores(scores)));
+  }
+  if(deep.length){
+    localStorage.setItem('cl_extra_result_partner',JSON.stringify({kind:'deep',scores:deep,answers:Array.isArray(profile.deepAnswers)?profile.deepAnswers:[],free:profile.free||'',updatedAt:Date.now()}));
+    localStorage.setItem('cl_extra_radar_partner',JSON.stringify({deep}));
+  }
+  const summary=buildAiProfileText(scores,'相手',deep,profile.free||'');
+  if(summary)localStorage.setItem('cl_diag_summary_partner',summary);
+  try{ applyDiagToProfile('partner',scores,deep); }catch(e){ console.warn('partner profile apply failed',e); }
+}
+function renderPartnerResultOnly(container,profile,label='相手'){
+  container.innerHTML='';renderSharedAnswers(container,profile,label);
+}
+function buildPairComparisonCard(myScores,partnerScores,partnerDeep){
+  if(!myScores?.length||!partnerScores?.length)return null;
+  const sec=document.createElement('section');sec.className='v46-pair-card';
+  sec.innerHTML='<div class="v46-pair-head">👥 2人のコミュニケーション比較</div><div class="v46-pair-note">同じ場面でも、2人が自然に選びやすい受け取り方・考え方・伝え方が違うと、すれ違いが起きることがあります。</div><div class="v46-pair-radar"><div class="v46-pair-person"><b>👤 あなた</b><canvas id="v46RadarMy"></canvas></div><div class="v46-pair-person"><b>👥 相手</b><canvas id="v46RadarPartner"></canvas></div></div><div class="v46-side-by-side"></div><div class="v46-pair-insights"></div>';
+  const grid=sec.querySelector('.v46-side-by-side');
+  const by=(arr)=>Object.fromEntries(arr.map(x=>[x.key,Number(x.score)]));const bm=by(myScores),bp=by(partnerScores);
+  Object.keys(AXES).forEach(key=>{
+    const a=AXES[key],m=AXIS_MEANINGS[key],ms=bm[key]??50,ps=bp[key]??50;
+    const mt=directionText(key,ms),pt=directionText(key,ps);
+    const card=document.createElement('div');card.className='v46-compare-row';
+    card.innerHTML=`<div class="v46-compare-axis">${a.icon} ${escapeHtml(a.label)}</div><div class="v46-two-col"><div><b>あなた</b><p>${escapeHtml(mt)}</p></div><div><b>相手</b><p>${escapeHtml(pt)}</p></div></div>`;grid.appendChild(card);
+  });
+  const diffs=Object.keys(AXES).map(key=>({key,diff:Math.abs((bm[key]??50)-(bp[key]??50))})).sort((a,b)=>b.diff-a.diff).slice(0,3);
+  const ins=sec.querySelector('.v46-pair-insights');
+  diffs.forEach(x=>{if(x.diff<15)return;const a=AXES[x.key],m=AXIS_MEANINGS[x.key],ms=bm[x.key],ps=bp[x.key];const mine=directionText(x.key,ms),theirs=directionText(x.key,ps);const c=document.createElement('div');c.className='v46-insight';c.innerHTML=`<b>💬 ${escapeHtml(a.label)}</b><p><strong>あなた：</strong>${escapeHtml(mine)}<br><strong>相手：</strong>${escapeHtml(theirs)}</p><p>この違いがあると、同じやり取りでも「どうしてそうなるの？」と感じやすいかもしれません。まず相手のやり方を拒絶や無関心と決めつけず、それぞれに必要な情報・時間・伝え方の違いとして見ると整理しやすくなります。</p>`;ins.appendChild(c)});
+  setTimeout(()=>{CoreLingual_v36.render(document.getElementById('v46RadarMy'),myScores);CoreLingual_v36.render(document.getElementById('v46RadarPartner'),partnerScores)},20);
+  return sec;
+}
+
 function buildPairNarrative(myScores,partnerScores){
   const byMy=Object.fromEntries((myScores||[]).map(x=>[x.key,Number(x.score)]));
   const byP=Object.fromEntries((partnerScores||[]).map(x=>[x.key,Number(x.score)]));
@@ -638,25 +673,19 @@ function v29HostInviteActive(){const inv=v23GetInviteState();return !!(inv?.toke
 function v29InvitePartnerRadar(){try{return JSON.parse(localStorage.getItem('cl_v29_invite_partner_radar')||'null')}catch{return null}}
 function clearV29InviteView(){
   ['cl_v29_invite_partner_radar','cl_v29_invite_partner_extra','cl_v29_invite_partner_profile'].forEach(k=>{try{localStorage.removeItem(k)}catch{}});
-  ['cl_shared_partner_profile','cl_diag_radar_partner','cl_extra_radar_partner'].forEach(k=>{try{localStorage.removeItem(k)}catch{}});
+  ['cl_shared_partner_profile'].forEach(k=>{try{localStorage.removeItem(k)}catch{}});
 }
 function renderTwoPersonComparison(){
   const card=document.getElementById('v21CompareCard'),grid=document.getElementById('v21CompareGrid'),listEl=document.getElementById('v21CompareList');if(!card||!grid||!listEl)return;
   const my=loadDiagRadar('my');
-  const inviteActive=v29HostInviteActive();
-  // 招待で受け取った相手結果だけを、この「2人比較」に使う。
-  // 招待終了後に旧来の cl_diag_radar_partner が残っていても、
-  // 終了した招待のグラフが復活しないようにする。
-  const partner=inviteActive?v29InvitePartnerRadar():null;
-  const oldPair=document.getElementById('v29PairNarrative');if(oldPair)oldPair.remove();
+  const partner=loadDiagRadar('partner');
   if(!my||!partner){card.style.display='none';grid.innerHTML='';listEl.innerHTML='';return}
-  card.hidden=false;card.style.removeProperty('display');card.style.display='block';card.classList.add('v36-compare-only');
-  grid.innerHTML=`<div class="v21-person"><div class="v21-person-name">あなた</div><canvas id="v21Radar_my" aria-label="あなたのコミュニケーション傾向"></canvas><div class="v21-person-note">6つの方向を同じ尺度で表示</div></div><div class="v21-person"><div class="v21-person-name">相手</div><canvas id="v21Radar_partner" aria-label="相手のコミュニケーション傾向"></canvas><div class="v21-person-note">6つの方向を同じ尺度で表示</div></div>`;
-  setTimeout(()=>{const a=document.getElementById('v21Radar_my'),b=document.getElementById('v21Radar_partner');if(a)CoreLingual_v36.render(a,my,null);if(b)CoreLingual_v36.render(b,partner,null)},20);
-  listEl.innerHTML='';
+  card.hidden=false;card.style.removeProperty('display');card.style.display='block';card.classList.add('v46-compare-only');
+  grid.innerHTML='';listEl.innerHTML='';
   const myScores=(()=>{try{return JSON.parse(localStorage.getItem('cl_diag_result_my')||'null')?.scores||[]}catch{return[]}})();
-  const partnerScores=inviteActive?(()=>{try{return JSON.parse(localStorage.getItem('cl_v29_invite_partner_profile')||'null')?.scores||[]}catch{return[]}})():(()=>{try{return JSON.parse(localStorage.getItem('cl_diag_result_partner')||'null')?.scores||[]}catch{return[]}})();
-  if(myScores.length&&partnerScores.length){const pair=buildPairNarrative(myScores,partnerScores);if(pair){pair.id='v29PairNarrative';card.appendChild(pair)}}
+  const partnerScores=(()=>{try{return JSON.parse(localStorage.getItem('cl_diag_result_partner')||'null')?.scores||[]}catch{return[]}})();
+  const deep=(()=>{try{return JSON.parse(localStorage.getItem('cl_extra_result_partner')||'null')?.scores||[]}catch{return[]}})();
+  const pair=buildPairComparisonCard(myScores,partnerScores,deep);if(pair)listEl.appendChild(pair);
 }
 
 function showRadar(before,after,caption){
@@ -902,8 +931,9 @@ function v23RenderHostStatus(d){
     if(d.partnerProfile.radar)localStorage.setItem('cl_v29_invite_partner_radar',JSON.stringify(d.partnerProfile.radar));
     if(d.partnerProfile.extraRadar)localStorage.setItem('cl_v29_invite_partner_extra',JSON.stringify(d.partnerProfile.extraRadar));
     localStorage.setItem('cl_v29_invite_partner_profile',JSON.stringify(d.partnerProfile));
-    box.innerHTML+=`<div class="v36-status"><b>🎉 2人分の結果が揃いました</b><br>お互いに共有OKなので、比較結果を表示しています。</div>`;
-    const shared=document.createElement('div');shared.className='v36-shared-result';renderSharedAnswers(shared,d.partnerProfile,'相手');box.appendChild(shared);
+    savePartnerSharedProfile(d.partnerProfile);
+    box.innerHTML+=`<div class="v36-status"><b>🎉 2人分の結果が揃いました</b><br>相手の36問の結果を「相手」プロフィールに反映し、2人の比較を表示しています。</div>`;
+    const shared=document.createElement('div');shared.className='v36-shared-result';renderPartnerResultOnly(shared,d.partnerProfile,'相手');box.appendChild(shared);
     renderTwoPersonComparison();
   }
 }
@@ -960,7 +990,15 @@ async function v23SubmitPartner(){
   const box=document.getElementById("v23InviteControls");
   if(box){box.innerHTML=`<div class="v36-status"><b>✅ 回答を送信しました</b><br>${share?"自分の結果を相手に共有しています。相手はあなたの結果を確認でき、2人の比較結果も表示できます。":"自分の結果は相手にはまだ見えません。共有しない限り、2人の比較結果も作成されません。"}</div><div class="v36-check"><input id="v26PartnerShareToggle" type="checkbox" ${share?'checked':''}><label for="v26PartnerShareToggle"><b>相手に自分の結果を見せる</b><br>あとから変更できます。</label></div><div class="v36-share-explain"><b>共有ON：</b>相手に結果を見せて、2人の比較を利用できます。<br><b>共有OFF：</b>相手には結果を見せず、比較も利用できません。</div><div id="v26PartnerSharedPreview"></div>`;
     document.getElementById('v26PartnerShareToggle')?.addEventListener('change',async e=>{try{const rr=await fetch('/api/invite',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:inv.token,who:'partner',share:e.target.checked,partnerKey:inv.partnerKey||''})});if(!rr.ok)throw new Error('共有設定を更新できませんでした。');inv.shareMy=e.target.checked;v23SetInviteState(inv);}catch(err){e.target.checked=!e.target.checked;alert(err.message)}});
-    if(d.hostProfile&&d.hostProfile.radar){const prev=document.getElementById('v26PartnerSharedPreview');prev.innerHTML='<div class="v36-status"><b>👀 相手が共有した結果</b><br>相手の結果も確認できます。</div>';const tmp=document.createElement('div');renderSharedAnswers(tmp,d.hostProfile,'相手');prev.appendChild(tmp);}
+    if(d.hostProfile&&d.hostProfile.radar){
+      savePartnerSharedProfile(d.hostProfile);
+      const prev=document.getElementById('v26PartnerSharedPreview');
+      prev.innerHTML='<div class="v36-status"><b>👀 相手が共有した結果</b><br>相手の36問の結果を確認できます。</div>';
+      const tmp=document.createElement('div');renderPartnerResultOnly(tmp,d.hostProfile,'相手');prev.appendChild(tmp);
+    }
+    document.getElementById('diagQuestionPanel')?.style.setProperty('display','none','important');
+    document.getElementById('moreDiag')?.style.setProperty('display','none','important');
+    document.getElementById('diagResult')?.style.setProperty('display','none','important');
     document.body.classList.remove('invite-questions-mode');
   }
 }
@@ -1022,7 +1060,7 @@ loadSharedFromUrl();
 </script>
 <script>
 (function(){
-  function boot(){ try{if(!v29HostInviteActive() && localStorage.getItem('cl_shared_partner_profile')){['cl_shared_partner_profile','cl_diag_radar_partner','cl_extra_radar_partner'].forEach(k=>localStorage.removeItem(k))}}catch{} renderTwoPersonComparison();restoreDiagAnswers(target); if(loadDiagRadar(target)){const m=document.getElementById('moreDiag');if(m)m.style.display='block';} }
+  function boot(){ try{if(!v29HostInviteActive() && localStorage.getItem('cl_shared_partner_profile')){localStorage.removeItem('cl_shared_partner_profile')}}catch{} renderTwoPersonComparison();restoreDiagAnswers(target); if(loadDiagRadar(target)){const m=document.getElementById('moreDiag');if(m)m.style.display='block';} }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
   addEventListener("resize",()=>renderTwoPersonComparison());
 })();
