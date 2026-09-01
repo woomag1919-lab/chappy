@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CoreLingual v39</title>
+<title>CoreLingual v41</title>
 <style>
 body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
 .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
@@ -330,7 +330,7 @@ const AXES={
 };
 
 /*
-  v39: 基本18問 = 6軸×3問。
+  v41: 基本18問 = 6軸×3問。
   ここは「玄関」として、会話の基本的な方向を広く確認する。
 */
 const Q=[
@@ -475,16 +475,54 @@ const AXIS_MEANINGS={
 };
 function directionText(key,score){return axisDirection(key,score).label}
 function directionShort(key,score){return axisDirection(key,score).short}
-function buildASDOverlapCard(scores){
-  const by=Object.fromEntries((scores||[]).map(x=>[x.key,Number(x.score)]));
-  const hits=[];
-  if(by.language<=35)hits.push('曖昧な表現より、具体的な言葉や条件を確認したくなりやすい');
-  if(by.thinking<=35)hits.push('理由・根拠・順序を整理してから納得しやすい');
-  if(by.change<=35)hits.push('予定や手順、変更後の流れが分かると動きやすい');
-  if(by.communication>=65)hits.push('共感より先に、具体的な解決方法や結論を求めやすい');
-  if(hits.length<2)return null;
-  const el=document.createElement('section');el.className='v36-asd-card';
-  el.innerHTML=`<div class="v36-asd-head">🧩 ASD特性と重なることがある思考パターン</div><div class="v36-asd-body"><p>今回の回答では、次のような考え方が比較的はっきり出ています。</p><ul>${hits.slice(0,4).map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul><div class="v36-cause">こうした特徴は、ASD特性のある人にも見られることがあります。ただし、同じ回答になる理由は人によって異なり、このチェックだけでASDを診断・判定することはできません。</div></div>`;
+function normalizeFeatureScore(v){return Math.max(0,Math.min(100,Number(v)||0));}
+function overlapLevel(score){
+  if(score>=70)return {label:"比較的強く重なる",tone:"strong"};
+  if(score>=55)return {label:"やや重なる",tone:"mid"};
+  return {label:"目立った重なりは少なめ",tone:"low"};
+}
+function featureOverlapScores(baseScores,deepScores){
+  const b=Object.fromEntries((baseScores||[]).map(x=>[x.key,Number(x.score)]));
+  const d=Object.fromEntries((deepScores||[]).map(x=>[x.key,Number(x.score)]));
+  const clamp=normalizeFeatureScore;
+  // 医学的尺度ではなく、CoreLingual内の回答傾向から「似た特徴がどれくらい重なるか」を見る参考スコア。
+  const asd=clamp(50 + (
+    (50-(b.language??50))*0.22 +
+    (50-(b.thinking??50))*0.18 +
+    (50-(b.change??50))*0.16 +
+    ((b.communication??50)-50)*0.12 +
+    (50-(d.process??50))*0.12
+  ));
+  const adhd=clamp(50 + (
+    ((b.thinking??50)-50)*0.16 +
+    ((b.change??50)-50)*0.18 +
+    ((d.process??50)-50)*0.24 +
+    ((d.sensory??50)-50)*0.08
+  ));
+  const hsp=clamp(50 + (
+    (50-(d.sensory??50))*0.32 +
+    (50-(b.emotion??50))*0.12 +
+    (50-(b.language??50))*0.08
+  ));
+  return {asd,adhd,hsp};
+}
+function buildFeatureOverlapCard(baseScores,deepScores){
+  const scores=featureOverlapScores(baseScores,deepScores);
+  const defs=[
+    {key:"asd",icon:"🧩",name:"ASD特性",desc:"具体性・情報整理・見通しなどの特徴との重なり"},
+    {key:"adhd",icon:"⚡",name:"ADHD特性",desc:"切り替え・進め方・思考の広がりなどの特徴との重なり"},
+    {key:"hsp",icon:"🌿",name:"HSP的な特徴",desc:"刺激・感情・情報量への反応などの特徴との重なり"}
+  ];
+  const el=document.createElement('section');el.className='v36-attachment-card';
+  el.innerHTML='<div class="v36-asd-head">🔎 あなたに近い特徴の重なり</div><div class="v36-asd-body"><p>36問の回答から、いくつかの特徴との「重なり」を参考情報として整理しています。これは診断や判定ではなく、会話のすれ違いを考えるための材料です。</p><div id="clFeatureOverlapList"></div><div class="v36-cause">同じ特徴があっても理由や現れ方は人によって違います。実際の会話では、この結果だけで相手や自分を決めつけず、発言内容や状況を優先します。</div></div>';
+  const list=el.querySelector('#clFeatureOverlapList');
+  defs.forEach(d=>{
+    const score=scores[d.key],lv=overlapLevel(score),row=document.createElement('div');
+    row.className='v36-cause';
+    row.style.margin='10px 0';
+    row.innerHTML=`<div style="display:flex;justify-content:space-between;gap:8px"><b>${d.icon} ${d.name}</b><span style="font-size:11px;color:#c74369;font-weight:800">${lv.label}</span></div><div style="font-size:11px;color:#717983;margin-top:4px;line-height:1.6">${d.desc}</div>`;
+    list.appendChild(row);
+  });
   return el;
 }
 function buildAttachmentOverlapCard(scores){
@@ -493,17 +531,17 @@ function buildAttachmentOverlapCard(scores){
   if(!Number.isFinite(score))return null;
   let title,main;
   if(score<=35){
-    title="🤝 不安型の特徴と重なることがある傾向";
-    main="相手の反応や関係の変化が気になると、つながりを確かめたくなりやすい傾向があります。返事や反応が読みにくいときに、状況を確認したくなることもあります。";
+    title="🤝 不安型の特徴と重なる傾向";
+    main="相手の反応や関係の変化が気になると、つながりを確かめたくなりやすい傾向があります。";
   }else if(score>=65){
-    title="🤝 回避型の特徴と重なることがある傾向";
-    main="近い関係でも、自分の中で整理してから距離を調整したくなりやすい傾向があります。気持ちをすぐ共有するより、一人で考える時間を必要とすることがあります。";
+    title="🤝 回避型の特徴と重なる傾向";
+    main="近い関係でも、自分の中で整理してから距離を調整したくなりやすい傾向があります。";
   }else{
-    title="🤝 愛着パターンで見ると、場面に応じて変わりやすい傾向";
-    main="相手との関係やその時の状況によって、つながりを確かめたい時と、一人で整理したい時の両方が出やすい傾向があります。";
+    title="🤝 安定型の特徴と重なる傾向";
+    main="相手とのつながりを保ちながら、自分で整理する時間も取りやすく、状況に応じて距離を調整しやすい傾向があります。";
   }
   const el=document.createElement('section');el.className='v36-attachment-card';
-  el.innerHTML=`<div class="v36-asd-head">${title}</div><div class="v36-asd-body"><p>${escapeHtml(main)}</p><div class="v36-cause">愛着パターンの考え方では似た特徴が説明されることがありますが、これは愛着スタイルの診断ではありません。人や状況によって反応は変わります。</div></div>`;
+  el.innerHTML=`<div class="v36-asd-head">${title}</div><div class="v36-asd-body"><p>${escapeHtml(main)}</p><div class="v36-cause">愛着パターンの考え方と重なる部分を参考情報として表示しています。これは愛着スタイルの診断ではなく、関係性や状況によって反応は変わります。</div></div>`;
   return el;
 }
 function traitNarrative(key,score){
@@ -525,7 +563,11 @@ function buildAiProfileText(scores,label,extraScores,free){
   const sorted=[...(scores||[])].sort((a,b)=>Math.abs(b.score-50)-Math.abs(a.score-50));
   const top=sorted.slice(0,4).map(x=>{const a=AXES[x.key],n=traitNarrative(x.key,x.score);return `・${a.label}: ${n.main}`}).join('\n');
   const deep=(extraScores||[]).filter(x=>DEEP_AXES[x.key]).sort((a,b)=>Math.abs(b.score-50)-Math.abs(a.score-50)).slice(0,3).map(x=>`・${DEEP_AXES[x.key].label}: ${deepNarrative(x.key,x.score).main}`).join('\n');
-  return `【特性チェック v39：${label}の会話プロフィール】\n【基本18問】\n${top}${deep?`\n\n【深掘り18問】\n${deep}`:''}\n\nこの情報は会話解析の補助情報です。実際の発言内容を最優先し、特性から心理・診断名を断定しません。${free?`\n\n【本人が追加したメモ】\n${free.trim()}`:''}`;
+  const overlaps=featureOverlapScores(scores,extraScores||[]);
+  const overlapText=`・ASD特性との重なり: ${overlapLevel(overlaps.asd).label}\n・ADHD特性との重なり: ${overlapLevel(overlaps.adhd).label}\n・HSP的な特徴との重なり: ${overlapLevel(overlaps.hsp).label}`;
+  const attachScore=(extraScores||[]).find(x=>x.key==='attach')?.score;
+  const attachText=Number.isFinite(Number(attachScore))?(Number(attachScore)<=35?'不安型の特徴との重なり':Number(attachScore)>=65?'回避型の特徴との重なり':'安定型の特徴との重なり'):'未判定';
+  return `【特性チェック v41：${label}の会話プロフィール】\n【基本18問】\n${top}${deep?`\n\n【深掘り18問】\n${deep}`:''}\n\n【参考：特徴の重なり】\n${overlapText}\n・愛着パターン: ${attachText}\n\nこれらは医学的な診断・判定ではなく、会話のすれ違いを理解するための補助情報です。実際の発言内容を最優先し、特性や愛着パターンから心理・診断名を断定しません。${free?`\n\n【本人が追加したメモ】\n${free.trim()}`:''}`;
 }
 function renderDiagResult(scores){
   diagResult.innerHTML='';
@@ -684,7 +726,7 @@ function renderExtraResult(scores,answers,free){
   baseTop.forEach(x=>{const a=AXES[x.key],n=traitNarrative(x.key,x.score),card=document.createElement('div');card.className='meaning-card';card.innerHTML=`<div class="meaning-title">${a.icon} ${a.label}</div><p class="meaning-main"><b>傾向：</b>${escapeHtml(n.main)}。</p><div class="meaning-use"><b>会話では：</b>${escapeHtml(n.use)}</div>`;body.appendChild(card)});
   scores.forEach(x=>{const a=DEEP_AXES[x.key],n=deepNarrative(x.key,x.score),card=document.createElement('div');card.className='meaning-card';card.innerHTML=`<div class="meaning-title">${a.icon} ${a.label}</div><p class="meaning-main"><b>傾向：</b>${escapeHtml(n.main)}。</p><div class="meaning-use"><b>会話では：</b>${escapeHtml(n.use)}</div>`;body.appendChild(card)});
   extraResult.appendChild(sec);
-  const asd=buildASDOverlapCard(base);if(asd)extraResult.appendChild(asd);
+  const feature=buildFeatureOverlapCard(base,scores);if(feature)extraResult.appendChild(feature);
   const attachment=buildAttachmentOverlapCard(scores);if(attachment)extraResult.appendChild(attachment);
   if(free){const n=document.createElement('div');n.className='v36-cause';n.innerHTML=`<b>📝 自由メモ</b><br>${escapeHtml(free)}`;extraResult.appendChild(n)}
   localStorage.setItem("cl_extra_result_"+extraTarget,JSON.stringify({kind:"deep",scores,answers,free:free||"",updatedAt:Date.now()}));
