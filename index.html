@@ -1,10 +1,10 @@
-<!-- CoreLingual_v49 -->
+<!-- CoreLingual_v52 -->
 <!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CoreLingual v49</title>
+<title>CoreLingual v52</title>
 <style>
 body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
 .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
@@ -133,6 +133,27 @@ window.CoreLingual_v36 = {
 </script>
 <style>
 .v46-partner-result,.v46-pair-card{margin-top:12px;border:1px solid #eadfe4;border-radius:14px;background:#fff;padding:12px}.v46-result-head,.v46-pair-head{font-size:18px;font-weight:800;color:#c74369}.v46-result-note,.v46-pair-note{font-size:12px;line-height:1.65;color:#717983;margin-top:5px}.v46-result-trait{margin-top:10px;padding:11px;border:1px solid #edf0f2;border-radius:12px;background:#fafbfc}.v46-result-trait h4{margin:0 0 6px;font-size:15px}.v46-result-trait p{margin:4px 0;line-height:1.7;font-size:13px}.v46-result-trait .use{margin-top:7px;padding:9px;background:#fff;border-radius:10px;line-height:1.65;font-size:12px}.v46-subhead{margin:14px 0 6px;color:#c74369}.v46-pair-radar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.v46-pair-person{border:1px solid #eadfe4;border-radius:12px;padding:8px;text-align:center;font-size:13px}.v46-pair-person canvas{width:100%;height:190px;display:block}.v46-side-by-side{margin-top:10px}.v46-compare-row{border-top:1px solid #eee;padding:10px 0}.v46-compare-axis{font-weight:800;font-size:14px;margin-bottom:6px}.v46-two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px}.v46-two-col>div{background:#fafbfc;border-radius:10px;padding:8px}.v46-two-col b{font-size:12px;color:#c74369}.v46-two-col p{font-size:12px;line-height:1.6;margin:4px 0}.v46-pair-insights{margin-top:10px}.v46-insight{padding:10px;border-radius:11px;background:#fff7fa;border:1px solid #f0dce3;margin-top:7px;font-size:12px;line-height:1.65}.v46-insight p{margin:5px 0}@media(max-width:600px){.v46-pair-person canvas{height:170px}}
+
+/* v52: 特性チェックの導線を整理 */
+.v52-guide{background:#fff;border:1px solid #eadfe4;border-radius:16px;padding:14px;margin-bottom:12px}
+.v52-guide h2{font-size:18px;margin:0 0 5px;color:#c74369}
+.v52-guide .lead{font-size:12px;color:#717983;line-height:1.7;margin:0 0 12px}
+.v52-step{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.v52-step button{padding:12px 10px;border:1px solid #eadfe4;border-radius:12px;background:#fff;text-align:left}
+.v52-step button b{display:block;font-size:13px;margin-bottom:3px}
+.v52-step button span{display:block;font-size:11px;color:#717983;line-height:1.5}
+.v52-step .accent{background:#fff7fa;border-color:#e6a5b8}
+.v52-flow{margin-top:12px;padding:10px 11px;border-radius:11px;background:#fafbfc;border:1px solid #e9edf1;font-size:11px;line-height:1.65;color:#59616b}
+.v52-flow strong{color:#c74369}
+.v52-section-title{font-size:15px;font-weight:800;margin:14px 0 6px}
+.v52-mini-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.v52-mini-actions button{padding:10px;border:1px solid #ddd;border-radius:11px;background:#fff;font-weight:700;font-size:12px}
+.v52-mini-actions button.accent{background:#fff0f5;border-color:#df6684;color:#c74369}
+.v52-compare-note{font-size:11px;color:#717983;line-height:1.6;margin-top:6px}
+@media(max-width:600px){.v52-step{grid-template-columns:1fr}.v52-mini-actions{grid-template-columns:1fr 1fr}}
+/* v52: レーダーチャートを撤去し、文章比較を主役にする */
+.v21-compare-grid,.v21-person,.v21-person canvas,.v46-pair-radar{display:none!important}
+.v21-compare-card{padding:14px 10px}
 </style></head>
 <body>
 <div class="app">
@@ -152,8 +173,19 @@ window.CoreLingual_v36 = {
 <div id="profilePartnerPane" class="person" style="display:none"><h3>👥 相手のプロフィール</h3><label class="small">会話の傾向</label><div id="partnerTraits" class="chips"></div><label class="small">メモ</label><div class="friendly-note">相手について分かる範囲で設定できます。推測だけで決めつけず、会話分析の補助として使います。</div><textarea id="partnerFree" class="profile-memo" placeholder="相手について、会話で気づいていることなど…"></textarea><div class="savebar"><input id="partnerName" type="text" placeholder="例：友人A、家族、同僚A"><button id="savePartner" class="save">保存</button></div><div id="partnerProfiles" class="profiles"></div><div class="profile-delete-hint">タップで使用中に切り替え。長押しで削除確認。</div></div></div>
 <button id="analyze" class="primary">✨ 分析・アドバイスを表示する</button><div class="ad-slot" id="bannerAd"><strong>📢 広告バナー予定エリア</strong>将来ここに常時バナー広告を表示します。現在は広告未接続。</div><div id="result"></div>
 </section>
-<section id="diag" style="display:none"><div class="panel"><b>🧩 特性チェック</b><p style="font-size:12px;color:#717983">前半18問で6つの基本方向を広く見たあと、短い広告をはさんで後半18問の深掘りチェックへ進めます。36問すべてを使って、会話のすれ違いにつながりやすい特徴を整理します。これは診断ではなく、会話のすれ違いを理解するための参考情報です。</p>
-<div class="actions"><button id="selfDiag" class="action on">👤 自分をチェック</button><button id="otherDiag" class="action">👥 相手をチェック</button></div><div id="targetNote" style="font-size:12px;color:#717983">自分自身について回答してください。</div>
+<section id="diag" style="display:none"><div class="v52-guide">
+<h2>🧩 特性プロフィールを作る</h2>
+<p class="lead">「誰の特性を、どうやって登録するか」をここで選べます。登録した特性はプロフィールや会話分析、2人の比較に使えます。</p>
+<div class="v52-step">
+<button type="button" class="accent" id="v52MyManual"><b>👤 自分を手入力</b><span>自分で気づいている特徴を登録</span></button>
+<button type="button" id="v52PartnerManual"><b>👥 相手を手入力</b><span>相手について分かる範囲で登録</span></button>
+<button type="button" class="accent" id="v52MyCheck"><b>🧩 自分をチェック</b><span>36問 → 自動で自分プロフィールへ反映</span></button>
+<button type="button" id="v52PartnerCheck"><b>🧩 相手をチェック</b><span>自分から見た相手を36問で整理</span></button>
+</div>
+<div class="v52-flow"><strong>おすすめ：</strong>まず「自分をチェック」→ 結果を自分プロフィールへ反映。次に「相手に特性チェックをお願いする」→ 相手本人の回答を相手プロフィールへ自動登録 → 2人の比較へ。</div>
+</div>
+<div class="panel"><div class="v52-section-title">今どの人を回答していますか？</div>
+<div class="actions"><button id="selfDiag" class="action on">👤 自分</button><button id="otherDiag" class="action">👥 相手</button></div><div id="targetNote" style="font-size:12px;color:#717983">自分自身について回答してください。</div>
 <div id="v23InviteCard" class="card" style="margin-top:12px;background:#fffafc;border-color:#f0dce3">
   <b>👥 2人で特性チェック</b>
   <p id="v23InviteIntro" style="font-size:12px;color:#717983;line-height:1.7;margin:6px 0 10px">自分のチェックが終わったら、相手にリンクを送って相手側のチェックをしてもらえます。相手の結果は、本人が「共有する」と選ばない限り見えません。</p>
@@ -161,7 +193,7 @@ window.CoreLingual_v36 = {
 </div>
 <div id="v21CompareCard" class="card v21-compare-card" style="display:none">
   <div class="v21-compare-title">👥 2人のコミュニケーション比較</div>
-  <div class="v21-compare-sub">2人分の特性チェック結果があると、6つの傾向を並べて見比べられます。</div>
+  <div class="v21-compare-sub">2人分の結果が揃うと、9つのコミュニケーション傾向を「あなた／相手」で並べて見比べられます。</div>
   <div id="v21CompareGrid" class="v21-compare-grid"></div>
   <div id="v21CompareList" class="v21-compare-list"></div>
 </div>
@@ -957,7 +989,7 @@ function v23InviteCreateControls(){
   const select=profiles.length
     ? `<div class="v49-invite-select"><label for="v49InvitePartnerProfile">回答結果を反映する「相手」プロフィール</label><select id="v49InvitePartnerProfile"><option value="">プロフィールを指定しない（現在の相手プロフィールを使用）</option>${opts}</select></div>`
     : `<div class="v49-invite-select">先に「相手」プロフィールを作っておくと、回答後にそのプロフィールへ自動反映できます。</div>`;
-  return `<div class="v36-check"><input id="v23HostShare" type="checkbox"><label for="v23HostShare"><b>相手にも自分の結果を見せる</b><br>招待を作るときに選べます。相手側の結果は相手本人の同意が必要です。</label></div>${select}<div class="v36-share-explain"><b>ON：</b>相手があなたの結果を確認できます。<br><b>OFF：</b>あなたの結果は相手には表示されません。</div><button id="v23CreateInviteBtn" class="primary">🔗 相手に特性チェックをお願いする</button>`;
+  return `<div class="v36-share-explain"><b>流れ：</b>あなたが先に36問 → リンクを相手へ送る → 相手が本人として36問 → 相手が結果を共有 → あなたの「相手」プロフィールへ自動登録 → 2人の比較を表示します。</div>${select}<button id="v23CreateInviteBtn" class="primary">🔗 相手に特性チェックをお願いする</button>`;
 }
 function v23BindCreateInvite(){
   const b=document.getElementById('v23CreateInviteBtn');if(!b)return;
@@ -1017,7 +1049,7 @@ function v23RenderHostStatus(d){
   const box=document.getElementById('v23InviteControls');if(!box)return;
   const s=d?.status||{};
   box.innerHTML=`<div class="v36-status"><b>🔗 2人用チェックを作成しました</b><br>${s.joined?'相手が回答を完了しています。':'まだ相手の回答待ちです。'}<br>${s.partnerShared?'相手の結果を共有しています。':'相手は結果を共有していないため、比較結果はまだ表示できません。'}</div><button id="v23ResetInviteBtn" type="button" style="margin-top:8px;width:100%;padding:10px;border:1px solid #ddd;border-radius:11px;background:#fff;color:#59616b">↩️ 招待を終了して戻る</button>`;
-  if(s.joined&&s.hostShare&&s.partnerShared&&d.partnerProfile){
+  if(s.joined&&s.partnerShared&&d.partnerProfile){
     savePartnerSharedProfile(d.partnerProfile,v23GetInviteState()?.partnerProfileName||'');
     box.innerHTML+=`<div class="v36-status"><b>🎉 2人分の結果が揃いました</b><br>相手の36問の結果を「相手」プロフィールに反映し、2人の比較を表示しています。</div>`;
     const shared=document.createElement('div');shared.className='v36-shared-result';renderPartnerResultOnly(shared,d.partnerProfile,'相手');box.appendChild(shared);
@@ -1191,6 +1223,30 @@ async function loadSharedFromUrl(){
  try{const r=await fetch("/api/share?token="+encodeURIComponent(t),{cache:"no-store"});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"共有結果を読み込めませんでした。");renderShared(d.payload||d);}catch(e){talk.style.display="block";diag.style.display="none";result.innerHTML='<div class="card"><b>📎 共有結果を読み込めませんでした</b><p class="friendly-note"></p></div>';result.querySelector("p").textContent=e.message;}
 }
 loadSharedFromUrl();
+
+/* v52: 特性チェックの入口を4パターンに整理 */
+(function(){
+  function goProfile(which){
+    talkTab.click();
+    setTimeout(()=>{
+      const btn=document.getElementById(which==='my'?'profileMyTab':'profilePartnerTab');
+      btn?.click();
+      document.getElementById(which==='my'?'profileMyPane':'profilePartnerPane')?.scrollIntoView({behavior:'smooth',block:'start'});
+    },80);
+  }
+  function goCheck(which){
+    target=which;
+    selfDiag.classList.toggle('on',which==='my');
+    otherDiag.classList.toggle('on',which==='partner');
+    targetNote.textContent=which==='my'?'自分自身について回答してください。':'相手について、分かる範囲で回答してください。本人の回答ではないため参考程度に。';
+    restoreDiagAnswers(which);
+    document.getElementById('diagQuestionPanel')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  document.getElementById('v52MyManual')?.addEventListener('click',()=>goProfile('my'));
+  document.getElementById('v52PartnerManual')?.addEventListener('click',()=>goProfile('partner'));
+  document.getElementById('v52MyCheck')?.addEventListener('click',()=>goCheck('my'));
+  document.getElementById('v52PartnerCheck')?.addEventListener('click',()=>goCheck('partner'));
+})();
 </script>
 <script>
 (function(){
