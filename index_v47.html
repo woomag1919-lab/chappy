@@ -1,0 +1,1123 @@
+<!-- CoreLingual_v45 -->
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CoreLingual v45</title>
+<style>
+body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
+.spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-note{text-align:center;font-size:12px;color:#737b85;margin-top:8px}.ad-slot{border:1px dashed #cfd5dc;background:#f7f8fa;border-radius:12px;padding:12px;text-align:center;color:#7b838d;font-size:12px;margin:12px 0}.ad-slot strong{display:block;color:#59616b;margin-bottom:4px}.ad-slot.small{padding:9px;margin:10px 0}.ad-countdown{font-size:11px;margin-top:5px}.ad-gate{border:1px dashed #e5a6b7;background:#fff8fa}.ad-gate button{margin-top:8px;padding:8px 12px;border:1px solid #df6684;border-radius:10px;background:#fff;color:#c74369}.friendly-note{font-size:12px;color:#717983;line-height:1.7}.extra-free{margin-top:12px}.profile.active{background:#ffeaf0;border-color:#df6684;font-weight:bold}.profile-delete-hint{font-size:10px;color:#8a919a;margin-top:5px}.action{flex:1;padding:11px;border:1px solid #ddd;border-radius:12px;background:#fff}.action.on{background:#fff0f5;border-color:#df6684}textarea,select,input[type=text]{width:100%;padding:10px;border:1px solid #dfe3e9;border-radius:10px;box-sizing:border-box}textarea{min-height:75px;resize:vertical}.profile-memo{min-height:240px;line-height:1.65}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.small{display:block;font-size:11px;font-weight:bold;margin:7px 0 5px}.chips,.profiles{display:flex;flex-wrap:wrap;gap:6px}.chip,.profile{padding:7px 9px;border:1px solid #ddd;border-radius:999px;background:#fff;font-size:11px}.chip.on{background:#ffeaf0;border-color:#df6684}.savebar{display:flex;gap:7px;margin-top:8px}.save{background:#343b44;color:white;border:0;border-radius:10px;padding:10px}.primary{width:100%;padding:14px;border:0;border-radius:13px;color:#fff;background:linear-gradient(100deg,#e84f78,#d94788);font-weight:bold}.upload{display:block;text-align:center;padding:18px;border:2px dashed #ccd4dd;border-radius:14px}.thumbs{display:flex;gap:7px;overflow:auto;margin-top:8px}.thumb{width:65px;height:65px;object-fit:cover;border-radius:8px}.q{padding:12px 0;border-top:1px solid #eee}.scale{display:flex;justify-content:space-between;font-size:11px}.badge{display:inline-block;padding:7px 10px;margin:3px;background:#fff0f5;border:1px solid #efcbd7;border-radius:999px;font-size:12px;font-weight:bold}.result-section{border:1px solid #eadfe4;border-radius:16px;background:#fff;margin:14px 0;overflow:hidden}.analysis-section{background:#fff7fa;border-color:#f0dce3}.result-heading{padding:14px 16px;font-size:16px;font-weight:800;color:#c74369}.result-card{margin:0 14px 10px;padding:14px 16px;background:#fff;border:1px solid #f0e4e8;border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}.result-card b{display:block;color:#c74369;margin-bottom:8px;font-size:14px}.result-card p,.advice-card p{margin:0;white-space:pre-wrap;line-height:1.75;font-size:13px}.advice-section{border-color:#e5e8ed}.advice-heading{color:#39424d}.advice-card{margin:0 14px 12px;padding:14px;background:#fbfcfd;border:1px solid #edf0f3;border-radius:14px}.advice-cause{font-size:13px;line-height:1.7;margin-bottom:10px}.advice-cause span{color:#df536f;font-weight:800}.advice-suggest{background:#fff0f5;border-left:3px solid #e84f78;border-radius:10px;padding:11px 12px}.advice-suggest b{display:block;color:#d64b6b;font-size:12px;margin-bottom:5px}.caution-card{font-size:12px}.caution-card p{line-height:1.7}.share-row{display:flex;gap:8px;margin:10px 14px 14px}.share-btn{flex:1;padding:10px 12px;border:1px solid #e1c7d0;border-radius:11px;background:#fff7fa;color:#c74369;font-weight:bold}.share-note{font-size:11px;color:#7b838d;text-align:center;margin:0 14px 12px}.shared-mode{background:#fafbfc}.shared-mode .app{max-width:760px}.shared-header{padding:22px 20px 18px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}.shared-header h1{margin:0;font-size:28px}.shared-header .sub{font-size:12px;opacity:.95}.shared-shell{padding:0 14px 42px}.shared-intro{margin-top:14px;background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:16px}.shared-intro h2{margin:0 0 7px;font-size:18px;color:#c74369}.shared-intro p{margin:0;color:#717983;font-size:12px;line-height:1.7}.shared-cta{margin-top:18px;padding:18px;background:#fff;border:1px solid #eadfe4;border-radius:16px;text-align:center}.shared-cta b{display:block;font-size:15px;margin-bottom:6px}.shared-cta p{margin:0 0 12px;font-size:12px;color:#717983;line-height:1.7}.shared-cta button{width:100%;padding:13px;border:0;border-radius:12px;color:#fff;background:linear-gradient(100deg,#e84f78,#d94788);font-weight:bold}.shared-error{margin:18px 14px;background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:16px}.shared-error b{display:block;margin-bottom:7px}.shared-error p{margin:0;color:#717983;font-size:12px;line-height:1.7}@media(max-width:600px){.grid{grid-template-columns:1fr}}
+
+.v20-radar-card{padding:14px 12px}.v20-radar-title{font-size:18px;font-weight:800}.v20-radar-sub{font-size:12px;color:#717983;line-height:1.6;margin-top:3px}.v20-radar-wrap{height:330px;margin:4px auto 0;max-width:430px}.v20-radar-wrap canvas{width:100%;height:100%;display:block}.v20-radar-changes{margin-top:8px}.v20-change{padding:9px 10px;margin-top:6px;border-radius:10px;background:#fafbfc;border:1px solid #e9edf1;font-size:12px;line-height:1.55}.v20-change strong{color:#c74369}.v20-legend{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;font-size:11px;color:#717983;margin-top:-4px}.v21-compare-card{padding:14px 10px}.v21-compare-title{font-size:18px;font-weight:800}.v21-compare-sub{font-size:12px;color:#717983;line-height:1.65;margin-top:3px}.v21-compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.v21-person{min-width:0;background:#fff;border:1px solid #eadfe4;border-radius:14px;padding:9px 6px}.v21-person-name{text-align:center;font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v21-person canvas{display:block;width:100%;height:190px}.v21-person-note{font-size:10px;color:#717983;line-height:1.5;text-align:center;min-height:30px}.v21-compare-list{margin-top:10px}.v21-diff{padding:9px 10px;margin-top:6px;border-radius:10px;background:#fafbfc;border:1px solid #e9edf1;font-size:12px;line-height:1.55}.v21-diff strong{color:#c74369}.v21-empty{padding:12px;border-radius:12px;background:#fafbfc;border:1px dashed #d9dee4;color:#717983;font-size:12px;line-height:1.7;margin-top:10px}@media(max-width:600px){.v21-person canvas{height:170px}}
+
+
+.v36-invite-row{display:flex;gap:8px;align-items:center}.v36-invite-row button{flex:1}.v36-check{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.55;margin:8px 0}.v36-status{margin-top:9px;padding:10px;border-radius:11px;background:#fafbfc;border:1px solid #e9edf1;font-size:12px;line-height:1.65}.v36-consent{padding:10px;background:#fff7fa;border:1px solid #f0dce3;border-radius:11px;margin:9px 0;font-size:12px;line-height:1.65}
+
+/* v33 result readability */
+.result-overview{margin:14px 0;border:1px solid #eadfe4;border-radius:16px;background:#fff;overflow:hidden}.overview-head{padding:14px 16px;background:#fff7fa;color:#c74369;font-size:17px;font-weight:800}.overview-body{padding:14px 16px}.overview-lead{margin:0 0 12px;font-size:14px;line-height:1.8}.overview-lead strong{color:#c74369}.meaning-card{padding:13px 0;border-top:1px solid #eee}.meaning-card:first-child{border-top:0}.meaning-title{font-weight:800;font-size:14px;margin-bottom:5px}.meaning-main{margin:0;font-size:13px;line-height:1.75}.meaning-use{margin-top:8px;padding:9px 10px;border-radius:10px;background:#fafbfc;font-size:12px;line-height:1.65}.meaning-use b{color:#c74369}.axis-result{padding:12px 0;border-top:1px solid #eee}.axis-result:first-child{border-top:0}.axis-head2{display:flex;justify-content:space-between;gap:8px;font-size:13px;font-weight:800}.axis-dir{font-size:11px;color:#c74369;white-space:nowrap}.axis-labels2{display:flex;justify-content:space-between;gap:8px;margin-top:5px;font-size:10px;color:#717983}.axis-labels2 span:last-child{text-align:right}.axis-bar2{height:7px;margin-top:7px;border-radius:99px;background:#edf0f3;position:relative}.axis-dot2{position:absolute;top:50%;width:13px;height:13px;border-radius:50%;background:#fff;border:3px solid #e84f78;transform:translate(-50%,-50%);box-sizing:border-box}.extra-adaptive-note{margin:8px 0 12px;padding:10px 11px;border-radius:11px;background:#fff7fa;border:1px solid #f0dce3;color:#717983;font-size:12px;line-height:1.7}.extra-adaptive-note b{color:#c74369}.v36-cause{margin:12px 0;padding:10px 11px;border-radius:11px;background:#fafbfc;border:1px solid #e9edf1;font-size:12px;line-height:1.7}.v36-attachment-card{margin:14px 0;border:1px solid #eadfe4;border-radius:16px;background:#fff;overflow:hidden}.v36-attachment-card .v36-asd-head{background:#fff7fa}.v36-attachment-card .v36-asd-body{padding:14px 16px}.v36-attachment-card .v36-cause{margin-top:12px}.extra-section-title{margin:14px 0 5px;font-size:14px;color:#39424d}
+.v36-asd-card{margin:14px 0;border:1px solid #eadfe4;border-radius:16px;background:#fff;overflow:hidden}.v36-asd-head{padding:14px 16px;background:#fff7fa;color:#c74369;font-size:16px;font-weight:800}.v36-asd-body{padding:14px 16px}.v36-asd-body p{margin:0 0 10px;font-size:13px;line-height:1.8}.v36-asd-body ul{margin:8px 0 12px;padding-left:20px}.v36-asd-body li{margin:7px 0;font-size:13px;line-height:1.7}.v36-cause{padding:10px 11px;border-radius:11px;background:#fafbfc;border:1px solid #e9edf1;font-size:12px;line-height:1.7}.v36-answer-box{margin-top:10px;border-top:1px solid #eee;padding-top:10px}.v36-answer-row{display:grid;grid-template-columns:34px 1fr 28px;gap:7px;align-items:start;padding:8px 0;border-bottom:1px solid #f0f1f3;font-size:11px;line-height:1.55}.v36-answer-row:last-child{border-bottom:0}.v36-answer-no{font-weight:800;color:#c74369}.v36-answer-score{text-align:center;font-weight:800}.v36-shared-result{margin-top:10px}.v36-shared-result h4{margin:0 0 8px;font-size:14px;color:#c74369}.v33-poll{margin-top:8px}.v33-poll button{width:100%;padding:9px;border:1px solid #ddd;border-radius:10px;background:#fff}
+.diag-question-panel{margin-top:12px}.diag-review{width:100%;padding:11px 12px;border:1px solid #df6684;border-radius:11px;background:#fff7fa;color:#c74369;font-weight:800;margin:10px 0 0}.diag-review-note{font-size:11px;color:#717983;line-height:1.6;margin:7px 2px 0}.v36-share-explain{margin:8px 0;padding:10px 11px;border-radius:11px;background:#fafbfc;border:1px solid #e9edf1;font-size:11px;line-height:1.65;color:#59616b}.v36-share-explain b{color:#c74369}
+
+/* v36 — result-first trait profile */
+.v36-profile-card{margin:14px 0;border:1px solid #eadfe4;border-radius:16px;background:#fff;overflow:hidden}.v36-profile-head{padding:14px 16px;background:#fff7fa;color:#c74369;font-size:17px;font-weight:800}.v36-profile-intro{padding:12px 16px 4px;font-size:12px;line-height:1.75;color:#717983}.v36-trait{margin:0 14px 12px;padding:13px 14px;border:1px solid #edf0f3;border-radius:13px;background:#fff}.v36-trait-title{font-weight:800;font-size:14px;color:#39424d;margin-bottom:6px}.v36-trait-main{font-size:13px;line-height:1.75;margin:0}.v36-trait-main b{color:#c74369}.v36-trait-use{margin-top:8px;padding:9px 10px;border-radius:10px;background:#fafbfc;font-size:12px;line-height:1.65;color:#59616b}.v36-trait-use b{color:#c74369}.v33-ai-note{margin:12px 14px;padding:10px 11px;border-radius:11px;background:#fff7fa;border:1px solid #f0dce3;font-size:11px;line-height:1.65;color:#717983}.v33-ai-note b{color:#c74369}.v36-pair-card{margin:14px 0;border:1px solid #eadfe4;border-radius:16px;background:#fff;overflow:hidden}.v36-pair-head{padding:14px 16px;background:#fff7fa;color:#c74369;font-size:17px;font-weight:800}.v36-pair-body{padding:14px 16px}.v36-pair-person{padding:12px 13px;border:1px solid #edf0f3;border-radius:13px;background:#fff;margin-bottom:10px}.v36-pair-person h4{margin:0 0 6px;font-size:14px;color:#39424d}.v36-pair-person p{margin:0;font-size:13px;line-height:1.75}.v33-mismatch{padding:12px 13px;border-radius:12px;background:#fafbfc;border:1px solid #e9edf1;font-size:13px;line-height:1.75}.v36-more{margin-top:16px;border-top:1px solid #eee;padding-top:12px}.v36-more summary{cursor:pointer;font-weight:800;color:#c74369;font-size:14px;padding:8px 2px}.v36-more-note{font-size:11px;color:#717983;line-height:1.6;margin:2px 2px 10px}.v36-compare-only .v21-compare-list{display:none}.v36-compare-only .v21-compare-sub{margin-bottom:4px}
+.v36-profile-apply{margin:10px 14px 14px}.v36-profile-apply button{width:100%;padding:11px 12px;border:1px solid #df6684;border-radius:11px;background:#fff7fa;color:#c74369;font-weight:800}.v36-pair-note{margin-top:10px;padding:11px 12px;border-radius:12px;background:#fff7fa;border:1px solid #f0dce3;font-size:12px;line-height:1.7}.v36-compare-empty{display:none}
+/* v36: focused invite/share screens — fix hidden #diag parent and question panel */
+body.invite-mode nav,body.invite-mode #talk{display:none!important}
+body.invite-mode #diag{display:block!important}
+body.invite-mode #diag > .panel > *:not(#v23InviteCard),body.invite-mode #v21CompareCard,body.invite-mode #diagQuestionPanel,body.invite-mode #diagResult,body.invite-mode #moreDiag{display:none!important}
+body.invite-mode #v23InviteCard{display:block!important;margin-top:0}
+body.invite-mode .v36-invite-focus{padding:16px;border-radius:14px;background:#fff7fa;border:1px solid #f0dce3}
+body.invite-questions-mode nav,body.invite-questions-mode #talk{display:none!important}
+body.invite-questions-mode #diag{display:block!important}
+body.invite-questions-mode #diag > .panel{display:block!important}
+body.invite-questions-mode #diag > .panel > *:not(#diagQuestionPanel),body.invite-questions-mode #v21CompareCard,body.invite-questions-mode #diagResult,body.invite-questions-mode #moreDiag{display:none!important}
+body.invite-questions-mode #diagQuestionPanel{display:block!important}
+body.shared-mode nav,body.shared-mode #talk > *:not(#result),body.shared-mode #diag{display:none!important}
+body.shared-mode #result{display:block!important}
+.v36-shared-result{margin-top:14px}
+.v36-shared-title{padding:16px;background:#fff7fa;border:1px solid #f0dce3;border-radius:16px;color:#c74369}
+.v36-shared-title h2{margin:0 0 6px;font-size:19px}.v36-shared-title p{margin:0;color:#717983;font-size:12px;line-height:1.7}
+.v36-shared-trait{margin-top:10px;padding:14px;background:#fff;border:1px solid #e9edf1;border-radius:14px}
+.v36-shared-trait h3{margin:0 0 6px;font-size:14px}.shared-subheading{margin:16px 2px 6px;font-size:15px;color:#59616b}.v36-shared-trait p{margin:0;font-size:13px;line-height:1.75}.v36-shared-trait .use{margin-top:8px;padding:9px 10px;background:#fafbfc;border-radius:10px;font-size:12px;line-height:1.65;color:#59616b}.v36-shared-trait .use b{color:#c74369}
+
+</style>
+
+<script>
+/* CoreLingual_v36 — result-linked radar chart */
+(function(){
+  const AX=[
+    {id:"context",label:"受け取り",desc:"情報の受け取り方"},
+    {id:"thinking",label:"考え方",desc:"整理・根拠 ↔ 直感・可能性"},
+    {id:"emotion",label:"感情",desc:"言葉にする ↔ 時間を置く"},
+    {id:"distance",label:"距離感",desc:"共有・相談 ↔ 自分の時間"},
+    {id:"change",label:"変化",desc:"見通し・慣れ ↔ 新しい方法"},
+    {id:"communication",label:"伝え方",desc:"共感・気持ち ↔ 具体策・結論"}
+  ];
+  const clamp=v=>Math.max(0,Math.min(100,Number(v)||0));
+  const normalize=score=>clamp((Number(score)-1)/4*100);
+  function points(cx,cy,r,n){return Array.from({length:n},(_,i)=>{const a=-Math.PI/2+i*2*Math.PI/n;return[cx+Math.cos(a)*r,cy+Math.sin(a)*r]})}
+  function path(ctx,pts){ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath()}
+  function draw(canvas,values,compare){
+    if(!canvas)return;
+    const rect=canvas.getBoundingClientRect(),w=Math.max(280,rect.width||330),h=Math.max(280,rect.height||330),dpr=window.devicePixelRatio||1;
+    canvas.width=w*dpr;canvas.height=h*dpr;
+    const ctx=canvas.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+    const cx=w/2,cy=h/2+3,r=Math.min(w,h)*.30,n=6,outer=points(cx,cy,r,n);
+    ctx.lineWidth=1;ctx.globalAlpha=.22;
+    [25,50,75,100].forEach(s=>{path(ctx,points(cx,cy,r*s/100,n));ctx.stroke()});
+    outer.forEach(p=>{ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(p[0],p[1]);ctx.stroke()});
+    ctx.globalAlpha=1;
+    const dataPts=vals=>vals.map((v,i)=>{const a=-Math.PI/2+i*2*Math.PI/n,rr=r*clamp(v)/100;return[cx+Math.cos(a)*rr,cy+Math.sin(a)*rr]});
+    const base=dataPts(values);
+    if(compare){
+      ctx.setLineDash([5,4]);ctx.lineWidth=2;path(ctx,base);ctx.stroke();ctx.setLineDash([]);
+      const after=dataPts(compare);ctx.globalAlpha=.13;path(ctx,after);ctx.fill();ctx.globalAlpha=1;ctx.lineWidth=2.5;path(ctx,after);ctx.stroke();
+      after.forEach(p=>{ctx.beginPath();ctx.arc(p[0],p[1],3,0,Math.PI*2);ctx.fill()});
+    }else{
+      ctx.globalAlpha=.13;path(ctx,base);ctx.fill();ctx.globalAlpha=1;ctx.lineWidth=2.5;path(ctx,base);ctx.stroke();
+      base.forEach(p=>{ctx.beginPath();ctx.arc(p[0],p[1],3,0,Math.PI*2);ctx.fill()});
+    }
+    ctx.font="12px system-ui,sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";
+    outer.forEach((p,i)=>{const a=-Math.PI/2+i*2*Math.PI/n;ctx.fillText(AX[i].label,cx+Math.cos(a)*(r+29),cy+Math.sin(a)*(r+29))});
+  }
+  window.CoreLingual_v36={axes:AX,normalize,render:(canvas,before,after)=>draw(canvas,before||AX.map(()=>50),after||null)};
+})();
+</script>
+
+
+<script>
+/* v46: canonical 6-axis radar. Accepts either score arrays or keyed maps. */
+window.CoreLingual_v36 = {
+  axes: [
+    {id:"language",label:"情報の受け取り方",left:"具体的・明確",right:"文脈・全体像"},
+    {id:"thinking",label:"考え方",left:"分析・整理",right:"直感・発想"},
+    {id:"emotion",label:"感情の扱い方",left:"言葉にして整理",right:"時間を置いて整理"},
+    {id:"distance",label:"人との距離感",left:"共有・相談",right:"自分の時間"},
+    {id:"change",label:"変化への対応",left:"見通し・慣れ",right:"新しい方法"},
+    {id:"communication",label:"伝え方・受け止め方",left:"共感・気持ち",right:"具体策・結論"}
+  ],
+  normalize(v){ const n=Number(v); return Math.max(0,Math.min(100,Number.isFinite(n)?n:50)); },
+  toValues(vals){
+    if(Array.isArray(vals)){
+      const by=Object.fromEntries(vals.map(x=>[x.key,Number(x.score)]));
+      return this.axes.map(a=>this.normalize(by[a.id]??50));
+    }
+    return this.axes.map(a=>this.normalize(vals?.[a.id]??50));
+  },
+  render(canvas,vals){
+    if(!canvas)return;
+    const values=this.toValues(vals), ctx=canvas.getContext("2d"), dpr=window.devicePixelRatio||1;
+    const rect=canvas.getBoundingClientRect(),w=Math.max(280,rect.width||320),h=Math.max(280,rect.height||300);
+    canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+    const cx=w/2,cy=h/2+4,r=Math.min(w,h)*.30,n=6;
+    const pts=(scale=1)=>this.axes.map((_,i)=>{const a=-Math.PI/2+i*2*Math.PI/n;return[cx+Math.cos(a)*r*scale,cy+Math.sin(a)*r*scale]});
+    const poly=p=>{ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath()};
+    ctx.globalAlpha=.18;ctx.lineWidth=1;[.25,.5,.75,1].forEach(k=>{poly(pts(k));ctx.stroke()});
+    pts(1).forEach(q=>{ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(q[0],q[1]);ctx.stroke()});
+    const data=values.map((v,i)=>{const a=-Math.PI/2+i*2*Math.PI/n;const rr=r*(.25+.75*v/100);return[cx+Math.cos(a)*rr,cy+Math.sin(a)*rr]});
+    ctx.globalAlpha=.14;poly(data);ctx.fill();ctx.globalAlpha=1;ctx.lineWidth=2.5;poly(data);ctx.stroke();
+    data.forEach(q=>{ctx.beginPath();ctx.arc(q[0],q[1],3,0,Math.PI*2);ctx.fill()});
+    ctx.font="12px system-ui,sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";
+    pts(1).forEach((q,i)=>{const a=-Math.PI/2+i*2*Math.PI/n;ctx.fillText(this.axes[i].label,cx+Math.cos(a)*(r+30),cy+Math.sin(a)*(r+30))});
+  }
+};
+</script>
+<style>
+.v46-partner-result,.v46-pair-card{margin-top:12px;border:1px solid #eadfe4;border-radius:14px;background:#fff;padding:12px}.v46-result-head,.v46-pair-head{font-size:18px;font-weight:800;color:#c74369}.v46-result-note,.v46-pair-note{font-size:12px;line-height:1.65;color:#717983;margin-top:5px}.v46-result-trait{margin-top:10px;padding:11px;border:1px solid #edf0f2;border-radius:12px;background:#fafbfc}.v46-result-trait h4{margin:0 0 6px;font-size:15px}.v46-result-trait p{margin:4px 0;line-height:1.7;font-size:13px}.v46-result-trait .use{margin-top:7px;padding:9px;background:#fff;border-radius:10px;line-height:1.65;font-size:12px}.v46-subhead{margin:14px 0 6px;color:#c74369}.v46-pair-radar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.v46-pair-person{border:1px solid #eadfe4;border-radius:12px;padding:8px;text-align:center;font-size:13px}.v46-pair-person canvas{width:100%;height:190px;display:block}.v46-side-by-side{margin-top:10px}.v46-compare-row{border-top:1px solid #eee;padding:10px 0}.v46-compare-axis{font-weight:800;font-size:14px;margin-bottom:6px}.v46-two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px}.v46-two-col>div{background:#fafbfc;border-radius:10px;padding:8px}.v46-two-col b{font-size:12px;color:#c74369}.v46-two-col p{font-size:12px;line-height:1.6;margin:4px 0}.v46-pair-insights{margin-top:10px}.v46-insight{padding:10px;border-radius:11px;background:#fff7fa;border:1px solid #f0dce3;margin-top:7px;font-size:12px;line-height:1.65}.v46-insight p{margin:5px 0}@media(max-width:600px){.v46-pair-person canvas{height:170px}}
+</style></head>
+<body>
+<div class="app">
+<header><h1>CoreLingual</h1><div class="sub">会話と「特性」の違いを読み解くサポートアプリ</div></header>
+<nav><button id="talkTab" class="on">💬 会話を読み解く</button><button id="diagTab">🧩 特性チェック</button></nav>
+<main>
+
+
+<section id="talk">
+<div class="panel"><b>会話を入力</b><p style="font-size:12px;color:#717983">スクショは <b>右側＝自分</b>、<b>左側＝相手</b> として扱います。</p>
+<div class="actions"><button id="textMode" class="action on">⌨️ テキスト入力</button><button id="imageMode" class="action">🖼️ スクショ送信</button></div>
+<div id="textArea"><label class="small">この文章は誰の発言？</label><div class="actions"><button id="speakerMe" class="action on">👤 自分</button><button id="speakerPartner" class="action">👥 相手</button><button id="speakerUnknown" class="action">❓ 不明</button></div><textarea id="message" placeholder="気になったメッセージや会話を入力…"></textarea></div>
+<div id="imageArea" style="display:none"><label class="upload" for="images">🖼️ <b>スクショを追加</b><br><small>LINE・DM・SMSなど、最大5枚</small></label><input id="images" type="file" accept="image/*" multiple style="display:none"><div id="thumbs" class="thumbs"></div><div id="imageControls" style="display:none;margin-top:8px"><button id="clearImages" class="action">🗑️ 選択したスクショを全部削除</button></div><label class="small">このスクショについて聞きたいこと</label><textarea id="imageQuestion" placeholder="例：最後の「了解」はどういうニュアンスに見える？"></textarea><div class="ad-slot small" id="imageAd"><strong>📺 スクショ分析前の広告枠</strong>短い広告を表示する場所です。現在は広告未接続。<div class="ad-countdown" id="imageAdCountdown"></div></div></div></div>
+<div class="panel"><b>👤 プロフィール</b><p style="font-size:12px;color:#717983">会話の中で見えやすい「傾向」を、自分と相手に分けて保存できます。診断名ではなく、コミュニケーションの特徴として扱います。</p>
+<div class="actions"><button id="profileMyTab" class="action on">👤 自分</button><button id="profilePartnerTab" class="action">👥 相手</button></div>
+<div id="profileMyPane" class="person"><h3>👤 自分のプロフィール</h3><label class="small">会話の傾向</label><div id="myTraits" class="chips"></div><label class="small">メモ</label><div class="friendly-note">特性チェックの結果を反映したり、自分で自由に書き換えたりできます。</div><textarea id="myFree" class="profile-memo" placeholder="自分について、会話で大切にしていることなど…"></textarea><div class="savebar"><input id="myName" type="text" placeholder="例：自分、仕事用"><button id="saveMy" class="save">保存</button></div><div id="myProfiles" class="profiles"></div><div class="profile-delete-hint">タップで使用中に切り替え。長押しで削除確認。</div></div>
+<div id="profilePartnerPane" class="person" style="display:none"><h3>👥 相手のプロフィール</h3><label class="small">会話の傾向</label><div id="partnerTraits" class="chips"></div><label class="small">メモ</label><div class="friendly-note">相手について分かる範囲で設定できます。推測だけで決めつけず、会話分析の補助として使います。</div><textarea id="partnerFree" class="profile-memo" placeholder="相手について、会話で気づいていることなど…"></textarea><div class="savebar"><input id="partnerName" type="text" placeholder="例：友人A、家族、同僚A"><button id="savePartner" class="save">保存</button></div><div id="partnerProfiles" class="profiles"></div><div class="profile-delete-hint">タップで使用中に切り替え。長押しで削除確認。</div></div></div>
+<button id="analyze" class="primary">✨ 分析・アドバイスを表示する</button><div class="ad-slot" id="bannerAd"><strong>📢 広告バナー予定エリア</strong>将来ここに常時バナー広告を表示します。現在は広告未接続。</div><div id="result"></div>
+</section>
+<section id="diag" style="display:none"><div class="panel"><b>🧩 特性チェック</b><p style="font-size:12px;color:#717983">前半18問で6つの基本方向を広く見たあと、短い広告をはさんで後半18問の深掘りチェックへ進めます。36問すべてを使って、会話のすれ違いにつながりやすい特徴を整理します。これは診断ではなく、会話のすれ違いを理解するための参考情報です。</p>
+<div class="actions"><button id="selfDiag" class="action on">👤 自分をチェック</button><button id="otherDiag" class="action">👥 相手をチェック</button></div><div id="targetNote" style="font-size:12px;color:#717983">自分自身について回答してください。</div>
+<div id="v23InviteCard" class="card" style="margin-top:12px;background:#fffafc;border-color:#f0dce3">
+  <b>👥 2人で特性チェック</b>
+  <p id="v23InviteIntro" style="font-size:12px;color:#717983;line-height:1.7;margin:6px 0 10px">自分のチェックが終わったら、相手にリンクを送って相手側のチェックをしてもらえます。相手の結果は、本人が「共有する」と選ばない限り見えません。</p>
+  <div id="v23InviteControls"></div>
+</div>
+<div id="v21CompareCard" class="card v21-compare-card" style="display:none">
+  <div class="v21-compare-title">👥 2人のコミュニケーション比較</div>
+  <div class="v21-compare-sub">2人分の特性チェック結果があると、6つの傾向を並べて見比べられます。</div>
+  <div id="v21CompareGrid" class="v21-compare-grid"></div>
+  <div id="v21CompareList" class="v21-compare-list"></div>
+</div>
+<div id="diagQuestionPanel" class="diag-question-panel"><div id="questions"></div><button id="runDiag" class="primary">📊 結果を見る</button></div><div id="diagResult"></div>
+<div id="moreDiag" style="display:none" class="v36-more">
+  <div class="v36-more-note"><b>🔎 もっと深くチェックする（後半18問）</b><br>前半18問とは別の3つの方向から、会話での反応のクセをもう一段深く見ます。後半も見てみたい人は、下のボタンから進めます。</div>
+  <div class="card">
+    <b>🔍 後半18問では何を見る？</b>
+    <p style="font-size:12px;color:#717983">🫂 近づき方・距離の取り方 ／ 🌿 刺激への反応 ／ 🧭 進め方・柔軟性。各6問、合計18問です。前半18問と合わせて36問のプロフィールを作ります。</p>
+    <button id="startMore" class="primary">🧭 後半18問を始める</button>
+  </div>
+  <div id="ad30" class="ad-slot" style="display:none">
+    <strong>📺 追加チェック前の広告枠（開発中）</strong>
+    <div>広告表示の代わりに3秒カウントします。終了後、自動で後半18問が始まります。</div>
+    <div class="ad-countdown" id="ad30Countdown"></div>
+  </div>
+  <div id="extraDiag" style="display:none" class="card">
+    <b id="extraTitle">追加チェック</b>
+    <p id="extraIntro" style="font-size:12px;color:#717983"></p>
+    <div id="extraQuestions"></div>
+    <button id="runExtra" class="primary">🔎 追加チェックの結果を見る</button>
+    <div id="extraResult"></div>
+  </div>
+</div></div></section>
+</main></div>
+<script>
+const PROFILE_TRAITS=[
+"具体的な言葉を好む","文脈や行間を重視する","理由や根拠を確認したい","直感を重視することがある",
+"複数の可能性を考える","一度気になると考え続けやすい","自分の気持ちを言葉にして整理する","一人で整理してから話したい",
+"相手の感情の変化に気づきやすい","関係の変化が気になりやすい","自分のペースを保ちたい","まず話し合って解決したい",
+"変化は前もって知りたい","新しいことを試すのが好き","興味のあることに集中しやすい","会話では共感を大切にする"
+];
+function makeTraits(id){const e=document.getElementById(id);PROFILE_TRAITS.forEach(t=>{const b=document.createElement("button");b.className="chip";b.type="button";b.textContent=t;b.onclick=()=>b.classList.toggle("on");e.appendChild(b)})}
+makeTraits("myTraits");makeTraits("partnerTraits");
+profileMyTab.onclick=()=>{profileMyTab.classList.add("on");profilePartnerTab.classList.remove("on");profileMyPane.style.display="block";profilePartnerPane.style.display="none"};
+profilePartnerTab.onclick=()=>{profilePartnerTab.classList.add("on");profileMyTab.classList.remove("on");profilePartnerPane.style.display="block";profileMyPane.style.display="none"};
+textMode.onclick=()=>setMode("text");imageMode.onclick=()=>setMode("image");function setMode(x){textMode.classList.toggle("on",x==="text");imageMode.classList.toggle("on",x==="image");textArea.style.display=x==="text"?"block":"none";imageArea.style.display=x==="image"?"block":"none"}
+talkTab.onclick=()=>{talk.style.display="block";diag.style.display="none";talkTab.classList.add("on");diagTab.classList.remove("on")};diagTab.onclick=()=>{talk.style.display="none";diag.style.display="block";diagTab.classList.add("on");talkTab.classList.remove("on")};
+let selectedImages=[];
+let compressedImages=[];
+function drawImages(){
+  thumbs.innerHTML="";
+  selectedImages.forEach((f,idx)=>{
+    let wrap=document.createElement("div");wrap.style.cssText="position:relative;flex:0 0 auto";
+    let i=document.createElement("img");i.className="thumb";i.src=URL.createObjectURL(f);
+    let x=document.createElement("button");x.type="button";x.textContent="×";x.title="この画像を削除";
+    x.style.cssText="position:absolute;right:-5px;top:-5px;width:23px;height:23px;border:0;border-radius:50%;background:#333;color:#fff;font-weight:bold;padding:0";
+    x.onclick=()=>{selectedImages.splice(idx,1);drawImages()};
+    wrap.appendChild(i);wrap.appendChild(x);thumbs.appendChild(wrap);
+  });
+  imageControls.style.display=selectedImages.length?"block":"none";
+}
+async function compressImage(file){
+  const bitmap=await createImageBitmap(file);
+  const maxSide=2200;
+  const scale=Math.min(1,maxSide/Math.max(bitmap.width,bitmap.height));
+  const w=Math.max(1,Math.round(bitmap.width*scale)),h=Math.max(1,Math.round(bitmap.height*scale));
+  const canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;
+  const ctx=canvas.getContext("2d",{alpha:false});
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h);ctx.drawImage(bitmap,0,0,w,h);
+  bitmap.close();
+  const blob=await new Promise(ok=>canvas.toBlob(ok,"image/jpeg",0.72));
+  if(!blob)throw Error("スクショの圧縮に失敗しました。");
+  return blob;
+}
+images.onchange=async()=>{
+  const incoming=[...images.files].slice(0,5-selectedImages.length);
+  if(!incoming.length){images.value="";return}
+  const oldText=imageMode.innerHTML;imageMode.disabled=true;imageMode.innerHTML="🖼️ 圧縮中…";
+  try{
+    for(const f of incoming){
+      const blob=await compressImage(f);
+      const compressed=new File([blob],(f.name||"screenshot").replace(/\.[^.]+$/i,".jpg"),{type:"image/jpeg"});
+      selectedImages.push(compressed);
+    }
+    drawImages();
+  }catch(e){alert(e.message||"スクショを処理できませんでした。");}
+  finally{imageMode.disabled=false;imageMode.innerHTML=oldText;images.value=""}
+};
+clearImages.onclick=()=>{selectedImages=[];drawImages()};
+let currentSpeaker="me";
+function setSpeaker(x){currentSpeaker=x;speakerMe.classList.toggle("on",x==="me");speakerPartner.classList.toggle("on",x==="partner");speakerUnknown.classList.toggle("on",x==="unknown")}
+speakerMe.onclick=()=>setSpeaker("me");speakerPartner.onclick=()=>setSpeaker("partner");speakerUnknown.onclick=()=>setSpeaker("unknown");
+function state(p){return{traits:[...document.querySelectorAll("#"+p+"Traits .on")].map(x=>x.textContent),free:document.getElementById(p+"Free").value}}
+function apply(p,s){document.getElementById(p+"Free").value=s.free||"";document.querySelectorAll("#"+p+"Traits .chip").forEach(x=>x.classList.toggle("on",(s.traits||[]).includes(x.textContent)))}
+function list(p){try{return JSON.parse(localStorage.getItem("cl_"+p)||"[]")}catch{return[]}}
+function activeProfile(p){try{return JSON.parse(localStorage.getItem("cl_"+p+"_active")||"null")}catch{return null}}
+function setActiveProfile(p,name){localStorage.setItem("cl_"+p+"_active",JSON.stringify(name))}
+function draw(p){const e=document.getElementById(p+"Profiles");e.innerHTML="";const active=activeProfile(p);list(p).forEach((x,idx)=>{let b=document.createElement("button");b.className="profile"+(active===x.name?" active":"");b.type="button";b.textContent=(active===x.name?"● ":"")+x.name;let timer=null,longPressed=false;const cancel=()=>{if(timer){clearTimeout(timer);timer=null}};b.addEventListener("pointerdown",()=>{longPressed=false;timer=setTimeout(()=>{longPressed=true;if(confirm("「"+x.name+"」を削除しますか？")){let a=list(p);a.splice(idx,1);localStorage.setItem("cl_"+p,JSON.stringify(a));if(active===x.name)localStorage.removeItem("cl_"+p+"_active");draw(p)}},650)});b.addEventListener("pointerup",cancel);b.addEventListener("pointercancel",cancel);b.addEventListener("pointerleave",cancel);b.addEventListener("click",()=>{if(longPressed)return;setActiveProfile(p,x.name);apply(p,x.state);draw(p)});e.appendChild(b)})}
+function save(p){let name=document.getElementById(p+"Name").value.trim()||"プロフィール "+(list(p).length+1),a=list(p);const existing=a.findIndex(x=>x.name===name);const item={name,state:state(p)};if(existing>=0)a[existing]=item;else a.push(item);a=a.slice(-5);localStorage.setItem("cl_"+p,JSON.stringify(a));setActiveProfile(p,name);document.getElementById(p+"Name").value="";draw(p);renderTwoPersonComparison()}
+
+saveMy.onclick=()=>save("my");savePartner.onclick=()=>save("partner");draw("my");draw("partner");
+function sharePayload(title,payload){
+  return fetch("/api/share",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title,payload})})
+    .then(async r=>{const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||"共有機能のDBがまだ接続されていません。DB設定後に利用できます。");return data;})
+    .then(async data=>{const url=data.url||location.origin+"/share/"+data.token;const shareData={title,text:title+"\nCoreLingualの共有結果を見る",url};if(navigator.share){await navigator.share(shareData);return;}if(navigator.clipboard){await navigator.clipboard.writeText(url);alert("安全な共有リンクをコピーしました！");return;}prompt("このリンクをコピーして送ってね",url);})
+    .catch(e=>{if(e?.name!=="AbortError")alert(e.message||"共有リンクを作れませんでした。");});
+}
+function addShareButton(parent,title,payload){
+  const row=document.createElement("div");row.className="share-row";
+  const b=document.createElement("button");b.className="share-btn";b.type="button";b.textContent="📤 この結果を共有する";
+  b.onclick=()=>sharePayload(title,payload);row.appendChild(b);parent.appendChild(row);
+  const n=document.createElement("div");n.className="share-note";n.textContent="共有するのは今回の結果だけ。会話本文・スクショ・プロフィール詳細は共有しません。共有リンクは推測しにくいランダムIDで管理します。";parent.appendChild(n);
+}
+function render(d){
+  result.innerHTML="";
+  const ana=document.createElement("section");ana.className="result-section analysis-section";
+  ana.innerHTML='<div class="result-heading">🔍 特性アナライズ</div>';
+  const items=[
+    ["🌸 相手の心理・背景",d.partner],
+    ["🧩 自分の心理・背景",d.me],
+    ["💡 すれ違いのメカニズム",d.mismatch]
+  ];
+  items.forEach(([title,text])=>{if(!text)return;const c=document.createElement("div");c.className="result-card";c.innerHTML="<b></b><p></p>";c.querySelector("b").textContent=title;c.querySelector("p").textContent=text;ana.appendChild(c)});
+  if(ana.children.length>1)result.appendChild(ana);
+
+  const advice=document.createElement("section");advice.className="result-section advice-section";
+  advice.innerHTML='<div class="result-heading advice-heading">💬 言い換えアドバイス</div>';
+  const list=Array.isArray(d.advice)?d.advice:[];
+  list.forEach(item=>{
+    const c=document.createElement("div");c.className="advice-card";
+    const cause=document.createElement("div");cause.className="advice-cause";cause.innerHTML='<span>原因：</span> '+(item.cause||"");
+    const suggest=document.createElement("div");suggest.className="advice-suggest";suggest.innerHTML='<b>💡 こう言い換えてみましょう</b><p></p>';suggest.querySelector("p").textContent=item.suggestion||"";
+    c.appendChild(cause);c.appendChild(suggest);advice.appendChild(c);
+  });
+  if(d.reply && !list.length){const c=document.createElement("div");c.className="advice-card";c.innerHTML='<div class="advice-suggest"><b>💡 こう言い換えてみましょう</b><p></p></div>';c.querySelector("p").textContent=d.reply;advice.appendChild(c)}
+  if(advice.children.length>1)result.appendChild(advice);
+
+  if(d.caution){const c=document.createElement("div");c.className="card caution-card";c.innerHTML='<b>🌱 ここは断定できないところ</b><p></p>';c.querySelector("p").textContent=d.caution;result.appendChild(c)}
+  addShareButton(result,"CoreLingualの会話解析結果",{kind:"analysis",version:1,result:{partner:d.partner||"",me:d.me||"",mismatch:d.mismatch||"",advice:Array.isArray(d.advice)?d.advice:[],caution:d.caution||""}});
+}
+async function waitAd(seconds, slot, countdownEl, label){
+  slot.style.display="block";
+  let c=seconds; countdownEl.textContent=label+"（"+c+"秒）";
+  await new Promise(resolve=>{const t=setInterval(()=>{c--;countdownEl.textContent=c>0?label+"（"+c+"秒）":"広告枠終了。分析を開始します…";if(c<=0){clearInterval(t);setTimeout(resolve,250)}},1000)});
+}
+function buildAiProfileTextFromStorage(p){
+  try{
+    const base=JSON.parse(localStorage.getItem('cl_diag_result_'+p)||'null');
+    const ex=JSON.parse(localStorage.getItem('cl_extra_result_'+p)||'null');
+    const free=document.getElementById(p+'Free')?.value||'';
+    if(!base?.scores)return '';
+    return buildAiProfileText(base.scores,p==='my'?'あなた':'相手',ex?.scores||[],free);
+  }catch{return ''}
+}
+analyze.onclick=async()=>{analyze.disabled=true;const originalText=analyze.innerHTML;analyze.innerHTML='<span class="spinner"></span>準備中…';let note=document.getElementById("loadingNote");if(!note){note=document.createElement("div");note.id="loadingNote";note.className="loading-note";analyze.after(note)}note.textContent="会話を読み込んでいます…";try{let body={inputMode:textArea.style.display!=="none"?"text":"image",message:message.value,speaker:currentSpeaker,imageQuestion:(document.getElementById("imageQuestion")||{}).value||"",myTraits:state("my").traits,partnerTraits:state("partner").traits,myFree:myFree.value,partnerFree:partnerFree.value,diagnosisContext:{my:buildAiProfileTextFromStorage("my"),partner:buildAiProfileTextFromStorage("partner")},images:[]};
+  if(body.inputMode==="image"){
+    if(!selectedImages.length)throw Error("スクショを1枚以上追加してね。");
+    analyze.innerHTML='<span class="spinner"></span>広告を表示中…';
+    await waitAd(5,imageAd,imageAdCountdown,"短い広告のあと分析します");
+    for(const f of selectedImages){const r=await new Promise(ok=>{let fr=new FileReader();fr.onload=()=>ok(fr.result.split(",")[1]);fr.readAsDataURL(f)});body.images.push({data:r,mime_type:f.type||"image/jpeg"})}
+  }
+  const requestBody=JSON.stringify(body);
+  if(requestBody.length>3900000)throw Error("スクショの容量がまだ大きすぎます。枚数を減らして、もう一度試してください。");
+  analyze.innerHTML='<span class="spinner"></span>分析中…';
+  note.textContent="会話を読み込んでいます。スクショが多い場合は少し時間がかかります…";
+  let r=await fetch("/api/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:requestBody});
+  const responseText=await r.text();let d;try{d=JSON.parse(responseText)}catch{throw Error(r.status===413?"スクショの容量が大きすぎます。枚数を減らして、もう一度試してください。":"サーバーから正常な応答を受け取れませんでした（HTTP "+r.status+"）。")}
+  if(!r.ok)throw Error(d.error||"APIエラー");render(d);note.textContent="分析が完了しました。"}
+  catch(e){result.innerHTML='<div class="card"><b>エラー</b><p></p></div>';result.querySelector("p").textContent=e.message;note.textContent="分析に失敗しました。"}
+  finally{analyze.disabled=false;analyze.innerHTML=originalText;imageAdCountdown.textContent=""}};
+
+const AXES={
+ language:{label:"情報の受け取り方",left:"言葉を具体的に確認",right:"文脈や全体像から理解",icon:"🗣️"},
+ thinking:{label:"考え方",left:"整理・根拠から考える",right:"直感・可能性から考える",icon:"🧠"},
+ emotion:{label:"感情の扱い方",left:"言葉にして整理",right:"時間を置いて整理",icon:"💭"},
+ distance:{label:"人との距離感",left:"その場で共有・相談",right:"自分の時間を確保",icon:"🤝"},
+ change:{label:"変化への対応",left:"見通し・慣れを重視",right:"新しい方法を試しやすい",icon:"🔄"},
+ communication:{label:"伝え方・受け止め方",left:"共感・気持ちを重視",right:"具体策・結論を重視",icon:"💬"}
+};
+
+/*
+  v39: 基本18問 = 6軸×3問。
+  ここは「玄関」として、会話の基本的な方向を広く確認する。
+*/
+const Q=[
+ {q:"説明を聞くとき、具体的な例や条件があると理解しやすい",axis:"language",dir:-1},
+ {q:"話の意味を考えるとき、前後の流れや状況を含めて受け取りたい",axis:"language",dir:1},
+ {q:"曖昧な表現があると、まず言葉の意味を確認したくなる",axis:"language",dir:-1},
+
+ {q:"何かを決めるとき、理由や根拠を整理してから判断したい",axis:"thinking",dir:-1},
+ {q:"一つの答えを決める前に、いくつかの可能性を思い浮かべる",axis:"thinking",dir:1},
+ {q:"『なんとなくこうだ』という感覚が、判断のきっかけになることがある",axis:"thinking",dir:1},
+
+ {q:"自分の気持ちは、言葉にすると整理しやすいほうだ",axis:"emotion",dir:-1},
+ {q:"感情が強くなったとき、いったん時間を置いてから考えたい",axis:"emotion",dir:1},
+ {q:"何が嫌だったのか、何が嬉しかったのかを言葉にすると分かりやすい",axis:"emotion",dir:-1},
+
+ {q:"気になることがあれば、その場で相手と話して確認したい",axis:"distance",dir:-1},
+ {q:"親しい相手でも、一人で過ごす時間は必要だ",axis:"distance",dir:1},
+ {q:"関係の中で気になることは、早めに共有したほうが楽だと感じる",axis:"distance",dir:-1},
+
+ {q:"予定や手順が前もって分かっていると、安心して取り組みやすい",axis:"change",dir:-1},
+ {q:"新しいやり方を試してみることに、あまり抵抗を感じない",axis:"change",dir:1},
+ {q:"急な予定変更があると、まず変更後の流れを確認したくなる",axis:"change",dir:-1},
+
+ {q:"誰かに相談されたとき、まず『それは大変だったね』と気持ちを受け止めたい",axis:"communication",dir:-1},
+ {q:"相談を受けると、まず具体的な解決方法を考えたくなる",axis:"communication",dir:1},
+ {q:"意見が違っても、まず相手の気持ちや理由を理解してから返したい",axis:"communication",dir:-1}
+];
+
+/* 後半18問 = 3系統×6問。前半6軸とは別の切り口で深掘りする。 */
+const DEEP_AXES={
+ attach:{label:"近づき方・距離の取り方",icon:"🫂",left:"気になると相手とのつながりを確かめたくなりやすい",right:"自分の中で整理してから距離を調整しやすい"},
+ sensory:{label:"刺激への反応",icon:"🌿",left:"情報量や刺激が重なると、いったん減らして整理したくなりやすい",right:"刺激や変化があっても、その場で切り替えながら対応しやすい"},
+ process:{label:"進め方・柔軟性",icon:"🧭",left:"順番や見通しを整えてから進めたい",right:"まず動いて、途中で調整しながら進めたい"}
+};
+const Q_DEEP=[
+ {q:"相手の反応がいつもと違うと、何があったのか確かめたくなる",axis:"attach",dir:-1},
+ {q:"気になることがあっても、まず自分の中で整理してから相手に話したい",axis:"attach",dir:1},
+ {q:"親しい相手から返事がないと、状況を確認したくなることがある",axis:"attach",dir:-1},
+ {q:"人間関係で疲れたときは、誰かと話すより一人の時間で回復しやすい",axis:"attach",dir:1},
+ {q:"関係が不安定に感じると、相手との距離を近づけて安心したくなることがある",axis:"attach",dir:-1},
+ {q:"近い関係でも、少し離れて考える時間があるほうが落ち着くことがある",axis:"attach",dir:1},
+
+ {q:"周りの音や情報が多い場所では、集中しにくくなることがある",axis:"sensory",dir:-1},
+ {q:"いくつかのことが同時に起きても、気持ちを切り替えながら対応できるほうだ",axis:"sensory",dir:1},
+ {q:"予定外の刺激が続くと、静かな時間を取りたくなることがある",axis:"sensory",dir:-1},
+ {q:"人が多い場所やにぎやかな場面でも、そこまで気にならないことが多い",axis:"sensory",dir:1},
+ {q:"相手の言葉や周囲の変化が重なると、いったん情報を減らしたくなる",axis:"sensory",dir:-1},
+ {q:"刺激が多い状況でも、面白ければそのまま楽しめることが多い",axis:"sensory",dir:1},
+
+ {q:"何かを始める前に、手順や順番を決めておきたい",axis:"process",dir:-1},
+ {q:"まず試してみて、やりながら方法を変えるほうが楽なことがある",axis:"process",dir:1},
+ {q:"途中で予定が変わると、いったん整理してから続けたい",axis:"process",dir:-1},
+ {q:"最初から完璧な計画を作るより、動きながら決めるほうが早いと感じる",axis:"process",dir:1},
+ {q:"複数の作業があると、優先順位や順番を決めてから取りかかりたい",axis:"process",dir:-1},
+ {q:"予定どおりでなくても、結果が良ければ途中のやり方は変えて構わないと思う",axis:"process",dir:1}
+];
+let diagScores=[];let diagAnswers=[];let target="my";
+function axisScore(qset,answers){
+ const out={};
+ Object.keys(AXES).forEach(k=>{
+   let total=0,count=0;
+   qset.forEach((q,i)=>{if(q.axis!==k)return;const v=Number(answers[i]);total+=(v-3)*q.dir;count++});
+   out[k]=count?Math.max(0,Math.min(100,50+(total/count)*25)):50;
+ });
+ return Object.entries(out).map(([key,score])=>({key,score}));
+}
+function deepScore(answers){
+ const out={};
+ Object.keys(DEEP_AXES).forEach(k=>{
+   let total=0,count=0;
+   Q_DEEP.forEach((q,i)=>{if(q.axis!==k)return;const v=Number(answers[i]);total+=(v-3)*q.dir;count++});
+   out[k]=count?Math.max(0,Math.min(100,50+(total/count)*25)):50;
+ });
+ return Object.entries(out).map(([key,score])=>({key,score}));
+}
+function deepNarrative(key,score){
+ const a=DEEP_AXES[key];
+ const uses={
+  attach:{left:"相手の反応が読みにくいときは、確認したくなる気持ちを否定せず、『今は返事が必要なのか、少し待てるのか』を切り分けると落ち着きやすくなります。",right:"近い関係でも一人で整理する時間が必要になることがあります。『少し考えてから話したい』と先に伝えると、距離を拒絶と受け取られにくくなります。",middle:"相手との関係やその時の気持ちによって、確認したい時と一人で整理したい時を切り替えやすい傾向があります。"},
+  sensory:{left:"情報や刺激が重なった場面では、話す量や通知などを少し減らしてから会話を続けると整理しやすくなることがあります。",right:"刺激が重なっても、その場で切り替えながら会話を続けやすい傾向があります。ただし疲れが出ているときは、無理に合わせなくても大丈夫です。",middle:"刺激の量やその場の余裕によって、受け止め方を変えやすい傾向があります。"},
+  process:{left:"予定や順番が見えないときは、まず『次に何をするか』を一つ決めると動きやすくなります。",right:"最初から全部決めるより、まず小さく始めて途中で調整するほうが進みやすいことがあります。",middle:"見通しを立ててから動く時と、まず試して途中で変える時を状況に応じて使い分けやすい傾向があります。"}
+ };
+ if(score<=35)return {main:a.left,use:uses[key].left};
+ if(score>=65)return {main:a.right,use:uses[key].right};
+ return {main:`${a.left}と${a.right}の両方が、場面によって出やすい`,use:uses[key].middle};
+}
+function directionText(key,score){const a=AXES[key];if(score<=35)return a.left;if(score>=65)return a.right;return "場面・相手に応じて使い分ける"}
+function directionShort(key,score){if(score<=35)return "左寄り";if(score>=65)return "右寄り";return "中間"}
+function axisValuesFromScores(scores){const by={};(scores||[]).forEach(x=>by[x.key]=Number(x.score));return CoreLingual_v36.axes.map(a=>Math.round(by[a.id]??50))}
+function extraAxisValues(extraScores){
+ const by={};
+ (extraScores||[]).forEach(x=>{
+   if(AXES[x.key]) by[x.key]=Number(x.score)||0;
+ });
+ return CoreLingual_v36.axes.map(a=>by[a.id]!=null?Math.round(CoreLingual_v36.normalize(by[a.id])):50);
+}
+function combinedAxisValues(baseScores,extraScores){const b=axisValuesFromScores(baseScores),e=extraAxisValues(extraScores);return b.map((v,i)=>Math.round(v*.5+e[i]*.5))}
+function profileDisplayName(p){return p==="my"?"あなた":"相手"}
+function loadDiagRadar(p){try{return JSON.parse(localStorage.getItem("cl_diag_radar_"+p)||"null")}catch{return null}}
+function escapeHtml(v){const d=document.createElement("div");d.textContent=String(v??"");return d.innerHTML}
+function profileTraitMap(){return{
+ language:["具体的な言葉を好む","文脈や行間を重視する"],
+ thinking:["理由や根拠を確認したい","直感を重視することがある","複数の可能性を考える","一度気になると考え続けやすい"],
+ emotion:["自分の気持ちを言葉にして整理する","一人で整理してから話したい","相手の感情の変化に気づきやすい"],
+ distance:["関係の変化が気になりやすい","自分のペースを保ちたい","まず話し合って解決したい"],
+ change:["変化は前もって知りたい","新しいことを試すのが好き","興味のあることに集中しやすい"],
+ communication:["具体的な言葉を好む","文脈や行間を重視する","まず話し合って解決したい","会話では共感を大切にする"]
+}}
+function diagSummary(scores,targetLabel){return `【特性チェックの自動まとめ】\n${targetLabel}の回答では、次のような方向が見えました。\n${scores.map(x=>`・${AXES[x.key].label}：${directionText(x.key,x.score)}`).join("\n")}\n\nこれは性格・病気・障害・愛着スタイルなどを判定するものではありません。会話の中で「どちらのやり方が自然に感じやすいか」を見るための参考メモです。`}
+function extractManualMemo(existing){
+  const text=String(existing||'').trim();
+  if(!text)return '';
+  const markers=['【本人が追加したメモ】','【自分で追加したメモ】'];
+  for(const marker of markers){
+    const i=text.indexOf(marker);
+    if(i>=0)return text.slice(i+marker.length).trim();
+  }
+  if(text.includes('【特性チェック v'))return '';
+  return text;
+}
+function mergeDiagFree(existing,auto){
+  const manual=extractManualMemo(existing);
+  return auto+(manual?`\n\n【本人が追加したメモ】\n${manual}`:'');
+}
+function applyDiagToProfile(p,scores,extraScoresOverride){
+  const id=p==='my'?'myTraits':'partnerTraits';const selected=new Set();const map=profileTraitMap();
+  (scores||[]).forEach(x=>{if(x.score<=35)(map[x.key]||[]).slice(0,1).forEach(t=>selected.add(t));if(x.score>=65)(map[x.key]||[]).slice(-1).forEach(t=>selected.add(t))});
+  document.querySelectorAll('#'+id+' .chip').forEach(c=>c.classList.toggle('on',selected.has(c.textContent)));
+  const freeId=p==='my'?'myFree':'partnerFree';const label=p==='my'?'あなた':'相手';
+  let extra=Array.isArray(extraScoresOverride)?extraScoresOverride:[];
+  if(!extra.length){try{extra=JSON.parse(localStorage.getItem('cl_extra_result_'+p)||'null')?.scores||[]}catch{}}
+  const current=document.getElementById(freeId)?.value||'';
+  const manual=extractManualMemo(current);
+  const auto=buildAiProfileText(scores||[],label,extra,manual);
+  const free=document.getElementById(freeId);if(free)free.value=auto;
+  localStorage.setItem('cl_diag_summary_'+p,auto);
+  const active=activeProfile(p);
+  if(active){
+    const arr=list(p);const idx=arr.findIndex(x=>x.name===active);
+    if(idx>=0){arr[idx]={...arr[idx],state:state(p)};localStorage.setItem('cl_'+p,JSON.stringify(arr));}
+  }
+}
+
+function axisDirection(key,score){
+ const a=AXES[key];
+ if(score<=35)return {short:"左寄り",label:a.left};
+ if(score>=65)return {short:"右寄り",label:a.right};
+ return {short:"中間",label:"場面・相手に応じて使い分け"};
+}
+const AXIS_MEANINGS={
+ language:{left:"言葉の細かい条件まで確認したいところがあるため、情報が曖昧なままだと引っかかりやすいことがあります",right:"会話全体の流れから意味をつかみやすいところがあるため、言葉だけを切り取られると意図と違って受け取ることがあります",middle:"言葉の具体性と会話全体の流れの両方を手がかりにしやすく、相手や場面によって理解の仕方が変わることがあります",use:"相手に『具体的な条件があると助かる』『前後の流れもあると分かりやすい』など、自分に必要な情報の量を伝えるとズレを減らせます。"},
+ thinking:{left:"理由や順序を整理してから納得したいところがあるため、結論だけを急に渡されると置いていかれたように感じることがあります",right:"いくつかの可能性を広げて考えやすいところがあるため、早く一つに決めるより選択肢を残したくなることがあります",middle:"筋道と直感の両方を使いやすく、状況によって判断材料を切り替えることがあります",use:"相手には『理由を聞いてから決めたい』『候補をいくつか出したい』など、考えるために必要な材料を伝えると会話が進みやすくなります。"},
+ emotion:{left:"気持ちを言葉にして整理したいところがあるため、話せないまま抱えると考えがまとまりにくくなることがあります",right:"感情が動いた直後より時間を置いて整理したいところがあるため、すぐ答えを求められると負担になることがあります",middle:"話しながら整理する時と、時間を置く時を状況に応じて選びやすい傾向があります",use:"感情的な場面では、『今話したい』『少し整理してから話したい』のどちらが楽かを相手に伝えておくと誤解を減らせます。"},
+ distance:{left:"気になることを共有して整理したいところがあるため、相手の反応が分からない状態が続くと確認したくなることがあります",right:"自分の時間やペースを守って整理したいところがあるため、すぐに話し合うよう求められると少し離れて考えたくなることがあります",middle:"相手と話す時間と一人で整える時間を、状況に応じて切り替えやすい傾向があります",use:"近い関係ほど、『話さない＝拒絶』ではなく、必要な距離の取り方が人によって違うことを前提にできます。"},
+ change:{left:"先の流れや慣れた手順を確認したいところがあるため、急な変更ではまず状況を整理したくなることがあります",right:"新しい方法を試しながら進めやすいところがあるため、細かく決めすぎるより自由に試せるほうが動きやすいことがあります",middle:"見通しを持つことと試しながら変えることを、状況に応じて使い分けやすい傾向があります",use:"予定変更では、変更そのものより『理由・次の流れ』を共有するだけで受け入れやすくなる場合があります。"},
+ communication:{left:"相手の気持ちや背景を受け止めてから進めたいところがあるため、解決策だけを急に出されると気持ちが追いつかないことがあります",right:"具体的な方法や次の一歩を決めて進めたいところがあるため、共感だけが続くと『で、どうすればいい？』となることがあります",middle:"共感と具体策のどちらを先に置くか、相手や状況に応じて調整しやすい傾向があります",use:"相談では『まず気持ちを聞いてほしい』『一緒に解決策を考えてほしい』など、最初に欲しいものを確認すると善意のズレを減らせます。"}
+};
+function directionText(key,score){return axisDirection(key,score).label}
+function directionShort(key,score){return axisDirection(key,score).short}
+function scoreTraitOverlap(scores, weights){
+  const by=Object.fromEntries((scores||[]).map(x=>[x.key,Number(x.score)]));
+  let total=0, used=0;
+  Object.entries(weights).forEach(([key,w])=>{const v=by[key]; if(!Number.isFinite(v))return; total += (50-v)*w; used += 50*Math.abs(w);});
+  if(!used)return 50;
+  // weights are signed: negative means the lower end of an axis contributes more.
+  return Math.max(0,Math.min(100,50 + (total/used)*50));
+}
+function overlapLevel(score){
+  if(score>=70)return '比較的強く重なる';
+  if(score>=58)return 'やや重なる';
+  return '目立った重なりは少なめ';
+}
+function buildTraitOverlapCards(baseScores,deepScores){
+  const base=baseScores||[]; const deep=deepScores||[];
+  const allBy=Object.fromEntries([...base,...deep].map(x=>[x.key,Number(x.score)]));
+  const get=k=>allBy[k];
+  const asd=Math.max(0,Math.min(100,50 + (50-(get('language')??50))*.28 + (50-(get('thinking')??50))*.22 + (50-(get('change')??50))*.18 + ((get('communication')??50)-50)*.16 - ((get('process')??50)-50)*.16));
+  const adhd=Math.max(0,Math.min(100,50 + ((get('thinking')??50)-50)*.24 + ((get('change')??50)-50)*.20 + ((get('process')??50)-50)*.28 + ((get('sensory')??50)-50)*.14));
+  const hsp=Math.max(0,Math.min(100,50 + (50-(get('emotion')??50))*.22 + (50-(get('sensory')??50))*.38 + (50-(get('language')??50))*.12 + (50-(get('distance')??50))*.10));
+  const defs=[
+    {key:'asd',icon:'🧩',title:'具体性・見通しを好む傾向',score:asd,note:'この傾向は、ASDの説明で語られる特徴と重なることがあります。',why:'曖昧さより具体性、理由や順序、予定変更後の見通しを重視する回答が重なると、この傾向が出やすくなります。'},
+    {key:'adhd',icon:'⚡',title:'切り替え・動きながら進めやすい傾向',score:adhd,note:'この傾向は、ADHDの説明で語られる特徴と重なることがあります。',why:'可能性を広げる、変化に合わせる、まず動いて調整する、といった回答が重なると、この傾向が出やすくなります。'},
+    {key:'hsp',icon:'🌿',title:'刺激や情報量に敏感な傾向',score:hsp,note:'この傾向は、HSPについて語られる特徴と重なることがあります。',why:'音・人の多さ・情報量などの刺激を強く受け取り、いったん減らして整理したいという回答が重なると、この傾向が出やすくなります.'}
+  ];
+  return defs.map(d=>{const el=document.createElement('section');el.className='v36-attachment-card';el.innerHTML=`<div class="v36-asd-head">${d.icon} ${d.title}</div><div class="v36-asd-body"><p><b>${overlapLevel(d.score)}</b></p><p>${escapeHtml(d.why)}</p><div class="v36-cause">${escapeHtml(d.note)} これは診断・判定ではなく、今回の回答と説明上の特徴との重なりを見る参考情報です。</div></div>`;return el;});
+}
+function buildAttachmentOverlapCard(scores){
+  const by=Object.fromEntries((scores||[]).map(x=>[x.key,Number(x.score)]));
+  const score=by.attach;
+  if(!Number.isFinite(score))return null;
+  let title,main;
+  if(score<=35){
+    title="🤝 つながりを確認したくなる傾向";
+    main="相手の反応や関係の変化が気になると、つながりを確かめたくなりやすい傾向があります。";
+  }else if(score>=65){
+    title="🤝 一人で整理して距離を調整したくなる傾向";
+    main="近い関係でも、自分の中で整理してから距離を調整したくなりやすい傾向があります。";
+  }else{
+    title="🤝 関係によって距離の取り方が変わりやすい傾向";
+    main="つながりを確かめたい時と、一人で整理したい時の両方が、相手や状況によって出やすい傾向があります。";
+  }
+  const type=score<=35?'不安型':score>=65?'回避型':'安定型';
+  const el=document.createElement('section');el.className='v36-attachment-card';
+  el.innerHTML=`<div class="v36-asd-head">${title}</div><div class="v36-asd-body"><p><b>愛着パターン：${type}の特徴と重なる傾向</b></p><p>${escapeHtml(main)}</p><div class="v36-cause">愛着パターンの考え方では似た特徴が説明されることがありますが、これは愛着スタイルの診断ではありません。人や状況によって反応は変わります。</div></div>`;
+  return el;
+}
+function traitNarrative(key,score){
+  const m=AXIS_MEANINGS[key];
+  if(score<=35)return {main:m.leftResult||m.left,use:m.use};
+  if(score>=65)return {main:m.rightResult||m.right,use:m.use};
+  return {main:m.middleResult||"状況や相手に応じて、複数の受け取り方・進め方を切り替えやすい",use:m.use};
+}
+function buildTraitSummary(scores,label){
+  const sorted=[...scores].sort((a,b)=>Math.abs(b.score-50)-Math.abs(a.score-50));
+  const focus=sorted.slice(0,3);
+  if(!focus.length)return null;
+  const sec=document.createElement('section');sec.className='v36-profile-card';
+  sec.innerHTML=`<div class="v36-profile-head">🧩 ${escapeHtml(label)}はこういう傾向</div><div class="v36-profile-intro">このチェックは診断名をつけるものではなく、会話の中でどんな受け取り方・考え方・伝え方が自然になりやすいかを整理するためのものです。</div>`;
+  focus.forEach(x=>{const a=AXES[x.key],n=traitNarrative(x.key,x.score),c=document.createElement('div');c.className='v36-trait';c.innerHTML=`<div class="v36-trait-title">${a.icon} ${a.label}</div><p class="v36-trait-main"><b>傾向：</b>${escapeHtml(n.main)}。</p><div class="v36-trait-use"><b>会話では：</b>${escapeHtml(n.use)}</div>`;sec.appendChild(c)});
+  return sec;
+}
+function buildTraitOverlapData(baseScores,deepScores){
+ const b=Object.fromEntries((baseScores||[]).map(x=>[x.key,Number(x.score)]));
+ const d=Object.fromEntries((deepScores||[]).map(x=>[x.key,Number(x.score)]));
+ const asd=Math.max(0,Math.min(100,50 + (50-(b.language??50))*.28 + (50-(b.thinking??50))*.22 + (50-(b.change??50))*.18 + ((b.communication??50)-50)*.16 - ((d.process??50)-50)*.16));
+ const adhd=Math.max(0,Math.min(100,50 + ((b.thinking??50)-50)*.24 + ((b.change??50)-50)*.20 + ((d.process??50)-50)*.28 + ((d.sensory??50)-50)*.14));
+ const hsp=Math.max(0,Math.min(100,50 + (50-(b.emotion??50))*.22 + (50-(d.sensory??50))*.38 + (50-(b.language??50))*.12 + (50-(b.distance??50))*.10));
+ const a=Object.fromEntries((deepScores||[]).map(x=>[x.key,Number(x.score)]));
+ const att=a.attach??50; const type=att<=35?'不安型':att>=65?'回避型':'安定型';
+ return `・具体性・見通しを好む傾向：${overlapLevel(asd)}（ASDの説明で語られる特徴との重なり）\n・切り替え・動きながら進めやすい傾向：${overlapLevel(adhd)}（ADHDの説明で語られる特徴との重なり）\n・刺激や情報量に敏感な傾向：${overlapLevel(hsp)}（HSPについて語られる特徴との重なり）\n・愛着パターン：${type}の特徴と重なる傾向`;
+}
+function buildAiProfileText(scores,label,extraScores,free){
+  const sorted=[...(scores||[])].sort((a,b)=>Math.abs(b.score-50)-Math.abs(a.score-50));
+  const top=sorted.slice(0,4).map(x=>{const a=AXES[x.key],n=traitNarrative(x.key,x.score);return `・${a.label}: ${n.main}`}).join('\n');
+  const deep=(extraScores||[]).filter(x=>DEEP_AXES[x.key]).sort((a,b)=>Math.abs(b.score-50)-Math.abs(a.score-50)).slice(0,3).map(x=>`・${DEEP_AXES[x.key].label}: ${deepNarrative(x.key,x.score).main}`).join('\n');
+  const overlap=extraScores&&extraScores.length?buildTraitOverlapData(scores,extraScores):null;
+  return `【特性チェック v46：${label}の会話プロフィール】
+【基本18問】
+${top}${deep?`
+
+【深掘り18問】
+${deep}`:''}${overlap?`
+
+【特徴との重なり（参考情報）】
+${overlap}`:''}
+
+この情報は会話解析の補助情報です。実際の発言内容を最優先し、特性名・愛着パターン・診断名から心理や行動を断定しません。${free?`
+
+【本人が追加したメモ】
+${free.trim()}`:''}`;
+}
+function renderDiagResult(scores){
+  diagResult.innerHTML='';
+  const label=target==='my'?'あなた':'相手';
+  const profile=buildTraitSummary(scores,label);
+  if(profile)diagResult.appendChild(profile);
+  const profileSection=document.createElement('section');profileSection.className='result-section analysis-section';
+  profileSection.innerHTML='<div class="result-heading">📊 6つの傾向を確認</div><div style="padding:0 14px 4px"><p class="friendly-note">グラフは結果の位置関係を確認するための補助表示です。「右寄り・左寄り・中間」というラベルは表示しません。</p></div>';
+  const box=document.createElement('div');box.className='result-card';
+  scores.forEach(x=>{const a=AXES[x.key];const row=document.createElement('div');row.className='axis-result';row.innerHTML=`<div class="axis-head2"><span>${a.icon} ${a.label}</span></div><div class="axis-bar2"><span class="axis-dot2" style="left:${x.score}%"></span></div><div class="axis-labels2"><span>${a.left}</span><span>${a.right}</span></div>`;box.appendChild(row)});
+  profileSection.appendChild(box);diagResult.appendChild(profileSection);
+  const shareBox=document.createElement('div');addShareButton(shareBox,'CoreLingualの特性チェック結果',{kind:'diagnosis',version:7,target:target,targetLabel:label,scores:scores.map(x=>({key:x.key,score:x.score}))});diagResult.appendChild(shareBox);
+  const applyBox=document.createElement('div');applyBox.className='v36-profile-apply';const applyBtn=document.createElement('button');applyBtn.type='button';applyBtn.textContent='🧩 この結果をプロフィールに反映する';applyBtn.onclick=()=>{applyDiagToProfile(target,scores);alert('特性チェックの結果をプロフィールに反映したよ！')};applyBox.appendChild(applyBtn);diagResult.appendChild(applyBox);
+}
+
+function renderSharedAnswers(container,profile,label){
+  const baseScores=Array.isArray(profile?.scores)?profile.scores:[];
+  const deepScores=Array.isArray(profile?.deepScores)?profile.deepScores:[];
+  if(!baseScores.length && !deepScores.length)return;
+  const sec=document.createElement('section');sec.className='v46-partner-result';
+  sec.innerHTML=`<div class="v46-result-head">🧩 ${escapeHtml(label)}の特性チェック結果</div><div class="v46-result-note">回答内容そのものではなく、36問から整理した「会話で出やすい傾向」を表示しています。</div>`;
+  const overview=buildTraitSummary(baseScores,label);
+  if(overview){
+    overview.querySelectorAll('.v36-trait').forEach(t=>{
+      const c=document.createElement('div');c.className='v46-result-trait';
+      c.innerHTML=`<h4>${escapeHtml(t.querySelector('.v36-trait-title')?.textContent||'')}</h4><p>${escapeHtml((t.querySelector('.v36-trait-main')?.textContent||'').replace(/^傾向：/,''))}</p><div class="use">${escapeHtml(t.querySelector('.v36-trait-use')?.textContent||'')}</div>`;
+      sec.appendChild(c);
+    });
+  }
+  if(deepScores.length){
+    const h=document.createElement('h4');h.className='v46-subhead';h.textContent='🔎 後半18問で見えた3つの方向';sec.appendChild(h);
+    deepScores.forEach(x=>{const a=DEEP_AXES[x.key];if(!a)return;const n=deepNarrative(x.key,x.score);const c=document.createElement('div');c.className='v46-result-trait';c.innerHTML=`<h4>${escapeHtml(a.icon+' '+a.label)}</h4><p>${escapeHtml(n.main)}。</p><div class="use"><b>会話では：</b>${escapeHtml(n.use)}</div>`;sec.appendChild(c)});
+    buildTraitOverlapCards(baseScores,deepScores).forEach(c=>sec.appendChild(c.cloneNode(true)));
+    const attachment=buildAttachmentOverlapCard(deepScores);if(attachment)sec.appendChild(attachment.cloneNode(true));
+  }
+  container.appendChild(sec);
+}
+function savePartnerSharedProfile(profile){
+  if(!profile)return;
+  const scores=Array.isArray(profile.scores)?profile.scores:[];
+  const deep=Array.isArray(profile.deepScores)?profile.deepScores:[];
+  if(scores.length){
+    localStorage.setItem('cl_diag_result_partner',JSON.stringify({scores,answers:Array.isArray(profile.answers)?profile.answers:[],updatedAt:Date.now()}));
+    localStorage.setItem('cl_diag_radar_partner',JSON.stringify(axisValuesFromScores(scores)));
+  }
+  if(deep.length){
+    localStorage.setItem('cl_extra_result_partner',JSON.stringify({kind:'deep',scores:deep,answers:Array.isArray(profile.deepAnswers)?profile.deepAnswers:[],free:profile.free||'',updatedAt:Date.now()}));
+    localStorage.setItem('cl_extra_radar_partner',JSON.stringify({deep}));
+  }
+  const summary=buildAiProfileText(scores,'相手',deep,profile.free||'');
+  if(summary)localStorage.setItem('cl_diag_summary_partner',summary);
+  try{ applyDiagToProfile('partner',scores,deep); }catch(e){ console.warn('partner profile apply failed',e); }
+}
+function renderPartnerResultOnly(container,profile,label='相手'){
+  container.innerHTML='';renderSharedAnswers(container,profile,label);
+}
+function buildPairComparisonCard(myScores,partnerScores,partnerDeep){
+  if(!myScores?.length||!partnerScores?.length)return null;
+  const sec=document.createElement('section');sec.className='v46-pair-card';
+  sec.innerHTML='<div class="v46-pair-head">👥 2人のコミュニケーション比較</div><div class="v46-pair-note">同じ場面でも、2人が自然に選びやすい受け取り方・考え方・伝え方が違うと、すれ違いが起きることがあります。</div><div class="v46-pair-radar"><div class="v46-pair-person"><b>👤 あなた</b><canvas id="v46RadarMy"></canvas></div><div class="v46-pair-person"><b>👥 相手</b><canvas id="v46RadarPartner"></canvas></div></div><div class="v46-side-by-side"></div><div class="v46-pair-insights"></div>';
+  const grid=sec.querySelector('.v46-side-by-side');
+  const by=(arr)=>Object.fromEntries(arr.map(x=>[x.key,Number(x.score)]));const bm=by(myScores),bp=by(partnerScores);
+  Object.keys(AXES).forEach(key=>{
+    const a=AXES[key],m=AXIS_MEANINGS[key],ms=bm[key]??50,ps=bp[key]??50;
+    const mt=directionText(key,ms),pt=directionText(key,ps);
+    const card=document.createElement('div');card.className='v46-compare-row';
+    card.innerHTML=`<div class="v46-compare-axis">${a.icon} ${escapeHtml(a.label)}</div><div class="v46-two-col"><div><b>あなた</b><p>${escapeHtml(mt)}</p></div><div><b>相手</b><p>${escapeHtml(pt)}</p></div></div>`;grid.appendChild(card);
+  });
+  const diffs=Object.keys(AXES).map(key=>({key,diff:Math.abs((bm[key]??50)-(bp[key]??50))})).sort((a,b)=>b.diff-a.diff).slice(0,3);
+  const ins=sec.querySelector('.v46-pair-insights');
+  diffs.forEach(x=>{if(x.diff<15)return;const a=AXES[x.key],m=AXIS_MEANINGS[x.key],ms=bm[x.key],ps=bp[x.key];const mine=directionText(x.key,ms),theirs=directionText(x.key,ps);const c=document.createElement('div');c.className='v46-insight';c.innerHTML=`<b>💬 ${escapeHtml(a.label)}</b><p><strong>あなた：</strong>${escapeHtml(mine)}<br><strong>相手：</strong>${escapeHtml(theirs)}</p><p>この違いがあると、同じやり取りでも「どうしてそうなるの？」と感じやすいかもしれません。まず相手のやり方を拒絶や無関心と決めつけず、それぞれに必要な情報・時間・伝え方の違いとして見ると整理しやすくなります。</p>`;ins.appendChild(c)});
+  setTimeout(()=>{CoreLingual_v36.render(document.getElementById('v46RadarMy'),myScores);CoreLingual_v36.render(document.getElementById('v46RadarPartner'),partnerScores)},20);
+  return sec;
+}
+
+function buildPairNarrative(myScores,partnerScores){
+  const byMy=Object.fromEntries((myScores||[]).map(x=>[x.key,Number(x.score)]));
+  const byP=Object.fromEntries((partnerScores||[]).map(x=>[x.key,Number(x.score)]));
+  const rows=Object.keys(AXES).map(key=>({key,diff:Math.abs((byMy[key]??50)-(byP[key]??50))})).sort((a,b)=>b.diff-a.diff);
+  const top=rows.filter(x=>x.diff>=15).slice(0,2);
+  const sec=document.createElement('section');sec.className='v36-pair-card';
+  sec.innerHTML='<div class="v36-pair-head">👥 2人で見ると、こうなりやすい</div><div class="v36-pair-body"></div>';
+  const body=sec.querySelector('.v36-pair-body');
+  const mine=buildTraitSummary(myScores,'あなた');const partner=buildTraitSummary(partnerScores,'相手');
+  if(mine){const wrap=document.createElement('div');wrap.className='v36-pair-person';wrap.innerHTML='<h4>👤 あなた</h4>';const traits=mine.querySelectorAll('.v36-trait');traits.forEach(t=>wrap.appendChild(t.cloneNode(true)));body.appendChild(wrap)}
+  if(partner){const wrap=document.createElement('div');wrap.className='v36-pair-person';wrap.innerHTML='<h4>👥 相手</h4>';const traits=partner.querySelectorAll('.v36-trait');traits.forEach(t=>wrap.appendChild(t.cloneNode(true)));body.appendChild(wrap)}
+  const mm=document.createElement('div');mm.className='v33-mismatch';
+  if(top.length){const lines=top.map(x=>{const a=AXES[x.key],m=AXIS_MEANINGS[x.key],ms=byMy[x.key],ps=byP[x.key];const mine=ms<=35?m.left:ms>=65?m.right:'場面に応じて使い分けやすい';const theirs=ps<=35?m.left:ps>=65?m.right:'場面に応じて使い分けやすい';return `<b>${a.label}</b>では、あなたは「${escapeHtml(mine)}」になりやすく、相手は「${escapeHtml(theirs)}」になりやすい組み合わせです。`}).join('<br><br>');mm.innerHTML=lines+`<br><br><b>ポイント：</b>同じ言葉でも、求めているものや受け取り方が違うと、善意のやり取りがすれ違いに見えることがあります。`;}else{mm.textContent='6つの方向では大きな差は出ていません。実際の会話では、同じ傾向でも言い方や状況によってすれ違いが起こることがあります。'}
+  body.appendChild(mm);return sec;
+}
+function v29HostInviteActive(){const inv=v23GetInviteState();return !!(inv?.token&&inv?.ownerToken)}
+function v29InvitePartnerRadar(){try{return JSON.parse(localStorage.getItem('cl_v29_invite_partner_radar')||'null')}catch{return null}}
+function clearV29InviteView(){
+  ['cl_v29_invite_partner_radar','cl_v29_invite_partner_extra','cl_v29_invite_partner_profile'].forEach(k=>{try{localStorage.removeItem(k)}catch{}});
+  ['cl_shared_partner_profile'].forEach(k=>{try{localStorage.removeItem(k)}catch{}});
+}
+function renderTwoPersonComparison(){
+  const card=document.getElementById('v21CompareCard'),grid=document.getElementById('v21CompareGrid'),listEl=document.getElementById('v21CompareList');if(!card||!grid||!listEl)return;
+  const my=loadDiagRadar('my');
+  const partner=loadDiagRadar('partner');
+  if(!my||!partner){card.style.display='none';grid.innerHTML='';listEl.innerHTML='';return}
+  card.hidden=false;card.style.removeProperty('display');card.style.display='block';card.classList.add('v46-compare-only');
+  grid.innerHTML='';listEl.innerHTML='';
+  const myScores=(()=>{try{return JSON.parse(localStorage.getItem('cl_diag_result_my')||'null')?.scores||[]}catch{return[]}})();
+  const partnerScores=(()=>{try{return JSON.parse(localStorage.getItem('cl_diag_result_partner')||'null')?.scores||[]}catch{return[]}})();
+  const deep=(()=>{try{return JSON.parse(localStorage.getItem('cl_extra_result_partner')||'null')?.scores||[]}catch{return[]}})();
+  const pair=buildPairComparisonCard(myScores,partnerScores,deep);if(pair)listEl.appendChild(pair);
+}
+
+function showRadar(before,after,caption){
+  /* 基本18問のプロフィールは結果カード内に表示するため、旧静的カードは使わない。 */
+  renderTwoPersonComparison();
+}
+
+// v38: 追加チェックの広告ゲート状態を明示的に初期化し、DOM参照を明示化。
+let extraTimer=null;
+let extraTarget="my";
+let extraPlan=[];
+const ad30=document.getElementById("ad30");
+const extraDiag=document.getElementById("extraDiag");
+const ad30Countdown=document.getElementById("ad30Countdown");
+const extraTitle=document.getElementById("extraTitle");
+const extraIntro=document.getElementById("extraIntro");
+const extraQuestions=document.getElementById("extraQuestions");
+const extraResult=document.getElementById("extraResult");
+
+function startExtra(){
+  try{
+    extraTarget=target;
+    if(!ad30||!extraDiag||!ad30Countdown)throw new Error("追加チェックの広告ゲート要素が見つかりません。");
+    ad30.style.display="block";
+    extraDiag.style.display="none";
+    const btn=document.getElementById("startMore");
+    if(btn)btn.disabled=true;
+    if(extraTimer)clearInterval(extraTimer);
+    let c=3;
+    ad30Countdown.textContent=`広告終了まで ${c}秒`;
+    extraTimer=setInterval(()=>{
+      try{
+        c--;
+        if(c>0){
+          ad30Countdown.textContent=`広告終了まで ${c}秒`;
+          return;
+        }
+        clearInterval(extraTimer);
+        extraTimer=null;
+        ad30Countdown.textContent="広告枠終了。後半18問を開始します…";
+        if(btn)btn.disabled=false;
+        setTimeout(()=>{try{showExtra()}catch(e){console.error(e);alert(e.message||"後半18問の表示に失敗しました。")}},350);
+      }catch(e){
+        clearInterval(extraTimer);
+        extraTimer=null;
+        console.error(e);
+        if(btn)btn.disabled=false;
+        alert(e.message||"追加チェックの開始に失敗しました。");
+      }
+    },1000);
+  }catch(e){
+    console.error(e);
+    const btn=document.getElementById("startMore");
+    if(btn)btn.disabled=false;
+    alert(e.message||"追加チェックの開始に失敗しました。");
+  }
+}
+
+const EXTRA_DRAFT_PREFIX="cl_extra_draft_";
+function extraDraftKey(p){return EXTRA_DRAFT_PREFIX+p;}
+function readExtraDraft(p){
+  try{
+    const d=JSON.parse(localStorage.getItem(extraDraftKey(p))||"null");
+    return d&&Array.isArray(d.answers)?d:null;
+  }catch{return null}
+}
+function saveExtraDraft(p,answers,free){
+  try{
+    localStorage.setItem(extraDraftKey(p),JSON.stringify({
+      answers:Array.isArray(answers)?answers.slice(0,18):[],
+      free:String(free||"").slice(0,4000),
+      updatedAt:Date.now()
+    }));
+  }catch(e){console.warn("extra draft save failed",e)}
+}
+function collectExtraAnswers(){
+  return extraPlan.map((_,i)=>{
+    const x=document.querySelector(`input[name="ex${i+1}"]:checked`);
+    return x?Number(x.value):null;
+  });
+}
+function persistExtraDraftFromUi(){
+  const answers=collectExtraAnswers();
+  const free=(document.getElementById("extraFree")?.value||"").trim();
+  saveExtraDraft(extraTarget,answers,free);
+}
+function restoreExtraDraftToUi(p){
+  const draft=readExtraDraft(p);if(!draft)return;
+  (draft.answers||[]).forEach((v,i)=>{
+    if(v==null)return;
+    const input=document.querySelector(`input[name="ex${i+1}"][value="${String(v)}"]`);
+    if(input)input.checked=true;
+  });
+  const free=document.getElementById("extraFree");
+  if(free)free.value=draft.free||"";
+}
+
+function showExtra(){
+  try{
+  if(!ad30||!extraDiag||!ad30Countdown||!extraTitle||!extraIntro||!extraQuestions||!extraResult)throw new Error("後半18問の表示要素が見つかりません。");
+  ad30.style.display="none";
+  extraDiag.style.setProperty("display","block","important");
+  extraTitle.textContent="🔎 深掘りチェック（後半18問）";
+  extraPlan=Q_DEEP.map(q=>({axis:q.axis,q:q.q,dir:q.dir}));
+  extraIntro.innerHTML=`<div class="extra-adaptive-note"><b>前半18問とは別の3方向を見ます。</b><br>近づき方・距離の取り方、刺激への反応、進め方・柔軟性を各6問ずつ確認します。全員同じ18問です。</div>`;
+  extraQuestions.innerHTML="";
+  extraPlan.forEach((item,i)=>{
+    const n=i+1;
+    if(i===0||item.axis!==extraPlan[i-1].axis){const h=document.createElement('div');h.className='extra-section-title';h.textContent=`${DEEP_AXES[item.axis].icon} ${DEEP_AXES[item.axis].label}`;extraQuestions.appendChild(h)}
+    extraQuestions.insertAdjacentHTML("beforeend",`<div class="q"><b>${n}. ${escapeHtml(item.q)}</b><div class="scale">${[1,2,3,4,5].map(v=>`<label><input type="radio" name="ex${n}" value="${v}">${v}</label>`).join("")}</div><div class="scale"><span>あまり当てはまらない</span><span>かなり当てはまる</span></div></div>`);
+  });
+  extraQuestions.insertAdjacentHTML("beforeend",`<div class="extra-free"><label class="small">📝 まだ選択肢にない特徴があれば（任意）</label><textarea id="extraFree" placeholder="例：こういう場面ではこうなりやすい、など自由にどうぞ"></textarea></div>`);
+  restoreExtraDraftToUi(extraTarget);
+  extraQuestions.querySelectorAll('input[type="radio"]').forEach(el=>el.addEventListener("change",persistExtraDraftFromUi));
+  document.getElementById("extraFree")?.addEventListener("input",persistExtraDraftFromUi);
+  extraResult.innerHTML="";
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    window.scrollTo({top:extraDiag.getBoundingClientRect().top+window.scrollY-20,behavior:"smooth"});
+  }));
+  }catch(e){
+    console.error(e);
+    alert(e.message||"後半18問の表示に失敗しました。");
+  }
+}
+function extraScore(){
+ const sums={};Object.keys(DEEP_AXES).forEach(k=>sums[k]=[]);
+ extraPlan.forEach((item,i)=>{const x=document.querySelector(`input[name="ex${i+1}"]:checked`);if(x)sums[item.axis].push({v:Number(x.value),q:item})});
+ return Object.keys(DEEP_AXES).map(key=>{const arr=sums[key];let total=0;arr.forEach(o=>{total+=(o.v-3)*Number(o.q.dir||1)});const score=arr.length?Math.max(0,Math.min(100,50+(total/arr.length)*25)):50;return {key,score,count:arr.length}});
+}
+function renderExtraResult(scores,answers,free){
+  extraResult.innerHTML="";
+  const base=diagScores.length?diagScores:axisScore(Q,diagAnswers);
+  const sec=document.createElement("section");sec.className="result-overview";
+  sec.innerHTML=`<div class="overview-head">🧩 36問で見えた、あなたのコミュニケーション特性</div><div class="overview-body"><p class="overview-lead">前半18問で基本の6方向、後半18問でさらに3つの方向を見ました。ここでは9方向をまとめて、会話で出やすい特徴を整理します。</p></div>`;
+  const body=sec.querySelector('.overview-body');
+  const baseTop=[...base].sort((a,b)=>Math.abs(b.score-50)-Math.abs(a.score-50)).slice(0,3);
+  baseTop.forEach(x=>{const a=AXES[x.key],n=traitNarrative(x.key,x.score),card=document.createElement('div');card.className='meaning-card';card.innerHTML=`<div class="meaning-title">${a.icon} ${a.label}</div><p class="meaning-main"><b>傾向：</b>${escapeHtml(n.main)}。</p><div class="meaning-use"><b>会話では：</b>${escapeHtml(n.use)}</div>`;body.appendChild(card)});
+  scores.forEach(x=>{const a=DEEP_AXES[x.key],n=deepNarrative(x.key,x.score),card=document.createElement('div');card.className='meaning-card';card.innerHTML=`<div class="meaning-title">${a.icon} ${a.label}</div><p class="meaning-main"><b>傾向：</b>${escapeHtml(n.main)}。</p><div class="meaning-use"><b>会話では：</b>${escapeHtml(n.use)}</div>`;body.appendChild(card)});
+  extraResult.appendChild(sec);
+  buildTraitOverlapCards(base,scores).forEach(card=>extraResult.appendChild(card));
+  const attachment=buildAttachmentOverlapCard(scores);if(attachment)extraResult.appendChild(attachment);
+  if(free){const n=document.createElement('div');n.className='v36-cause';n.innerHTML=`<b>📝 本人が追加したメモ</b><br>${escapeHtml(free)}`;extraResult.appendChild(n)}
+  localStorage.setItem("cl_extra_result_"+extraTarget,JSON.stringify({kind:"deep",scores,answers,free:free||"",updatedAt:Date.now()}));
+  localStorage.setItem("cl_extra_radar_"+extraTarget,JSON.stringify({deep:scores}));
+  const baseSaved=(()=>{try{return JSON.parse(localStorage.getItem('cl_diag_result_'+extraTarget)||'null')}catch{return null}})();
+  const baseAnswers=Array.isArray(baseSaved?.answers)?baseSaved.answers.slice(0,18):[];
+  const shareBox=document.createElement('div');
+  addShareButton(shareBox,'CoreLingualの36問特性チェック結果',{
+    kind:'diagnosis',version:9,target:extraTarget,targetLabel:extraTarget==='my'?'自分':'相手',
+    scores:base.map(x=>({key:x.key,score:x.score})),
+    deepScores:scores.map(x=>({key:x.key,score:x.score})),
+    answers:baseAnswers,
+    deepAnswers:answers.slice(0,18),
+    deep:{scores:scores.map(x=>({key:x.key,score:x.score})),answers:answers.slice(0,18)},
+    free:free||''
+  });
+  extraResult.appendChild(shareBox);
+  const applyBox=document.createElement('div');applyBox.className='v36-profile-apply';
+  const applyBtn=document.createElement('button');applyBtn.type='button';applyBtn.className='primary';applyBtn.textContent='🧩 この36問の結果をプロフィールに反映する';
+  applyBtn.onclick=()=>{
+    const manual=free||extractManualMemo(document.getElementById(extraTarget==='my'?'myFree':'partnerFree')?.value||'');
+    applyDiagToProfile(extraTarget,base,scores);
+    const freeId=extraTarget==='my'?'myFree':'partnerFree';
+    const profileText=buildAiProfileText(base,extraTarget==='my'?'あなた':'相手',scores,manual);
+    const freeEl=document.getElementById(freeId);if(freeEl)freeEl.value=profileText;
+    localStorage.setItem('cl_diag_summary_'+extraTarget,profileText);
+    alert('36問の特性チェック結果をプロフィールに反映したよ！');
+  };
+  applyBox.appendChild(applyBtn);extraResult.appendChild(applyBox);
+}
+runExtra.onclick=()=>{
+  const answers=collectExtraAnswers();
+  const missing=answers.findIndex(v=>v==null);
+  if(missing>=0){saveExtraDraft(extraTarget,answers,(document.getElementById('extraFree')?.value||'').trim());alert(`追加探索の全${extraPlan.length}問に回答してください。未回答は${missing+1}問目です。1〜5で選んでね。`);return}
+  const free=(document.getElementById('extraFree')?.value||'').trim();
+  saveExtraDraft(extraTarget,answers,free);
+  renderExtraResult(extraScore(),answers,free);
+};
+startMore.onclick=()=>startExtra();
+Q.forEach((q,i)=>questions.insertAdjacentHTML("beforeend",`<div class="q"><b>${i+1}. ${q.q}</b><div class="scale">${[1,2,3,4,5].map(v=>`<label><input type="radio" name="q${i}" value="${v}">${v}</label>`).join("")}</div><div class="scale"><span>あまり当てはまらない</span><span>かなり当てはまる</span></div></div>`));
+selfDiag.onclick=()=>{target="my";selfDiag.classList.add("on");otherDiag.classList.remove("on");targetNote.textContent="自分自身について回答してください。";restoreDiagAnswers("my")};otherDiag.onclick=()=>{target="partner";otherDiag.classList.add("on");selfDiag.classList.remove("on");targetNote.textContent="相手について、分かる範囲で回答してください。本人の回答ではないため参考程度に。";restoreDiagAnswers("partner")};
+function showDiagQuestions(){const panel=document.getElementById("diagQuestionPanel");if(panel){panel.hidden=false;panel.style.display="block"}}
+function hideDiagQuestions(){/* v36: 質問は常時表示。過去回答をそのまま残すため非表示化しない。 */}
+function restoreDiagAnswers(p){
+  try{
+    const saved=JSON.parse(localStorage.getItem("cl_diag_result_"+p)||"null");
+    const answers=Array.isArray(saved?.answers)?saved.answers:[];
+    if(answers.length!==Q.length)return false;
+    for(let i=0;i<Q.length;i++){
+      const value=String(answers[i]);
+      const input=document.querySelector(`input[name="q${i}"][value="${value}"]`);
+      if(input)input.checked=true;
+    }
+    diagAnswers=answers.map(Number);
+    diagScores=Array.isArray(saved?.scores)?saved.scores:axisScore(Q,diagAnswers);
+    return true;
+  }catch{return false}
+}
+runDiag.onclick=()=>{const answers=[];for(let i=0;i<Q.length;i++){const x=document.querySelector(`input[name="q${i}"]:checked`);if(!x){alert("前半18問すべてに回答してください。1〜5で選んでね。");return}answers.push(Number(x.value))}diagAnswers=answers;diagScores=axisScore(Q,answers);localStorage.setItem("cl_diag_radar_"+target,JSON.stringify(axisValuesFromScores(diagScores)));localStorage.setItem("cl_diag_result_"+target,JSON.stringify({scores:diagScores,answers,updatedAt:Date.now()}));renderDiagResult(diagScores);applyDiagToProfile(target,diagScores);document.getElementById("moreDiag").style.display="block";renderTwoPersonComparison();};
+
+/* v36 — two-person trait-check invitation flow */
+const V22_INVITE_KEY="cl_v23_invite";
+const V22_OWNER_KEY="cl_v23_owner";
+function v23OwnerToken(){let x=localStorage.getItem(V22_OWNER_KEY);if(!x){x=crypto.randomUUID().replace(/-/g,"")+crypto.randomUUID().replace(/-/g,"");localStorage.setItem(V22_OWNER_KEY,x)}return x}
+function v23InviteToken(){return new URLSearchParams(location.search).get("invite")||null}
+function v23SetInviteState(x){try{localStorage.setItem(V22_INVITE_KEY,JSON.stringify(x))}catch{}}
+function v23GetInviteState(){try{return JSON.parse(localStorage.getItem(V22_INVITE_KEY)||"null")}catch{return null}}
+function v23ResetInvite(){
+  try{if(v26HostPollTimer)clearInterval(v26HostPollTimer);v26HostPollTimer=null}catch{}
+  const hadLegacyInvite=!!localStorage.getItem('cl_shared_partner_profile');
+  clearV29InviteView();
+  if(hadLegacyInvite){['cl_diag_radar_partner','cl_extra_radar_partner'].forEach(k=>{try{localStorage.removeItem(k)}catch{}})}
+  try{localStorage.removeItem(V22_INVITE_KEY)}catch{}
+  const compare=document.getElementById('v21CompareCard');if(compare){compare.style.setProperty('display','none','important');compare.hidden=true;}
+  const grid=document.getElementById('v21CompareGrid');if(grid)grid.innerHTML='';
+  const list=document.getElementById('v21CompareList');if(list)list.innerHTML='';
+  const box=document.getElementById('v23InviteControls');
+  if(box){box.innerHTML=`<div class="v36-check"><input id="v23HostShare" type="checkbox"><label for="v23HostShare"><b>相手にも自分の結果を見せる</b><br>招待を作るときに選べます。相手側の結果は相手本人の同意が必要です。</label></div><div class="v36-share-explain"><b>ON：</b>相手があなたの結果を確認できます。<br><b>OFF：</b>あなたの結果は相手には表示されません。</div><button id="v23CreateInviteBtn" class="primary">🔗 相手に特性チェックをお願いする</button>`;document.getElementById('v23CreateInviteBtn')?.addEventListener('click',async()=>{try{await v23CreateInvite()}catch(e){alert(e.message||'2人用チェックを作れませんでした。')}})}
+  history.replaceState({},document.title,location.pathname);
+  target='my';selfDiag.classList.add('on');otherDiag.classList.remove('on');targetNote.textContent='自分自身について回答してください。';
+  renderTwoPersonComparison();
+  window.scrollTo({top:document.getElementById('diag')?.offsetTop||0,behavior:'auto'});
+}
+function v23CurrentProfilePayload(p){
+  const radar=loadDiagRadar(p);
+  const ex=(()=>{try{return JSON.parse(localStorage.getItem("cl_extra_radar_"+p)||"null")}catch{return null}})();
+  const base=(()=>{try{return JSON.parse(localStorage.getItem("cl_diag_result_"+p)||"null")}catch{return null}})();
+  const extra=(()=>{try{return JSON.parse(localStorage.getItem("cl_extra_result_"+p)||"null")}catch{return null}})();
+  return {name:p==="my"?"あなた":"相手",radar:radar||null,extraRadar:ex||null,traits:state(p).traits,summary:document.getElementById(p+"Free")?.value||"",answers:Array.isArray(base?.answers)?base.answers.slice(0,18):[],extraAnswers:Array.isArray(extra?.answers)?extra.answers.slice(0,18):[]};
+}
+async function v23CreateInvite(){
+  if(!loadDiagRadar("my")){alert("先に自分の前半18問の特性チェックを終えてね。");return}
+  const shareMy=!!document.getElementById("v23HostShare")?.checked;
+  const owner=v23OwnerToken();
+  const payload={ownerToken:owner,host:v23CurrentProfilePayload("my"),hostShare:shareMy};
+  const r=await fetch("/api/invite",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.error||"2人用チェックを作れませんでした。");
+  const url=d.url||location.origin+"?invite="+d.token;
+  v23SetInviteState({token:d.token,ownerToken:owner,hostShare:shareMy});
+  // 作成直後からホスト側ポーリングを開始する。ページ再読込に依存しない。
+  v26StartHostPolling();
+  const shareData={title:"CoreLingual 2人で特性チェック",text:"CoreLingualで2人のコミュニケーション傾向をチェックしよう",url};
+  if(navigator.share){try{await navigator.share(shareData)}catch(e){if(e?.name!=="AbortError")throw e}}else if(navigator.clipboard){await navigator.clipboard.writeText(url);alert("招待リンクをコピーしたよ！\n相手に送ってみてね。")}else prompt("このリンクを送ってね",url);
+  v23RenderHostStatus(d);
+}
+let v26HostPollTimer=null;
+function v23RenderHostStatus(d){
+  if(!v29HostInviteActive())return;
+  const box=document.getElementById('v23InviteControls');if(!box)return;
+  const s=d?.status||{};
+  box.innerHTML=`<div class="v36-status"><b>🔗 2人用チェックを作成しました</b><br>${s.joined?'相手が回答を完了しています。':'まだ相手の回答待ちです。'}<br>${s.partnerShared?'相手の結果を共有しています。':'相手は結果を共有していないため、比較結果はまだ表示できません。'}</div><button id="v23ResetInviteBtn" type="button" style="margin-top:8px;width:100%;padding:10px;border:1px solid #ddd;border-radius:11px;background:#fff;color:#59616b">↩️ 招待を終了して戻る</button>`;
+  document.getElementById('v23ResetInviteBtn')?.addEventListener('click',(e)=>{e.preventDefault();e.stopPropagation();v23ResetInvite();});
+  if(s.joined&&s.hostShare&&s.partnerShared&&d.partnerProfile){
+    if(d.partnerProfile.radar)localStorage.setItem('cl_v29_invite_partner_radar',JSON.stringify(d.partnerProfile.radar));
+    if(d.partnerProfile.extraRadar)localStorage.setItem('cl_v29_invite_partner_extra',JSON.stringify(d.partnerProfile.extraRadar));
+    localStorage.setItem('cl_v29_invite_partner_profile',JSON.stringify(d.partnerProfile));
+    savePartnerSharedProfile(d.partnerProfile);
+    box.innerHTML+=`<div class="v36-status"><b>🎉 2人分の結果が揃いました</b><br>相手の36問の結果を「相手」プロフィールに反映し、2人の比較を表示しています。</div>`;
+    const shared=document.createElement('div');shared.className='v36-shared-result';renderPartnerResultOnly(shared,d.partnerProfile,'相手');box.appendChild(shared);
+    renderTwoPersonComparison();
+  }
+}
+function v26StartHostPolling(){
+  if(v26HostPollTimer)clearInterval(v26HostPollTimer);
+  const inv=v23GetInviteState();if(!inv?.token||!inv?.ownerToken)return;
+  v23LoadHost();
+  v26HostPollTimer=setInterval(v23LoadHost,5000);
+}
+// 動的に描画される終了ボタン用の保険。イベント委譲で確実にリセットする。
+document.addEventListener('click',(e)=>{
+  const b=e.target?.closest?.('#v23ResetInviteBtn');
+  if(!b)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  v23ResetInvite();
+},true);
+async function v23CheckInvite(){
+  const t=v23InviteToken();if(!t)return false;
+  // /diag has an inline display:none in the normal app. Enter invite mode
+  // before the async request so the invite page can never become header-only.
+  document.body.classList.add('invite-mode');
+  const box=document.getElementById("v23InviteControls");
+  if(!box)return true;
+  let d;try{const r=await fetch("/api/invite?token="+encodeURIComponent(t),{cache:"no-store"});d=await r.json();if(!r.ok)throw new Error(d.error||"招待リンクを読み込めませんでした。")}catch(e){box.innerHTML=`<div class="v36-invite-focus"><div style="font-size:19px;font-weight:800;color:#c74369;margin-bottom:8px">👋 特性チェックへの招待です</div><div class="v36-status">${escapeHtml(e.message)}</div></div>`;return true}
+  document.body.classList.add('invite-mode');
+  box.innerHTML=`<div class="v36-invite-focus"><div style="font-size:19px;font-weight:800;color:#c74369;margin-bottom:8px">👋 特性チェックへの招待です</div><p style="margin:0 0 12px;font-size:13px;line-height:1.75">このリンクは、2人のコミュニケーション傾向を比べるための特性チェック用です。ここでは特性チェックだけを行います。</p><div class="v36-consent"><b>🔒 結果の共有は自分で選べます</b><br>あなたの回答結果は、「共有する」を選ばない限り相手には表示されません。</div><div id="v26HostSharedPreview"></div><div class="v36-check"><input id="v23ShareMy" type="checkbox"><label for="v23ShareMy"><b>回答後、自分の結果を相手に共有する</b><br>チェック後にも変更できます。</label></div><button id="v23JoinBtn" class="primary">🧩 特性チェックを始める</button></div>`;
+  if(d.hostShare&&d.hostProfile){document.getElementById('v26HostSharedPreview').innerHTML='<div class="v36-status"><b>相手が自分の結果を共有しています。</b><br>チェック完了後、ここでも確認できます。</div>';}
+  document.getElementById("v23JoinBtn").onclick=()=>{
+    v23SetInviteState({token:t,shareMy:document.getElementById("v23ShareMy").checked});
+    document.body.classList.remove('invite-mode');document.body.classList.add('invite-questions-mode');
+    document.getElementById("diag").style.display="block";document.getElementById("talk").style.display="none";
+    document.getElementById("diagTab").classList.add("on");document.getElementById("talkTab").classList.remove("on");
+    target="my";selfDiag.classList.add("on");otherDiag.classList.remove("on");targetNote.textContent="";
+    diagResult.innerHTML='';document.getElementById('moreDiag').style.display='none';
+    showDiagQuestions();
+    window.scrollTo({top:0,behavior:"smooth"});
+  };
+  return true;
+}
+async function v23SubmitPartner(){
+  const inv=v23GetInviteState();if(!inv?.token)return;
+  const share=!!inv.shareMy;
+  const payload={token:inv.token,partnerKey:inv.partnerKey||"",partner:v23CurrentProfilePayload("my"),partnerShare:share};
+  const r=await fetch("/api/invite",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"回答を保存できませんでした。");
+  if(d.partnerKey){inv.partnerKey=d.partnerKey;v23SetInviteState(inv)}
+  // PATCHで回答を保存した後、共有設定を明示的に確定する。
+  // 古い実装で partnerShare の反映が不安定でも、ここで最終状態を揃える。
+  if(inv.partnerKey){
+    const shareResp=await fetch('/api/invite',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:inv.token,who:'partner',share,partnerKey:inv.partnerKey})});
+    if(!shareResp.ok){const sd=await shareResp.json().catch(()=>({}));throw new Error(sd.error||'共有設定を保存できませんでした。もう一度試してね。');}
+  }
+  v23SetInviteState({...inv,shareMy:share});
+  const box=document.getElementById("v23InviteControls");
+  if(box){box.innerHTML=`<div class="v36-status"><b>✅ 回答を送信しました</b><br>${share?"自分の結果を相手に共有しています。相手はあなたの結果を確認でき、2人の比較結果も表示できます。":"自分の結果は相手にはまだ見えません。共有しない限り、2人の比較結果も作成されません。"}</div><div class="v36-check"><input id="v26PartnerShareToggle" type="checkbox" ${share?'checked':''}><label for="v26PartnerShareToggle"><b>相手に自分の結果を見せる</b><br>あとから変更できます。</label></div><div class="v36-share-explain"><b>共有ON：</b>相手に結果を見せて、2人の比較を利用できます。<br><b>共有OFF：</b>相手には結果を見せず、比較も利用できません。</div><div id="v26PartnerSharedPreview"></div>`;
+    document.getElementById('v26PartnerShareToggle')?.addEventListener('change',async e=>{try{const rr=await fetch('/api/invite',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:inv.token,who:'partner',share:e.target.checked,partnerKey:inv.partnerKey||''})});if(!rr.ok)throw new Error('共有設定を更新できませんでした。');inv.shareMy=e.target.checked;v23SetInviteState(inv);}catch(err){e.target.checked=!e.target.checked;alert(err.message)}});
+    if(d.hostProfile&&d.hostProfile.radar){
+      savePartnerSharedProfile(d.hostProfile);
+      const prev=document.getElementById('v26PartnerSharedPreview');
+      prev.innerHTML='<div class="v36-status"><b>👀 相手が共有した結果</b><br>相手の36問の結果を確認できます。</div>';
+      const tmp=document.createElement('div');renderPartnerResultOnly(tmp,d.hostProfile,'相手');prev.appendChild(tmp);
+    }
+    document.getElementById('diagQuestionPanel')?.style.setProperty('display','none','important');
+    document.getElementById('moreDiag')?.style.setProperty('display','none','important');
+    document.getElementById('diagResult')?.style.setProperty('display','none','important');
+    document.body.classList.remove('invite-questions-mode');
+  }
+}
+async function v23LoadHost(){
+  const inv=v23GetInviteState();if(!inv?.token||!inv?.ownerToken)return;
+  try{const r=await fetch("/api/invite?token="+encodeURIComponent(inv.token)+"&owner="+encodeURIComponent(inv.ownerToken),{cache:"no-store"});const d=await r.json();if(r.ok)v23RenderHostStatus(d)}catch{}
+}
+
+function normalizeSharedDeepScores(p){
+  const direct=Array.isArray(p?.deepScores)?p.deepScores:[];
+  if(direct.length)return direct;
+  const nested=Array.isArray(p?.deep?.scores)?p.deep.scores:[];
+  if(nested.length)return nested;
+  const radar=Array.isArray(p?.extraRadar?.deep)?p.extraRadar.deep:(Array.isArray(p?.extraRadar?.scores)?p.extraRadar.scores:[]);
+  if(radar.length)return radar;
+  const ans=Array.isArray(p?.deepAnswers)?p.deepAnswers:(Array.isArray(p?.deep?.answers)?p.deep.answers:[]);
+  if(ans.length===18){
+    const sums={};Object.keys(DEEP_AXES).forEach(k=>sums[k]=[]);
+    Q_DEEP.forEach((item,i)=>{const v=Number(ans[i]);if(Number.isFinite(v))sums[item.axis].push({v,q:item});});
+    return Object.keys(DEEP_AXES).map(key=>{
+      const arr=sums[key]||[];let total=0;arr.forEach(o=>{total+=(o.v-3)*Number(o.q.dir||1)});
+      const score=arr.length?Math.max(0,Math.min(100,50+(total/arr.length)*25)):50;
+      return {key,score,count:arr.length};
+    });
+  }
+  return [];
+}
+
+function renderShared(payload){
+ const p=payload||{};
+ document.body.classList.add('shared-mode');
+ talk.style.display='block';diag.style.display='none';result.innerHTML='';
+ const shell=document.createElement('div');shell.className='shared-shell v36-shared-result';
+ const title=document.createElement('div');title.className='v36-shared-title';
+ title.innerHTML=`<h2>📎 特性チェックの共有結果</h2><p>${escapeHtml(p.title||'特性チェックの結果が共有されました。')}</p>`;
+ shell.appendChild(title);
+ if(p.kind==='analysis'){
+   const r=p.result||{},sec=document.createElement('section');sec.className='result-section analysis-section';sec.innerHTML='<div class="result-heading">🔍 会話解析結果</div>';
+   [['🌸 相手の心理・背景',r.partner],['🧩 自分の心理・背景',r.me],['💡 すれ違いのメカニズム',r.mismatch]].forEach(([t,x])=>{if(!x)return;const c=document.createElement('div');c.className='result-card';c.innerHTML=`<b>${t}</b><p>${escapeHtml(x)}</p>`;sec.appendChild(c)});
+   (Array.isArray(r.advice)?r.advice:[]).forEach(a=>{const c=document.createElement('div');c.className='advice-card';c.innerHTML=`<div class="advice-cause"><span>原因：</span>${escapeHtml(a.cause||'')}</div><div class="advice-suggest"><b>💡 こう言い換えてみましょう</b><p>${escapeHtml(a.suggestion||'')}</p></div>`;sec.appendChild(c)});shell.appendChild(sec);
+ }else if(p.kind==='diagnosis'){
+   const scores=Array.isArray(p.scores)?p.scores:[];
+   const deepScores=normalizeSharedDeepScores(p);
+   const label=p.targetLabel||'本人';
+   const title2=document.createElement('div');title2.className='v36-shared-title';title2.innerHTML=`<h2>🧩 ${escapeHtml(label)}の特性チェック結果</h2><p>${deepScores.length?'前半18問＋後半18問の36問から、会話で出やすい特徴をまとめています。':'会話の中で、どんな受け取り方・考え方・伝え方が自然になりやすいかをまとめています。'}これは診断ではありません。</p>`;
+   shell.innerHTML='';shell.appendChild(title2);
+   const baseProfile=buildTraitSummary(scores,label);
+   if(baseProfile){
+     baseProfile.querySelectorAll('.v36-trait').forEach(t=>{
+       const c=document.createElement('div');c.className='v36-shared-trait';
+       const h=t.querySelector('.v36-trait-title')?.textContent||'';
+       const main=t.querySelector('.v36-trait-main')?.textContent||'';
+       const use=t.querySelector('.v36-trait-use')?.textContent||'';
+       c.innerHTML=`<h3>${escapeHtml(h)}</h3><p>${escapeHtml(main)}</p><div class="use"><b>会話では：</b>${escapeHtml(use.replace(/^会話では：/,'').trim())}</div>`;
+       shell.appendChild(c);
+     });
+   }
+   if(deepScores.length){
+     const deepTitle=document.createElement('h3');deepTitle.className='shared-subheading';deepTitle.textContent='🔎 後半18問で見えた3つの方向';shell.appendChild(deepTitle);
+     deepScores.forEach(x=>{const a=DEEP_AXES[x.key];if(!a)return;const n=deepNarrative(x.key,x.score);const c=document.createElement('div');c.className='v36-shared-trait';c.innerHTML=`<h3>${escapeHtml(a.icon+' '+a.label)}</h3><p><b>傾向：</b>${escapeHtml(n.main)}。</p><div class="use"><b>会話では：</b>${escapeHtml(n.use)}</div>`;shell.appendChild(c)});
+     buildTraitOverlapCards(scores,deepScores).forEach(card=>{const clone=card.cloneNode(true);shell.appendChild(clone)});
+     const attachment=buildAttachmentOverlapCard(deepScores);if(attachment)shell.appendChild(attachment.cloneNode(true));
+   }
+   if(p.free){const memo=document.createElement('div');memo.className='v36-cause';memo.innerHTML=`<b>📝 本人が追加したメモ</b><br>${escapeHtml(p.free)}`;shell.appendChild(memo);}
+   const cta=document.createElement('div');cta.className='shared-cta';
+   cta.innerHTML='<b>🧩 自分も特性チェックしてみる</b><p>自分のコミュニケーション傾向もチェックしてみよう。</p><button type="button">特性チェックを始める</button>';
+   cta.querySelector('button').addEventListener('click',()=>{const u=new URL(location.href);u.pathname='/';u.search='';u.hash='';location.href=u.toString();});
+   shell.appendChild(cta);
+ }else shell.innerHTML+='<div class="shared-error"><b>共有データを表示できませんでした</b><p>対応していない共有形式です。</p></div>';
+ result.appendChild(shell);
+}
+async function loadSharedFromUrl(){
+ const pathMatch=location.pathname.match(/^\/share\/([A-Za-z0-9_-]{40,50})\/?$/);
+ const queryToken=new URLSearchParams(location.search).get("sharedToken");
+ const t=(pathMatch&&pathMatch[1])||queryToken;if(!t)return;
+ try{const r=await fetch("/api/share?token="+encodeURIComponent(t),{cache:"no-store"});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"共有結果を読み込めませんでした。");renderShared(d.payload||d);}catch(e){talk.style.display="block";diag.style.display="none";result.innerHTML='<div class="card"><b>📎 共有結果を読み込めませんでした</b><p class="friendly-note"></p></div>';result.querySelector("p").textContent=e.message;}
+}
+loadSharedFromUrl();
+</script>
+<script>
+(function(){
+  function boot(){ try{if(!v29HostInviteActive() && localStorage.getItem('cl_shared_partner_profile')){localStorage.removeItem('cl_shared_partner_profile')}}catch{} renderTwoPersonComparison();restoreDiagAnswers(target); if(loadDiagRadar(target)){const m=document.getElementById('moreDiag');if(m)m.style.display='block';} }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
+  addEventListener("resize",()=>renderTwoPersonComparison());
+})();
+
+(function(){
+  const box=document.getElementById("v23InviteControls");
+  if(box){
+    box.innerHTML=`<div class="v36-check"><input id="v23HostShare" type="checkbox"><label for="v23HostShare"><b>相手にも自分の結果を見せる</b><br>招待を作るときに選べます。相手側の結果は相手本人の同意が必要です。</label></div><div class="v36-share-explain"><b>ON：</b>相手があなたの結果を確認できます。<br><b>OFF：</b>あなたの結果は相手には表示されません。</div><button id="v23CreateInviteBtn" class="primary">🔗 相手に特性チェックをお願いする</button>`;
+    document.getElementById("v23CreateInviteBtn").onclick=async()=>{try{await v23CreateInvite()}catch(e){alert(e.message||"招待リンクを作れませんでした。")}};
+  }
+  const oldRun=window.__cl_v23_runWrapped;
+  if(!oldRun){
+    window.__cl_v23_runWrapped=true;
+    runDiag.addEventListener("click",async()=>{
+      const inv=v23GetInviteState();
+      if(inv?.token && target==="my"){
+        setTimeout(async()=>{try{await v23SubmitPartner()}catch(e){alert(e.message||"2人用チェックの送信に失敗しました。")}},150);
+      }
+    });
+  }
+  v23CheckInvite();
+  v23LoadHost();
+  v26StartHostPolling();
+})();
+</script>
+
+
+</body></html>
