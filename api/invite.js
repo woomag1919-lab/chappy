@@ -16,15 +16,28 @@ function cleanProfile(p){
   const radar = Array.isArray(p.radar) ? p.radar.slice(0,6).map(v=>Math.max(0,Math.min(100,Number(v)||0))) : null;
   const extraRadar = p.extraRadar && typeof p.extraRadar === "object" ? {
     before:Array.isArray(p.extraRadar.before)?p.extraRadar.before.slice(0,6).map(v=>Math.max(0,Math.min(100,Number(v)||0))):null,
-    after:Array.isArray(p.extraRadar.after)?p.extraRadar.after.slice(0,6).map(v=>Math.max(0,Math.min(100,Number(v)||0))):null
+    after:Array.isArray(p.extraRadar.after)?p.extraRadar.after.slice(0,6).map(v=>Math.max(0,Math.min(100,Number(v)||0))):null,
+    deep:Array.isArray(p.extraRadar.deep)?p.extraRadar.deep.slice(0,3).map(x=>({
+      key:cleanText(x?.key,80),
+      score:Math.max(0,Math.min(100,Number(x?.score)||0)),
+      count:Math.max(0,Math.min(18,Number(x?.count)||0))
+    })).filter(x=>x.key):null
   } : null;
+  const deepScores = Array.isArray(p.deepScores) ? p.deepScores.slice(0,3).map(x=>({
+    key:cleanText(x?.key,80),
+    score:Math.max(0,Math.min(100,Number(x?.score)||0)),
+    count:Math.max(0,Math.min(18,Number(x?.count)||0))
+  })).filter(x=>x.key) : [];
+  const deepAnswers = Array.isArray(p.deepAnswers) ? p.deepAnswers.slice(0,18).map(v=>Math.max(1,Math.min(5,Number(v)||1))) : [];
   return {
     name: cleanText(p.name,80) || "相手",
     radar,
     extraRadar,
+    deepScores,
+    deepAnswers,
     traits: Array.isArray(p.traits) ? p.traits.slice(0,20).map(x=>cleanText(String(x),80)).filter(Boolean) : [],
-    answers: Array.isArray(p.answers) ? p.answers.slice(0,24).map(v=>Math.max(1,Math.min(5,Number(v)||1))) : [],
-    extraAnswers: Array.isArray(p.extraAnswers) ? p.extraAnswers.slice(0,36).map(v=>Math.max(1,Math.min(5,Number(v)||1))) : []
+    answers: Array.isArray(p.answers) ? p.answers.slice(0,18).map(v=>Math.max(1,Math.min(5,Number(v)||1))) : [],
+    extraAnswers: Array.isArray(p.extraAnswers) ? p.extraAnswers.slice(0,18).map(v=>Math.max(1,Math.min(5,Number(v)||1))) : []
   };
 }
 function profileBytes(p){ return Buffer.byteLength(JSON.stringify(p||{}),"utf8"); }

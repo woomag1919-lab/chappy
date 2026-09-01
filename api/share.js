@@ -21,10 +21,39 @@ function cleanPayload(payload) {
     }};
   }
   if (payload.kind === "diagnosis") {
-    return { kind:"diagnosis", version:1,
+    const cleanScores = value => Array.isArray(value)
+      ? value.slice(0,8).map(x=>({
+          key:typeof x?.key === "string" ? x.key.slice(0,80) : "",
+          score:Number.isFinite(Number(x?.score)) ? Math.max(0,Math.min(100,Number(x.score))) : 0
+        })).filter(x=>x.key && Number.isFinite(x.score))
+      : [];
+
+    const cleanAnswers = value => Array.isArray(value)
+      ? value.slice(0,18).map(v => Math.max(1,Math.min(5,Number(v)||1)))
+      : [];
+
+    const deepScores = cleanScores(payload.deepScores);
+    const deepAnswers = cleanAnswers(payload.deepAnswers);
+    const nestedDeepScores = cleanScores(payload.deep?.scores);
+    const nestedDeepAnswers = cleanAnswers(payload.deep?.answers);
+
+    return {
+      kind:"diagnosis",
+      version:2,
       targetLabel:payload.targetLabel === "相手" ? "相手" : "自分",
-      scores:Array.isArray(payload.scores) ? payload.scores.slice(0,8).map(x=>({key:typeof x?.key === "string"?x.key.slice(0,80):"",score:Number.isFinite(Number(x?.score))?Math.max(0,Math.min(100,Number(x.score))):0})).filter(x=>x.key&&Number.isFinite(x.score)):[],
-      hints:Array.isArray(payload.hints) ? payload.hints.slice(0,6).map(h=>({name:typeof h?.name === "string"?h.name.slice(0,160):"",text:typeof h?.text === "string"?h.text.slice(0,1500):""})).filter(x=>x.name||x.text):[]
+      scores:cleanScores(payload.scores),
+      deepScores:deepScores.length ? deepScores : nestedDeepScores,
+      answers:cleanAnswers(payload.answers),
+      deepAnswers:deepAnswers.length ? deepAnswers : nestedDeepAnswers,
+      deep:{
+        scores:deepScores.length ? deepScores : nestedDeepScores,
+        answers:deepAnswers.length ? deepAnswers : nestedDeepAnswers
+      },
+      free:typeof payload.free === "string" ? payload.free.slice(0,4000) : "",
+      hints:Array.isArray(payload.hints) ? payload.hints.slice(0,6).map(h=>({
+        name:typeof h?.name === "string"?h.name.slice(0,160):"",
+        text:typeof h?.text === "string"?h.text.slice(0,1500):""
+      })).filter(x=>x.name||x.text):[]
     };
   }
   throw new Error("対応していない共有結果です。");
