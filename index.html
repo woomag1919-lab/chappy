@@ -1,10 +1,10 @@
-<!-- CoreLingual_v45 -->
+<!-- CoreLingual_v48 -->
 <!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CoreLingual v45</title>
+<title>CoreLingual v48</title>
 <style>
 body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
 .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
@@ -834,7 +834,7 @@ function renderExtraResult(scores,answers,free){
   const baseAnswers=Array.isArray(baseSaved?.answers)?baseSaved.answers.slice(0,18):[];
   const shareBox=document.createElement('div');
   addShareButton(shareBox,'CoreLingualの36問特性チェック結果',{
-    kind:'diagnosis',version:9,target:extraTarget,targetLabel:extraTarget==='my'?'自分':'相手',
+    kind:'diagnosis',version:10,target:extraTarget,targetLabel:extraTarget==='my'?'自分':'相手',
     scores:base.map(x=>({key:x.key,score:x.score})),
     deepScores:scores.map(x=>({key:x.key,score:x.score})),
     answers:baseAnswers,
