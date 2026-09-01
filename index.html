@@ -1,10 +1,10 @@
-<!-- CoreLingual_v42 -->
+<!-- CoreLingual_v44 -->
 <!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CoreLingual v42</title>
+<title>CoreLingual v44</title>
 <style>
 body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
 .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
@@ -41,7 +41,7 @@ body.shared-mode #result{display:block!important}
 .v36-shared-title{padding:16px;background:#fff7fa;border:1px solid #f0dce3;border-radius:16px;color:#c74369}
 .v36-shared-title h2{margin:0 0 6px;font-size:19px}.v36-shared-title p{margin:0;color:#717983;font-size:12px;line-height:1.7}
 .v36-shared-trait{margin-top:10px;padding:14px;background:#fff;border:1px solid #e9edf1;border-radius:14px}
-.v36-shared-trait h3{margin:0 0 6px;font-size:14px}.v36-shared-trait p{margin:0;font-size:13px;line-height:1.75}.v36-shared-trait .use{margin-top:8px;padding:9px 10px;background:#fafbfc;border-radius:10px;font-size:12px;line-height:1.65;color:#59616b}.v36-shared-trait .use b{color:#c74369}
+.v36-shared-trait h3{margin:0 0 6px;font-size:14px}.shared-subheading{margin:16px 2px 6px;font-size:15px;color:#59616b}.v36-shared-trait p{margin:0;font-size:13px;line-height:1.75}.v36-shared-trait .use{margin-top:8px;padding:9px 10px;background:#fafbfc;border-radius:10px;font-size:12px;line-height:1.65;color:#59616b}.v36-shared-trait .use b{color:#c74369}
 
 </style>
 
@@ -440,18 +440,33 @@ function profileTraitMap(){return{
  communication:["具体的な言葉を好む","文脈や行間を重視する","まず話し合って解決したい","会話では共感を大切にする"]
 }}
 function diagSummary(scores,targetLabel){return `【特性チェックの自動まとめ】\n${targetLabel}の回答では、次のような方向が見えました。\n${scores.map(x=>`・${AXES[x.key].label}：${directionText(x.key,x.score)}`).join("\n")}\n\nこれは性格・病気・障害・愛着スタイルなどを判定するものではありません。会話の中で「どちらのやり方が自然に感じやすいか」を見るための参考メモです。`}
-function mergeDiagFree(existing,auto){const marker="【特性チェックの自動まとめ】";let manual=(existing||"").trim();const i=manual.indexOf(marker);if(i>=0)manual=manual.slice(0,i).trim();return auto+(manual?`\n\n【自分で追加したメモ】\n${manual}`:"")}
-function applyDiagToProfile(p,scores){
+function extractManualMemo(existing){
+  const text=String(existing||'').trim();
+  if(!text)return '';
+  const markers=['【本人が追加したメモ】','【自分で追加したメモ】'];
+  for(const marker of markers){
+    const i=text.indexOf(marker);
+    if(i>=0)return text.slice(i+marker.length).trim();
+  }
+  if(text.includes('【特性チェック v'))return '';
+  return text;
+}
+function mergeDiagFree(existing,auto){
+  const manual=extractManualMemo(existing);
+  return auto+(manual?`\n\n【本人が追加したメモ】\n${manual}`:'');
+}
+function applyDiagToProfile(p,scores,extraScoresOverride){
   const id=p==='my'?'myTraits':'partnerTraits';const selected=new Set();const map=profileTraitMap();
-  scores.forEach(x=>{if(x.score<=35)(map[x.key]||[]).slice(0,1).forEach(t=>selected.add(t));if(x.score>=65)(map[x.key]||[]).slice(-1).forEach(t=>selected.add(t))});
+  (scores||[]).forEach(x=>{if(x.score<=35)(map[x.key]||[]).slice(0,1).forEach(t=>selected.add(t));if(x.score>=65)(map[x.key]||[]).slice(-1).forEach(t=>selected.add(t))});
   document.querySelectorAll('#'+id+' .chip').forEach(c=>c.classList.toggle('on',selected.has(c.textContent)));
   const freeId=p==='my'?'myFree':'partnerFree';const label=p==='my'?'あなた':'相手';
-  let extra=[];try{extra=JSON.parse(localStorage.getItem('cl_extra_result_'+p)||'null')?.scores||[]}catch{}
+  let extra=Array.isArray(extraScoresOverride)?extraScoresOverride:[];
+  if(!extra.length){try{extra=JSON.parse(localStorage.getItem('cl_extra_result_'+p)||'null')?.scores||[]}catch{}}
   const current=document.getElementById(freeId)?.value||'';
-  const auto=buildAiProfileText(scores,label,extra,current);
+  const manual=extractManualMemo(current);
+  const auto=buildAiProfileText(scores||[],label,extra,manual);
   const free=document.getElementById(freeId);if(free)free.value=auto;
   localStorage.setItem('cl_diag_summary_'+p,auto);
-  // 現在選択中のプロフィールにも反映して、リロード後に消えないよう保存する。
   const active=activeProfile(p);
   if(active){
     const arr=list(p);const idx=arr.findIndex(x=>x.name===active);
@@ -492,9 +507,9 @@ function buildTraitOverlapCards(baseScores,deepScores){
   const base=baseScores||[]; const deep=deepScores||[];
   const allBy=Object.fromEntries([...base,...deep].map(x=>[x.key,Number(x.score)]));
   const get=k=>allBy[k];
-  const asd=Math.max(0,Math.min(100,50 + (((50-(get('language')??50))*0.28)+((50-(get('thinking')??50))*0.22)+((50-(get('change')??50))*0.18)+((get('communication')??50)-50)*0.16+((get('process')??50)-50)*-0.16)/1.0));
- const adhd=Math.max(0,Math.min(100,50 + ((b.thinking??50)-50)*.24 + ((b.change??50)-50)*.20 + ((d.process??50)-50)*.28 + ((d.sensory??50)-50)*.14));
- const hsp=Math.max(0,Math.min(100,50 + (50-(b.emotion??50))*.22 + (50-(d.sensory??50))*.38 + (50-(b.language??50))*.12 + (50-(b.distance??50))*.10));
+  const asd=Math.max(0,Math.min(100,50 + (50-(get('language')??50))*.28 + (50-(get('thinking')??50))*.22 + (50-(get('change')??50))*.18 + ((get('communication')??50)-50)*.16 - ((get('process')??50)-50)*.16));
+  const adhd=Math.max(0,Math.min(100,50 + ((get('thinking')??50)-50)*.24 + ((get('change')??50)-50)*.20 + ((get('process')??50)-50)*.28 + ((get('sensory')??50)-50)*.14));
+  const hsp=Math.max(0,Math.min(100,50 + (50-(get('emotion')??50))*.22 + (50-(get('sensory')??50))*.38 + (50-(get('language')??50))*.12 + (50-(get('distance')??50))*.10));
   const defs=[
     {key:'asd',icon:'🧩',title:'具体性・見通しを好む傾向',score:asd,note:'この傾向は、ASDの説明で語られる特徴と重なることがあります。',why:'曖昧さより具体性、理由や順序、予定変更後の見通しを重視する回答が重なると、この傾向が出やすくなります。'},
     {key:'adhd',icon:'⚡',title:'切り替え・動きながら進めやすい傾向',score:adhd,note:'この傾向は、ADHDの説明で語られる特徴と重なることがあります。',why:'可能性を広げる、変化に合わせる、まず動いて調整する、といった回答が重なると、この傾向が出やすくなります。'},
@@ -552,7 +567,7 @@ function buildAiProfileText(scores,label,extraScores,free){
   const top=sorted.slice(0,4).map(x=>{const a=AXES[x.key],n=traitNarrative(x.key,x.score);return `・${a.label}: ${n.main}`}).join('\n');
   const deep=(extraScores||[]).filter(x=>DEEP_AXES[x.key]).sort((a,b)=>Math.abs(b.score-50)-Math.abs(a.score-50)).slice(0,3).map(x=>`・${DEEP_AXES[x.key].label}: ${deepNarrative(x.key,x.score).main}`).join('\n');
   const overlap=extraScores&&extraScores.length?buildTraitOverlapData(scores,extraScores):null;
-  return `【特性チェック v42：${label}の会話プロフィール】
+  return `【特性チェック v44：${label}の会話プロフィール】
 【基本18問】
 ${top}${deep?`
 
@@ -583,11 +598,26 @@ function renderDiagResult(scores){
 
 function renderSharedAnswers(container,profile,label){
   const answers=Array.isArray(profile?.answers)?profile.answers:[];
-  if(!answers.length)return;
-  const wrap=document.createElement('div');wrap.className='v36-answer-box';
-  const h=document.createElement('h4');h.textContent=`📝 ${label}の回答`;wrap.appendChild(h);
-  answers.slice(0,18).forEach((v,i)=>{const row=document.createElement('div');row.className='v36-answer-row';const q=Q[i]?.q||`基本チェックの質問 ${i+1}`;row.innerHTML=`<span class="v36-answer-no">${i+1}</span><span>${escapeHtml(q)}</span><span class="v36-answer-score">${escapeHtml(v)}</span>`;wrap.appendChild(row)});
-  container.appendChild(wrap);
+  const deepAnswers=Array.isArray(profile?.extraAnswers)?profile.extraAnswers:[];
+  const deepRadar=profile?.extraRadar?.deep||profile?.extraRadar?.scores||[];
+  if(answers.length){
+    const wrap=document.createElement('div');wrap.className='v36-answer-box';
+    const h=document.createElement('h4');h.textContent=`📝 ${label}の前半18問`;wrap.appendChild(h);
+    answers.slice(0,18).forEach((v,i)=>{const row=document.createElement('div');row.className='v36-answer-row';const q=Q[i]?.q||`基本チェックの質問 ${i+1}`;row.innerHTML=`<span class="v36-answer-no">${i+1}</span><span>${escapeHtml(q)}</span><span class="v36-answer-score">${escapeHtml(v)}</span>`;wrap.appendChild(row)});
+    container.appendChild(wrap);
+  }
+  if(deepAnswers.length){
+    const wrap=document.createElement('div');wrap.className='v36-answer-box';
+    const h=document.createElement('h4');h.textContent=`🔎 ${label}の後半18問`;wrap.appendChild(h);
+    deepAnswers.slice(0,18).forEach((v,i)=>{const row=document.createElement('div');row.className='v36-answer-row';const item=Q_DEEP[i];const q=item?.q||`深掘りチェックの質問 ${i+1}`;row.innerHTML=`<span class="v36-answer-no">${i+1}</span><span>${escapeHtml(q)}</span><span class="v36-answer-score">${escapeHtml(v)}</span>`;wrap.appendChild(row)});
+    container.appendChild(wrap);
+  }
+  if(deepRadar.length){
+    const sec=document.createElement('section');sec.className='v36-shared-deep';
+    const h=document.createElement('h3');h.textContent='🔎 後半18問で見えた3つの方向';sec.appendChild(h);
+    deepRadar.forEach(x=>{const a=DEEP_AXES[x.key];if(!a)return;const n=deepNarrative(x.key,x.score);const c=document.createElement('div');c.className='v36-shared-trait';c.innerHTML=`<h4>${escapeHtml(a.icon+' '+a.label)}</h4><p>${escapeHtml(n.main)}。</p><div class="use"><b>会話では：</b>${escapeHtml(n.use)}</div>`;sec.appendChild(c)});
+    container.appendChild(sec);
+  }
 }
 function buildPairNarrative(myScores,partnerScores){
   const byMy=Object.fromEntries((myScores||[]).map(x=>[x.key,Number(x.score)]));
@@ -726,14 +756,22 @@ function renderExtraResult(scores,answers,free){
   extraResult.appendChild(sec);
   buildTraitOverlapCards(base,scores).forEach(card=>extraResult.appendChild(card));
   const attachment=buildAttachmentOverlapCard(scores);if(attachment)extraResult.appendChild(attachment);
-  if(free){const n=document.createElement('div');n.className='v36-cause';n.innerHTML=`<b>📝 自由メモ</b><br>${escapeHtml(free)}`;extraResult.appendChild(n)}
+  if(free){const n=document.createElement('div');n.className='v36-cause';n.innerHTML=`<b>📝 本人が追加したメモ</b><br>${escapeHtml(free)}`;extraResult.appendChild(n)}
   localStorage.setItem("cl_extra_result_"+extraTarget,JSON.stringify({kind:"deep",scores,answers,free:free||"",updatedAt:Date.now()}));
   localStorage.setItem("cl_extra_radar_"+extraTarget,JSON.stringify({deep:scores}));
-  applyDiagToProfile(extraTarget,base);
-  const merged=buildAiProfileText(base,extraTarget==='my'?'あなた':'相手',scores,free);
-  localStorage.setItem('cl_diag_summary_'+extraTarget,merged);
-  const freeId=extraTarget==='my'?'myFree':'partnerFree';const freeEl=document.getElementById(freeId);if(freeEl)freeEl.value=merged;
-  const shareBox=document.createElement('div');addShareButton(shareBox,'CoreLingualの36問特性チェック結果',{kind:'diagnosis',version:7,target:extraTarget,targetLabel:extraTarget==='my'?'自分':'相手',scores:base.map(x=>({key:x.key,score:x.score})),deepScores:scores.map(x=>({key:x.key,score:x.score})),answers:answers});extraResult.appendChild(shareBox);
+  const shareBox=document.createElement('div');addShareButton(shareBox,'CoreLingualの36問特性チェック結果',{kind:'diagnosis',version:8,target:extraTarget,targetLabel:extraTarget==='my'?'自分':'相手',scores:base.map(x=>({key:x.key,score:x.score})),deepScores:scores.map(x=>({key:x.key,score:x.score})),answers:answers,deepAnswers:answers,free:free||''});extraResult.appendChild(shareBox);
+  const applyBox=document.createElement('div');applyBox.className='v36-profile-apply';
+  const applyBtn=document.createElement('button');applyBtn.type='button';applyBtn.className='primary';applyBtn.textContent='🧩 この36問の結果をプロフィールに反映する';
+  applyBtn.onclick=()=>{
+    const manual=free||extractManualMemo(document.getElementById(extraTarget==='my'?'myFree':'partnerFree')?.value||'');
+    applyDiagToProfile(extraTarget,base,scores);
+    const freeId=extraTarget==='my'?'myFree':'partnerFree';
+    const profileText=buildAiProfileText(base,extraTarget==='my'?'あなた':'相手',scores,manual);
+    const freeEl=document.getElementById(freeId);if(freeEl)freeEl.value=profileText;
+    localStorage.setItem('cl_diag_summary_'+extraTarget,profileText);
+    alert('36問の特性チェック結果をプロフィールに反映したよ！');
+  };
+  applyBox.appendChild(applyBtn);extraResult.appendChild(applyBox);
 }
 runExtra.onclick=()=>{
   const answers=[];for(let i=0;i<extraPlan.length;i++){const x=document.querySelector(`input[name="ex${i+1}"]:checked`);if(!x){alert(`追加探索の全${extraPlan.length}問に回答してください。1〜5で選んでね。`);return}answers.push(Number(x.value));}
@@ -891,13 +929,13 @@ function renderShared(payload){
    (Array.isArray(r.advice)?r.advice:[]).forEach(a=>{const c=document.createElement('div');c.className='advice-card';c.innerHTML=`<div class="advice-cause"><span>原因：</span>${escapeHtml(a.cause||'')}</div><div class="advice-suggest"><b>💡 こう言い換えてみましょう</b><p>${escapeHtml(a.suggestion||'')}</p></div>`;sec.appendChild(c)});shell.appendChild(sec);
  }else if(p.kind==='diagnosis'){
    const scores=Array.isArray(p.scores)?p.scores:[];
+   const deepScores=Array.isArray(p.deepScores)?p.deepScores:[];
    const label=p.targetLabel||'本人';
-   const profile=buildTraitSummary(scores,label);
-   if(profile){
-     const traits=profile.querySelectorAll('.v36-trait');
-     const title2=document.createElement('div');title2.className='v36-shared-title';title2.innerHTML=`<h2>🧩 ${escapeHtml(label)}の特性チェック結果</h2><p>会話の中で、どんな受け取り方・考え方・伝え方が自然になりやすいかをまとめています。これは診断ではありません。</p>`;
-     shell.innerHTML='';shell.appendChild(title2);
-     traits.forEach(t=>{
+   const title2=document.createElement('div');title2.className='v36-shared-title';title2.innerHTML=`<h2>🧩 ${escapeHtml(label)}の特性チェック結果</h2><p>${deepScores.length?'前半18問＋後半18問の36問から、会話で出やすい特徴をまとめています。':'会話の中で、どんな受け取り方・考え方・伝え方が自然になりやすいかをまとめています。'}これは診断ではありません。</p>`;
+   shell.innerHTML='';shell.appendChild(title2);
+   const baseProfile=buildTraitSummary(scores,label);
+   if(baseProfile){
+     baseProfile.querySelectorAll('.v36-trait').forEach(t=>{
        const c=document.createElement('div');c.className='v36-shared-trait';
        const h=t.querySelector('.v36-trait-title')?.textContent||'';
        const main=t.querySelector('.v36-trait-main')?.textContent||'';
@@ -905,11 +943,18 @@ function renderShared(payload){
        c.innerHTML=`<h3>${escapeHtml(h)}</h3><p>${escapeHtml(main)}</p><div class="use"><b>会話では：</b>${escapeHtml(use.replace(/^会話では：/,'').trim())}</div>`;
        shell.appendChild(c);
      });
-     const cta=document.createElement('div');cta.className='shared-cta';
-     cta.innerHTML='<b>🧩 自分も特性チェックしてみる</b><p>自分のコミュニケーション傾向もチェックしてみよう。</p><button type="button">特性チェックを始める</button>';
-     cta.querySelector('button').addEventListener('click',()=>{const u=new URL(location.href);u.pathname='/';u.search='';u.hash='';location.href=u.toString();});
-     shell.appendChild(cta);
    }
+   if(deepScores.length){
+     const deepTitle=document.createElement('h3');deepTitle.className='shared-subheading';deepTitle.textContent='🔎 後半18問で見えた3つの方向';shell.appendChild(deepTitle);
+     deepScores.forEach(x=>{const a=DEEP_AXES[x.key];if(!a)return;const n=deepNarrative(x.key,x.score);const c=document.createElement('div');c.className='v36-shared-trait';c.innerHTML=`<h3>${escapeHtml(a.icon+' '+a.label)}</h3><p><b>傾向：</b>${escapeHtml(n.main)}。</p><div class="use"><b>会話では：</b>${escapeHtml(n.use)}</div>`;shell.appendChild(c)});
+     buildTraitOverlapCards(scores,deepScores).forEach(card=>{const clone=card.cloneNode(true);shell.appendChild(clone)});
+     const attachment=buildAttachmentOverlapCard(deepScores);if(attachment)shell.appendChild(attachment.cloneNode(true));
+   }
+   if(p.free){const memo=document.createElement('div');memo.className='v36-cause';memo.innerHTML=`<b>📝 本人が追加したメモ</b><br>${escapeHtml(p.free)}`;shell.appendChild(memo);}
+   const cta=document.createElement('div');cta.className='shared-cta';
+   cta.innerHTML='<b>🧩 自分も特性チェックしてみる</b><p>自分のコミュニケーション傾向もチェックしてみよう。</p><button type="button">特性チェックを始める</button>';
+   cta.querySelector('button').addEventListener('click',()=>{const u=new URL(location.href);u.pathname='/';u.search='';u.hash='';location.href=u.toString();});
+   shell.appendChild(cta);
  }else shell.innerHTML+='<div class="shared-error"><b>共有データを表示できませんでした</b><p>対応していない共有形式です。</p></div>';
  result.appendChild(shell);
 }
