@@ -17,17 +17,9 @@ function cleanProfile(p){
   const extraRadar = p.extraRadar && typeof p.extraRadar === "object" ? {
     before:Array.isArray(p.extraRadar.before)?p.extraRadar.before.slice(0,6).map(v=>Math.max(0,Math.min(100,Number(v)||0))):null,
     after:Array.isArray(p.extraRadar.after)?p.extraRadar.after.slice(0,6).map(v=>Math.max(0,Math.min(100,Number(v)||0))):null,
-    deep:Array.isArray(p.extraRadar.deep)?p.extraRadar.deep.slice(0,3).map(x=>({
-      key:cleanText(x?.key,80),
-      score:Math.max(0,Math.min(100,Number(x?.score)||0)),
-      count:Math.max(0,Math.min(18,Number(x?.count)||0))
-    })).filter(x=>x.key):null
+    deep:Array.isArray(p.extraRadar.deep)?p.extraRadar.deep.slice(0,3).map(x=>({key:cleanText(x?.key,80),score:Math.max(0,Math.min(100,Number(x?.score)||0)),count:Math.max(0,Math.min(18,Number(x?.count)||0))})).filter(x=>x.key):null
   } : null;
-  const deepScores = Array.isArray(p.deepScores) ? p.deepScores.slice(0,3).map(x=>({
-    key:cleanText(x?.key,80),
-    score:Math.max(0,Math.min(100,Number(x?.score)||0)),
-    count:Math.max(0,Math.min(18,Number(x?.count)||0))
-  })).filter(x=>x.key) : [];
+  const deepScores = Array.isArray(p.deepScores) ? p.deepScores.slice(0,3).map(x=>({key:cleanText(x?.key,80),score:Math.max(0,Math.min(100,Number(x?.score)||0)),count:Math.max(0,Math.min(18,Number(x?.count)||0))})).filter(x=>x.key) : [];
   const deepAnswers = Array.isArray(p.deepAnswers) ? p.deepAnswers.slice(0,18).map(v=>Math.max(1,Math.min(5,Number(v)||1))) : [];
   return {
     name: cleanText(p.name,80) || "相手",
@@ -110,7 +102,18 @@ export default async function handler(req,res){
       const q=await sql`UPDATE corelingual_invites SET partner_share=${share},updated_at=NOW() WHERE id=${row.id} AND expires_at > NOW() RETURNING host_share,partner_share`;
       return res.status(200).json({ok:true,hostShare:q[0].host_share,partnerShare:q[0].partner_share});
     }
-    res.setHeader("Allow","GET,POST,PATCH,PUT"); return res.status(405).json({error:"Method not allowed"});
+    if(req.method === "DELETE"){
+      const body=req.body||{};
+      const token=String(body.token||"");
+      const ownerToken=String(body.ownerToken||"");
+      if(!validToken(token) || !ownerToken) return res.status(400).json({error:"終了情報が不正です。"});
+      const rows=await sql`SELECT id,owner_hash FROM corelingual_invites WHERE token_hash=${tokenHash(token)} AND expires_at > NOW() LIMIT 1`;
+      if(!rows.length)return res.status(404).json({error:"招待リンクが見つからないか、すでに終了しています。"});
+      if(tokenHash(ownerToken)!==rows[0].owner_hash)return res.status(403).json({error:"所有者キーが一致しません。"});
+      await sql`DELETE FROM corelingual_invites WHERE id=${rows[0].id}`;
+      return res.status(200).json({ok:true,ended:true});
+    }
+    res.setHeader("Allow","GET,POST,PATCH,PUT,DELETE"); return res.status(405).json({error:"Method not allowed"});
   }catch(e){
     console.error("CoreLingual invite API error:",e);
     return res.status(500).json({error:"招待機能でエラーが発生しました。"});
