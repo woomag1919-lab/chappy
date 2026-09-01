@@ -1,126 +1,176 @@
-const MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
-const MAX_MESSAGE = 30000;
-const MAX_IMAGES = 5;
-const MAX_IMAGE_BYTES = 1800000;
-const MAX_TOTAL_BYTES = 3600000;
-const MAX_CONTEXT = 14000;
-const ALLOWED_MIME = new Set(["image/jpeg","image/png","image/webp"]);
+const MODEL = process.env.GEMINI_MODEL || "gemini-3.7-flash";
+const API_KEY = process.env.GEMINI_API_KEY;
+const MAX_MESSAGE = 60000;
+const MAX_IMAGES = 8;
+const MAX_TOTAL_IMAGE_CHARS = 3200000;
+const TIMEOUT_MS = 45000;
 
-const cleanText=(v,max)=>typeof v==="string"?v.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g,"").slice(0,max):"";
-const fail=(res,status,msg)=>res.status(status).json({error:msg});
+const json = (status, body) => ({ statusCode: status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" }, body: JSON.stringify(body) });
 
-function validateBody(b){
-  if(!b || typeof b!=="object" || Array.isArray(b))throw new Error("入力データが不正です。");
-  if(!["text","image"].includes(b.inputMode))throw new Error("入力形式が不正です。");
-  const speaker=cleanText(b.speaker||"me",20);
-  if(!["me","partner","unknown"].includes(speaker))throw new Error("発言者の指定が不正です。");
-  const message=cleanText(b.message||"",MAX_MESSAGE);
-  if(b.inputMode==="text" && !message.trim())throw new Error("会話内容を入力してください。");
-  const images=Array.isArray(b.images)?b.images:[];
-  if(images.length>MAX_IMAGES)throw new Error(`画像は${MAX_IMAGES}枚までです。`);
-  let total=0;
-  for(const x of images){
-    if(!x || typeof x!=="object" || typeof x.data!=="string")throw new Error("画像データが不正です。");
-    const mime=String(x.mime_type||"image/jpeg").toLowerCase();
-    if(!ALLOWED_MIME.has(mime))throw new Error("対応していない画像形式です。");
-    const bytes=Math.ceil(x.data.length*0.75);
-    if(bytes>MAX_IMAGE_BYTES)throw new Error("画像サイズが大きすぎます。");
-    total+=bytes;
-  }
-  if(total>MAX_TOTAL_BYTES)throw new Error("画像の合計サイズが大きすぎます。");
-  const dc=b.diagnosisContext && typeof b.diagnosisContext==="object"?b.diagnosisContext:{};
-  const diagnosisContext={my:cleanText(dc.my||"",MAX_CONTEXT),partner:cleanText(dc.partner||"",MAX_CONTEXT)};
-  const myTraits=Array.isArray(b.myTraits)?b.myTraits.slice(0,20).map(x=>cleanText(String(x),80)).filter(Boolean):[];
-  const partnerTraits=Array.isArray(b.partnerTraits)?b.partnerTraits.slice(0,20).map(x=>cleanText(String(x),80)).filter(Boolean):[];
-  return {inputMode:b.inputMode,speaker,message,imageQuestion:cleanText(b.imageQuestion||"",3000),images,diagnosisContext,myTraits,partnerTraits,myFree:cleanText(b.myFree||"",3000),partnerFree:cleanText(b.partnerFree||"",3000)};
+function cleanText(value, max = 12000) {
+  return typeof value === "string" ? value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").slice(0, max) : "";
 }
 
-function makePrompt(b){
-  return `あなたはCoreLingual。会話の「言葉の翻訳」を手伝うアシスタントです。
-目的は、特性の違う2人が「気持ちは同じでも、言葉の選び方・受け取り方がズレてしまう」ことで起きるすれ違いを、責めずに分かりやすく整理することです。
+function cleanProfile(value) {
+  if (typeof value === "string") return cleanText(value, 14000);
+  if (!value || typeof value !== "object") return "";
+  return JSON.stringify(value).slice(0, 16000);
+}
 
-【重要な分析原則】
-- 実際の発言・会話の流れを最優先する。プロフィールだけから心理や本心を断定しない。
-- diagnosisContext は会話解釈の補助材料。会話内容と矛盾する場合は会話内容を優先する。
-- 特性情報を診断名や病名として扱わない。「なぜその言葉が出た可能性があるか」「なぜそう受け取った可能性があるか」を考える材料として使う。
-- どちらか一方を悪者にしない。両方の気持ちや意図が成立する可能性を大切にする。
-- 「この人はこういう性格だから」で終わらせず、今回の発言→伝えたかった可能性→相手が受け取った可能性→特性の組み合わせによるズレ→次に使えそうな言葉までつなげる。
-- ASD等の診断・判定はしない。特性チェックはあくまで会話上の参考情報。
+function normalizeAdvice(value) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, 8).map(x => ({
+    cause: cleanText(x?.cause, 900),
+    suggestion: cleanText(x?.suggestion ?? x?.suggest, 900)
+  })).filter(x => x.cause || x.suggestion);
+}
 
-【自分の会話プロフィール】
-${b.diagnosisContext.my||"なし"}
+function normalizeResult(raw) {
+  const x = raw && typeof raw === "object" ? raw : {};
+  return {
+    partner: cleanText(x.partner, 2200),
+    me: cleanText(x.me, 2200),
+    mismatch: cleanText(x.mismatch, 3000),
+    advice: normalizeAdvice(x.advice),
+    caution: cleanText(x.caution, 1600)
+  };
+}
 
-【相手の会話プロフィール】
-${b.diagnosisContext.partner||"なし"}
+function parseJson(text) {
+  const s = String(text || "").trim().replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/, "");
+  try { return JSON.parse(s); } catch {}
+  const start = s.indexOf("{");
+  const end = s.lastIndexOf("}");
+  if (start >= 0 && end > start) return JSON.parse(s.slice(start, end + 1));
+  throw new Error("invalid_json");
+}
 
-【補助的なプロフィール情報】
-自分の選択特性=${b.myTraits.join(",")||"なし"}
-相手の選択特性=${b.partnerTraits.join(",")||"なし"}
-自分メモ=${b.myFree||"なし"}
-相手メモ=${b.partnerFree||"なし"}
+function buildPrompt(body) {
+  const meProfile = cleanProfile(body.diagnosisContext?.my);
+  const partnerProfile = cleanProfile(body.diagnosisContext?.partner);
+  const myTraits = Array.isArray(body.myTraits) ? body.myTraits.slice(0, 20).map(x => cleanText(x, 120)).join(", ") : "";
+  const partnerTraits = Array.isArray(body.partnerTraits) ? body.partnerTraits.slice(0, 20).map(x => cleanText(x, 120)).join(", ") : "";
+  const myFree = cleanText(body.myFree, 2500);
+  const partnerFree = cleanText(body.partnerFree, 2500);
+  const message = cleanText(body.message, MAX_MESSAGE);
+  const speaker = cleanText(body.speaker, 80);
+  const imageQuestion = cleanText(body.imageQuestion, 500);
 
-【口調】
-硬すぎず、砕けすぎず。教科書・医師・心理検査の結果のような文章にはしない。
-「〜かもしれません」「〜だったのかも」「〜と受け取った可能性があります」など自然な日本語にする。
+  return `あなたはCoreLingualの会話解析エンジンです。
+目的は、2人の会話のすれ違いを責めずに整理し、双方の意図を尊重しながら、次に伝えやすい言い方を提案することです。
 
-【必ずこの構造でJSONを返す】
+【最重要ルール】
+- 実際の会話・発言内容を最優先する。
+- 特性プロフィールは「解釈の補助材料」であり、発言より優先しない。
+- ASD、ADHD、HSP、愛着パターンなどの名称から、診断・病気・障害・性格を断定しない。
+- 「ASDだから」「不安型だから」のように因果関係を決めつけない。
+- プロフィールと会話が関係しているときだけ、「今回の場面では、その傾向が影響した可能性があります」と慎重に述べる。
+- 関係が確認できない特性は無理に使わない。
+- 相手を悪者にしない。双方にとって自然な受け取り方の違いとして説明する。
+- 断定より「〜かもしれません」「〜だった可能性があります」を使う。
+- 改善案は、相手を操作する方法ではなく、自分の気持ち・意図・お願いを具体的に伝える言い方にする。
+- 診断や医療的評価を求められても、この解析では行わない。
+
+【出力】
+JSONのみ。Markdownやコードフェンスは禁止。
 {
-  "partner":"相手の心理・背景。今回の言葉をどう受け取った可能性があるか、相手の特性との関係も含める",
-  "me":"自分の心理・背景。今回、本当は何を伝えたかった可能性があるか、自分の特性との関係も含める",
-  "mismatch":"すれ違いのメカニズム。2人の気持ち・意図そのものがどう違ったのではなく、同じ／近い気持ちがなぜ別の言葉や意味として伝わったのかを具体的に説明する",
-  "advice":[{"cause":"今回のズレにつながったポイント","suggestion":"次に同じ場面になったときに使いやすい具体的で自然な言い換え"}],
-  "caution":"断定できない点や会話だけでは分からない点。なければ空文字"
+  "partner": "相手側の受け取り方・意図を会話に即して説明",
+  "me": "自分側の受け取り方・意図を会話に即して説明",
+  "mismatch": "2人の認識・期待・伝え方がどこですれ違ったか。特性が関係する場合は具体的な特徴と会話場面をつなげる",
+  "advice": [
+    {"cause":"なぜこの場面ですれ違いやすかったか", "suggestion":"次に伝えるならどう言うと分かりやすいか"}
+  ],
+  "caution": "断定できない点や、会話だけでは判断できない点"
 }
 
-【入力】
-発言者=${b.speaker}
-${b.inputMode==="text"?b.message:`複数スクショを確認してください。スクショについての質問=${b.imageQuestion||"特になし"}`}
+【自分の特性プロフィール】
+${meProfile || "なし"}
 
-【出力ルール】
-advice は1〜3個。単なる一般論ではなく、今回の言葉のどこをどう変えると伝わりやすいかを書く。JSON以外の文章は返さない。`;
+【相手の特性プロフィール】
+${partnerProfile || "なし"}
+
+【自分が選択した特徴メモ】
+${myTraits || "なし"}
+
+【相手が選択した特徴メモ】
+${partnerTraits || "なし"}
+
+【自分の自由記述】
+${myFree || "なし"}
+
+【相手の自由記述】
+${partnerFree || "なし"}
+
+【会話】
+話者: ${speaker || "不明"}
+${message || "（テキストなし。画像を参照）"}
+
+【画像についての補足】
+${imageQuestion || "なし"}
+
+特性プロフィールには、基本18問の6軸、深掘り18問の3軸、ASD/ADHD/HSPとの特徴上の重なり、愛着パターンが含まれることがあります。
+それらは「この人を分類するラベル」ではなく、「この会話をどう受け取りやすかったかを考えるための補助情報」として使ってください。
+`;
 }
 
-function normalizeResult(raw){
-  let d=raw;
-  if(typeof d!=="object"||!d)d={};
-  const advice=Array.isArray(d.advice)?d.advice.slice(0,3).map(x=>({cause:cleanText(x?.cause||"",1200),suggestion:cleanText(x?.suggestion||"",1800)})).filter(x=>x.cause||x.suggestion):[];
-  return {partner:cleanText(d.partner||"",6000),me:cleanText(d.me||"",6000),mismatch:cleanText(d.mismatch||"",7000),advice,caution:cleanText(d.caution||"",3000)};
-}
-function parseJson(raw){
-  const cleaned=String(raw||"").replace(/^```json\s*/i,"").replace(/```$/i,"").trim();
-  try{return normalizeResult(JSON.parse(cleaned));}catch{
-    const a=cleaned.indexOf("{"); const z=cleaned.lastIndexOf("}");
-    if(a>=0&&z>a)return normalizeResult(JSON.parse(cleaned.slice(a,z+1)));
-    throw new Error("AI結果の形式を確認できませんでした。");
+async function generate(body) {
+  if (!API_KEY) throw new Error("missing_api_key");
+  const images = Array.isArray(body.images) ? body.images.slice(0, MAX_IMAGES) : [];
+  let imageChars = 0;
+  const parts = [{ text: buildPrompt(body) }];
+  for (const img of images) {
+    const mime = ["image/jpeg", "image/png", "image/webp"].includes(img?.mime_type) ? img.mime_type : null;
+    const data = typeof img?.data === "string" ? img.data : "";
+    if (!mime || !data) continue;
+    imageChars += data.length;
+    if (imageChars > MAX_TOTAL_IMAGE_CHARS) throw new Error("image_too_large");
+    parts.push({ inline_data: { mime_type: mime, data } });
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(MODEL)}:generateContent`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": API_KEY },
+      signal: controller.signal,
+      body: JSON.stringify({
+        contents: [{ role: "user", parts }],
+        generationConfig: {
+          temperature: 0.35,
+          maxOutputTokens: 1800,
+          responseMimeType: "application/json"
+        }
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.error("Gemini request failed", { status: res.status, model: MODEL });
+      throw new Error("gemini_request_failed");
+    }
+    const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("") || "";
+    if (!text) throw new Error("empty_model_response");
+    return normalizeResult(parseJson(text));
+  } finally {
+    clearTimeout(timer);
   }
 }
 
-export default async function handler(req,res){
-  res.setHeader("Cache-Control","no-store");
-  if(req.method!=="POST"){res.setHeader("Allow","POST");return fail(res,405,"Method Not Allowed");}
-  const key=process.env.GEMINI_API_KEY;
-  if(!key)return fail(res,500,"解析サービスの設定が完了していません。");
-  try{
-    const b=validateBody(req.body||{});
-    const parts=[{text:makePrompt(b)}];
-    for(const x of b.images)parts.push({inline_data:{mime_type:String(x.mime_type||"image/jpeg"),data:x.data}});
-    const controller=new AbortController(); const timer=setTimeout(()=>controller.abort(),40000);
-    let r;
-    try{
-      r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(MODEL)}:generateContent`,{
-        method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},
-        body:JSON.stringify({contents:[{role:"user",parts}],generationConfig:{responseMimeType:"application/json",temperature:0.35,maxOutputTokens:5000}}),signal:controller.signal
-      });
-    }finally{clearTimeout(timer)}
-    const d=await r.json().catch(()=>({}));
-    if(!r.ok){console.error("Gemini API status:",r.status,d.error?.status||"");return fail(res,502,"解析サービスから正常な結果を受け取れませんでした。");}
-    const raw=d.candidates?.[0]?.content?.parts?.map(x=>x.text||"").join("")||"";
-    if(!raw)throw new Error("Geminiから結果が返りませんでした。");
-    return res.status(200).json(parseJson(raw));
-  }catch(e){
-    if(e?.name==="AbortError")return fail(res,504,"解析に時間がかかりすぎました。もう一度試してください。");
-    console.error("CoreLingual translate API error:",e?.message||e);
-    const client=/入力|画像|発言者|形式|サイズ|枚/.test(String(e?.message||""))?e.message:"会話の解析に失敗しました。もう一度試してください。";
-    return fail(res,400,client);
+export default async function handler(req, res) {
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  try {
+    const body = req.body && typeof req.body === "object" ? req.body : JSON.parse(req.body || "{}");
+    const message = cleanText(body.message, MAX_MESSAGE);
+    const images = Array.isArray(body.images) ? body.images : [];
+    if (!message && !images.length) return res.status(400).json({ error: "会話内容を入力してください。" });
+    if (images.length > MAX_IMAGES) return res.status(400).json({ error: "画像が多すぎます。" });
+    const result = await generate({ ...body, message, images });
+    return res.status(200).json(result);
+  } catch (e) {
+    if (e?.name === "AbortError") return res.status(504).json({ error: "解析に時間がかかりすぎました。もう一度試してください。" });
+    if (e?.message === "image_too_large") return res.status(413).json({ error: "画像の容量が大きすぎます。枚数を減らしてください。" });
+    console.error("translate error", e?.message || e);
+    return res.status(500).json({ error: "会話の解析に失敗しました。もう一度試してください。" });
   }
 }
