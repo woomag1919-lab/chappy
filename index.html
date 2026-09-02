@@ -1,10 +1,10 @@
-<!-- CoreLingual_v52 -->
+<!-- CoreLingual_v55 -->
 <!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CoreLingual v54</title>
+<title>CoreLingual v55</title>
 <style>
 body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
 .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
@@ -27,19 +27,28 @@ body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMa
 /* v36: focused invite/share screens — fix hidden #diag parent and question panel */
 body.invite-mode nav,body.invite-mode #talk{display:none!important}
 body.invite-mode #diag{display:block!important}
-body.invite-mode #diag > .panel > *:not(#v23InviteCard),body.invite-mode #v21CompareCard,body.invite-mode #diagQuestionPanel,body.invite-mode #diagResult,body.invite-mode #moreDiag{display:none!important}
+body.invite-mode .cl55-head,body.invite-mode .cl55-tabs,body.invite-mode #cl55PaneMy,body.invite-mode .cl55-check-panel,body.invite-mode #v21CompareCard{display:none!important}
+body.invite-mode #cl55PanePartner{display:block!important}
+body.invite-mode #cl55PanePartner > .cl55-note,body.invite-mode #cl55PanePartner > .cl55-block:not(.cl55-invite){display:none!important}
 body.invite-mode #v23InviteCard{display:block!important;margin-top:0}
 body.invite-mode .v36-invite-focus{padding:16px;border-radius:14px;background:#fff7fa;border:1px solid #f0dce3}
 body.invite-questions-mode nav,body.invite-questions-mode #talk{display:none!important}
 body.invite-questions-mode #diag{display:block!important}
-body.invite-questions-mode #diag > .panel{display:block!important}
-body.invite-questions-mode #diag > .panel > *:not(#diagQuestionPanel),body.invite-questions-mode #v21CompareCard,body.invite-questions-mode #diagResult,body.invite-questions-mode #moreDiag{display:none!important}
+body.invite-questions-mode .cl55-head,body.invite-questions-mode .cl55-tabs,body.invite-questions-mode #cl55PaneMy,body.invite-questions-mode #cl55PanePartner,body.invite-questions-mode #v21CompareCard{display:none!important}
+body.invite-questions-mode .cl55-check-panel{display:block!important}
 body.invite-questions-mode #diagQuestionPanel{display:block!important}
+body.invite-questions-mode #moreDiag{display:block!important}
+body.invite-questions-mode #startMore{display:none!important}
+body.invite-questions-mode #moreDiag .v36-more-note + .card{display:none!important}
 body.invite-ended-mode nav,body.invite-ended-mode #talk{display:none!important}
 body.invite-ended-mode #diag{display:block!important}
-body.invite-ended-mode #diag > .panel > *:not(#v23InviteCard),body.invite-ended-mode #v21CompareCard,body.invite-ended-mode #diagQuestionPanel,body.invite-ended-mode #diagResult,body.invite-ended-mode #moreDiag{display:none!important}
+body.invite-ended-mode .cl55-head,body.invite-ended-mode .cl55-tabs,body.invite-ended-mode #cl55PaneMy,body.invite-ended-mode .cl55-check-panel,body.invite-ended-mode #v21CompareCard{display:none!important}
+body.invite-ended-mode #cl55PanePartner{display:block!important}
+body.invite-ended-mode #cl55PanePartner > .cl55-note,body.invite-ended-mode #cl55PanePartner > .cl55-block:not(.cl55-invite){display:none!important}
 body.invite-ended-mode #v23InviteCard{display:block!important;margin-top:0}
-body.invite-complete-mode #diagQuestionPanel,body.invite-complete-mode #diagResult,body.invite-complete-mode #moreDiag{display:none!important}
+body.invite-complete-mode #diagQuestionPanel,body.invite-complete-mode #diagResult,body.invite-complete-mode #moreDiag,body.invite-complete-mode .cl55-check-panel{display:none!important}
+body.invite-complete-mode .cl55-tabs,body.invite-complete-mode #cl55PaneMy{display:none!important}
+body.invite-complete-mode #cl55PanePartner{display:block!important}
 body.invite-complete-mode #v23InviteCard{display:block!important;margin-top:0}
 body.shared-mode nav,body.shared-mode #talk > *:not(#result),body.shared-mode #diag{display:none!important}
 body.shared-mode #result{display:block!important}
@@ -135,6 +144,18 @@ window.CoreLingual_v36 = {
 .v46-partner-result,.v46-pair-card{margin-top:12px;border:1px solid #eadfe4;border-radius:14px;background:#fff;padding:12px}.v46-result-head,.v46-pair-head{font-size:18px;font-weight:800;color:#c74369}.v46-result-note,.v46-pair-note{font-size:12px;line-height:1.65;color:#717983;margin-top:5px}.v46-result-trait{margin-top:10px;padding:11px;border:1px solid #edf0f2;border-radius:12px;background:#fafbfc}.v46-result-trait h4{margin:0 0 6px;font-size:15px}.v46-result-trait p{margin:4px 0;line-height:1.7;font-size:13px}.v46-result-trait .use{margin-top:7px;padding:9px;background:#fff;border-radius:10px;line-height:1.65;font-size:12px}.v46-subhead{margin:14px 0 6px;color:#c74369}.v46-pair-radar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.v46-pair-person{border:1px solid #eadfe4;border-radius:12px;padding:8px;text-align:center;font-size:13px}.v46-pair-person canvas{width:100%;height:190px;display:block}.v46-side-by-side{margin-top:10px}.v46-compare-row{border-top:1px solid #eee;padding:10px 0}.v46-compare-axis{font-weight:800;font-size:14px;margin-bottom:6px}.v46-two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px}.v46-two-col>div{background:#fafbfc;border-radius:10px;padding:8px}.v46-two-col b{font-size:12px;color:#c74369}.v46-two-col p{font-size:12px;line-height:1.6;margin:4px 0}.v46-pair-insights{margin-top:10px}.v46-insight{padding:10px;border-radius:11px;background:#fff7fa;border:1px solid #f0dce3;margin-top:7px;font-size:12px;line-height:1.65}.v46-insight p{margin:5px 0}@media(max-width:600px){.v46-pair-person canvas{height:170px}}
 
 /* v52: 特性チェックの導線を整理 */
+.cl55-head{margin:0 0 12px;padding:0 2px}.cl55-head h2{margin:0 0 4px;font-size:20px;color:#c74369}.cl55-head p{margin:0;font-size:12px;color:#717983;line-height:1.65}
+.cl55-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.cl55-tab{padding:14px 12px;border:1px solid #e1c7d0;border-radius:14px;background:#fff;font-weight:800;font-size:15px;color:#59616b}
+.cl55-tab.on{background:linear-gradient(100deg,#fff0f5,#ffeaf0);border-color:#df6684;color:#c74369;box-shadow:0 1px 0 rgba(199,67,105,.12)}
+.cl55-pane{margin-bottom:10px}
+.cl55-note{font-size:12px;color:#717983;line-height:1.7;margin:0 0 10px;padding:10px 12px;background:#fafbfc;border-radius:12px;border:1px solid #e9edf1}
+.cl55-partner-lead{background:#fff7fa;border-color:#f0dce3;color:#59616b}
+.cl55-block{margin-bottom:10px}
+.cl55-desc{font-size:12px;color:#717983;line-height:1.65;margin:6px 0 10px}
+.cl55-subbtn{width:100%;padding:11px;border-radius:11px;border:1px solid #ddd;background:#fff;font-weight:700}
+.cl55-invite{background:#fffafc;border-color:#f0dce3}
+.cl55-check-panel{margin-top:4px}
 .v52-guide{background:#fff;border:1px solid #eadfe4;border-radius:16px;padding:14px;margin-bottom:12px}
 .v52-guide h2{font-size:18px;margin:0 0 5px;color:#c74369}
 .v52-guide .lead{font-size:12px;color:#717983;line-height:1.7;margin:0 0 12px}
@@ -185,51 +206,79 @@ body.invite-complete-mode #targetNote{display:none!important}
 <div id="profilePartnerPane" class="person" style="display:none"><h3>👥 相手のプロフィール</h3><label class="small">会話の傾向</label><div id="partnerTraits" class="chips"></div><label class="small">メモ</label><div class="friendly-note">相手について分かる範囲で設定できます。推測だけで決めつけず、会話分析の補助として使います。</div><textarea id="partnerFree" class="profile-memo" placeholder="相手について、会話で気づいていることなど…"></textarea><div class="savebar"><input id="partnerName" type="text" placeholder="例：友人A、家族、同僚A"><button id="savePartner" class="save">保存</button></div><div id="partnerProfiles" class="profiles"></div><div class="profile-delete-hint">タップで使用中に切り替え。長押しで削除確認。</div></div></div>
 <button id="analyze" class="primary">✨ 分析・アドバイスを表示する</button><div class="ad-slot" id="bannerAd"><strong>📢 広告バナー予定エリア</strong>将来ここに常時バナー広告を表示します。現在は広告未接続。</div><div id="result"></div>
 </section>
-<section id="diag" style="display:none"><div class="v52-guide">
-<h2>🧩 特性プロフィールを作る</h2>
-<p class="lead">「誰の特性を、どうやって登録するか」をここで選べます。登録した特性はプロフィールや会話分析、2人の比較に使えます。</p>
-<div class="v52-step">
-<button type="button" class="accent" id="v52MyManual"><b>👤 自分を手入力</b><span>自分で気づいている特徴を登録</span></button>
-<button type="button" id="v52PartnerManual"><b>👥 相手を手入力</b><span>相手について分かる範囲で登録</span></button>
-<button type="button" class="accent" id="v52MyCheck"><b>🧩 自分をチェック</b><span>36問 → 自動で自分プロフィールへ反映</span></button>
-<button type="button" id="v52PartnerCheck"><b>🧩 相手をチェック</b><span>自分から見た相手を36問で整理</span></button>
+<section id="diag" style="display:none">
+<div class="cl55-head">
+  <h2>🧩 特性チェック</h2>
+  <p>会話の受け取り方のクセを整理します。まずは「自分」、必要なら「相手」へ。</p>
 </div>
-<div class="v52-flow"><strong>おすすめ：</strong>まず「自分をチェック」→ 結果を自分プロフィールへ反映。次に「相手に特性チェックをお願いする」→ 相手本人の回答を相手プロフィールへ自動登録 → 2人の比較へ。</div>
+<div class="cl55-tabs" role="tablist">
+  <button type="button" id="selfDiag" class="cl55-tab on" role="tab" aria-selected="true">👤 自分</button>
+  <button type="button" id="otherDiag" class="cl55-tab" role="tab" aria-selected="false">👥 相手</button>
 </div>
-<div class="panel"><div class="v52-section-title">今どの人を回答していますか？</div>
-<div class="actions"><button id="selfDiag" class="action on">👤 自分</button><button id="otherDiag" class="action">👥 相手</button></div><div id="targetNote" style="font-size:12px;color:#717983">自分自身について回答してください。</div>
-<div id="v23InviteCard" class="card" style="margin-top:12px;background:#fffafc;border-color:#f0dce3">
-  <b>👥 2人で特性チェック</b>
-  <p id="v23InviteIntro" style="font-size:12px;color:#717983;line-height:1.7;margin:6px 0 10px">自分のチェックが終わったら、相手にリンクを送って相手側のチェックをしてもらえます。相手の結果は、本人が「共有する」と選ばない限り見えません。</p>
-  <div id="v23InviteControls"></div>
+
+<div id="cl55PaneMy" class="cl55-pane">
+  <div class="cl55-note" id="targetNote">自分自身について、気づいていることやチェック結果を残せます。</div>
+  <div class="card cl55-block">
+    <b>✍️ 手入力</b>
+    <p class="cl55-desc">自分が会話で大切にしていること・出やすいクセを、自由に書けます。</p>
+    <button type="button" id="cl55MyManual" class="action cl55-subbtn">プロフィールを手で書く</button>
+  </div>
+  <div class="card cl55-block">
+    <b>🧩 診断（36問）</b>
+    <p class="cl55-desc">前半18問のあと、任意で後半18問（短い広告あり）。結果は自分プロフィールへ反映・共有できます。</p>
+  </div>
 </div>
+
+<div id="cl55PanePartner" class="cl55-pane" style="display:none">
+  <div class="cl55-note cl55-partner-lead">相手は「こんな人だと思う」で大丈夫です。正解を当てるテストではありません。分かる範囲のメモや、診断で整理できます。</div>
+  <div class="card cl55-block">
+    <b>✍️ 手入力</b>
+    <p class="cl55-desc">相手について気づいていることを、自由に書いてOKです。</p>
+    <button type="button" id="cl55PartnerManual" class="action cl55-subbtn">相手プロフィールを手で書く</button>
+  </div>
+  <div class="card cl55-block">
+    <b>🧩 分からないときは診断してみる</b>
+    <p class="cl55-desc">自分から見た相手を36問で整理します。本人の回答ではないので、参考程度に使ってください。</p>
+  </div>
+  <div id="v23InviteCard" class="card cl55-block cl55-invite">
+    <b>🔗 相手本人にチェックしてもらう</b>
+    <p id="v23InviteIntro" class="cl55-desc">リンクを送ると、相手が本人として36問に答えられます。結果は相手が「共有する」を選んだときだけ、あなたの側に「相手の回答」として登録されます。この画面に共有ボタンはありません。</p>
+    <div id="v23InviteControls"></div>
+  </div>
+</div>
+
+<div class="panel cl55-check-panel">
+  <div id="diagQuestionPanel" class="diag-question-panel"><div id="questions"></div><button id="runDiag" class="primary">📊 結果を見る</button></div>
+  <div id="diagResult"></div>
+  <div id="moreDiag" style="display:none" class="v36-more">
+    <div class="v36-more-note"><b>🔎 もっと深くチェックする（後半18問）</b><br>前半18問とは別の3つの方向から、会話での反応のクセをもう一段深く見ます。</div>
+    <div class="card">
+      <b>🔍 後半18問では何を見る？</b>
+      <p style="font-size:12px;color:#717983">🫂 近づき方・距離の取り方 ／ 🌿 刺激への反応 ／ 🧭 進め方・柔軟性。各6問です。</p>
+      <button id="startMore" class="primary">🧭 後半18問を始める</button>
+    </div>
+    <div id="ad30" class="ad-slot" style="display:none">
+      <strong>📺 追加チェック前の広告枠（開発中）</strong>
+      <div>広告表示の代わりに3秒カウントします。終了後、自動で後半18問が始まります。</div>
+      <div class="ad-countdown" id="ad30Countdown"></div>
+    </div>
+    <div id="extraDiag" style="display:none" class="card">
+      <b id="extraTitle">追加チェック</b>
+      <p id="extraIntro" style="font-size:12px;color:#717983"></p>
+      <div id="extraQuestions"></div>
+      <button id="runExtra" class="primary">🔎 追加チェックの結果を見る</button>
+      <div id="extraResult"></div>
+    </div>
+  </div>
+</div>
+
 <div id="v21CompareCard" class="card v21-compare-card" style="display:none">
   <div class="v21-compare-title">👥 2人のコミュニケーション比較</div>
-  <div class="v21-compare-sub">2人分の結果が揃うと、9つのコミュニケーション傾向を「あなた／相手」で並べて見比べられます。</div>
+  <div class="v21-compare-sub">2人分の結果が揃うと、傾向を「あなた／相手」で並べて見比べられます。</div>
   <div id="v21CompareGrid" class="v21-compare-grid"></div>
   <div id="v21CompareList" class="v21-compare-list"></div>
 </div>
-<div id="diagQuestionPanel" class="diag-question-panel"><div id="questions"></div><button id="runDiag" class="primary">📊 結果を見る</button></div><div id="diagResult"></div>
-<div id="moreDiag" style="display:none" class="v36-more">
-  <div class="v36-more-note"><b>🔎 もっと深くチェックする（後半18問）</b><br>前半18問とは別の3つの方向から、会話での反応のクセをもう一段深く見ます。後半も見てみたい人は、下のボタンから進めます。</div>
-  <div class="card">
-    <b>🔍 後半18問では何を見る？</b>
-    <p style="font-size:12px;color:#717983">🫂 近づき方・距離の取り方 ／ 🌿 刺激への反応 ／ 🧭 進め方・柔軟性。各6問、合計18問です。前半18問と合わせて36問のプロフィールを作ります。</p>
-    <button id="startMore" class="primary">🧭 後半18問を始める</button>
-  </div>
-  <div id="ad30" class="ad-slot" style="display:none">
-    <strong>📺 追加チェック前の広告枠（開発中）</strong>
-    <div>広告表示の代わりに3秒カウントします。終了後、自動で後半18問が始まります。</div>
-    <div class="ad-countdown" id="ad30Countdown"></div>
-  </div>
-  <div id="extraDiag" style="display:none" class="card">
-    <b id="extraTitle">追加チェック</b>
-    <p id="extraIntro" style="font-size:12px;color:#717983"></p>
-    <div id="extraQuestions"></div>
-    <button id="runExtra" class="primary">🔎 追加チェックの結果を見る</button>
-    <div id="extraResult"></div>
-  </div>
-</div></div></section>
+</section>
 </main></div>
 <script>
 const PROFILE_TRAITS=[
@@ -700,12 +749,23 @@ function savePartnerSharedProfile(profile,targetName){
   const summary=buildAiProfileText(scores,'相手',deep,profile.free||profile.summary||'');
   if(summary)localStorage.setItem('cl_diag_summary_partner',summary);
 
-  const desired=String(targetName||'').trim();
+  const desired=String(targetName||'').trim()||'相手の回答';
   const active=activeProfile('partner');
-  const target=desired || active || '';
+  let target=desired || active || '相手の回答';
   if(target){
-    const arr=list('partner');
-    const idx=arr.findIndex(x=>x.name===target);
+    let arr=list('partner');
+    let idx=arr.findIndex(x=>x.name===target);
+    if(idx<0){
+      const traits=typeof sharedTraitsFromScores==='function'?sharedTraitsFromScores(scores):(Array.isArray(profile.traits)?profile.traits:[]);
+      const st={traits,free:summary||profile.free||profile.summary||''};
+      arr.push({name:target,state:st});
+      localStorage.setItem('cl_partner',JSON.stringify(arr));
+      setActiveProfile('partner',target);
+      apply('partner',st);
+      try{draw('partner')}catch(e){}
+      renderTwoPersonComparison();
+      return;
+    }
     if(idx>=0){
       const traits=typeof sharedTraitsFromScores==='function'?sharedTraitsFromScores(scores):(Array.isArray(profile.traits)?profile.traits:[]);
       arr[idx]={...arr[idx],state:{traits,free:summary||profile.free||profile.summary||''}};
@@ -973,7 +1033,19 @@ runExtra.onclick=()=>{
 };
 startMore.onclick=()=>startExtra();
 Q.forEach((q,i)=>questions.insertAdjacentHTML("beforeend",`<div class="q"><b>${i+1}. ${q.q}</b><div class="scale">${[1,2,3,4,5].map(v=>`<label><input type="radio" name="q${i}" value="${v}">${v}</label>`).join("")}</div><div class="scale"><span>あまり当てはまらない</span><span>かなり当てはまる</span></div></div>`));
-selfDiag.onclick=()=>{target="my";selfDiag.classList.add("on");otherDiag.classList.remove("on");targetNote.textContent="自分自身について回答してください。";restoreDiagAnswers("my")};otherDiag.onclick=()=>{target="partner";otherDiag.classList.add("on");selfDiag.classList.remove("on");targetNote.textContent="相手について、分かる範囲で回答してください。本人の回答ではないため参考程度に。";restoreDiagAnswers("partner")};
+function cl55ShowPane(which){
+  const myPane=document.getElementById('cl55PaneMy');
+  const pPane=document.getElementById('cl55PanePartner');
+  if(myPane)myPane.style.display=which==='my'?'block':'none';
+  if(pPane)pPane.style.display=which==='partner'?'block':'none';
+  selfDiag.classList.toggle('on',which==='my');
+  otherDiag.classList.toggle('on',which==='partner');
+  selfDiag.setAttribute('aria-selected',which==='my'?'true':'false');
+  otherDiag.setAttribute('aria-selected',which==='partner'?'true':'false');
+}
+selfDiag.onclick=()=>{target="my";cl55ShowPane('my');const n=document.getElementById('targetNote');if(n)n.textContent="自分自身について、気づいていることやチェック結果を残せます。";restoreDiagAnswers("my")};
+otherDiag.onclick=()=>{target="partner";cl55ShowPane('partner');restoreDiagAnswers("partner")};
+
 function showDiagQuestions(){const panel=document.getElementById("diagQuestionPanel");if(panel){panel.hidden=false;panel.style.display="block"}}
 function hideDiagQuestions(){/* v36: 質問は常時表示。過去回答をそのまま残すため非表示化しない。 */}
 function restoreDiagAnswers(p){
@@ -1009,13 +1081,9 @@ function v23EnsurePartnerKey(token){
   return key;
 }
 function v23InviteCreateControls(){
-  const profiles=list('partner');
-  const active=activeProfile('partner');
-  const opts=profiles.map(x=>`<option value="${escapeHtml(x.name)}" ${x.name===active?'selected':''}>${escapeHtml(x.name)}</option>`).join('');
-  const select=profiles.length
-    ? `<div class="v49-invite-select"><label for="v49InvitePartnerProfile">回答結果を反映する「相手」プロフィール</label><select id="v49InvitePartnerProfile"><option value="">プロフィールを指定しない（現在の相手プロフィールを使用）</option>${opts}</select></div>`
-    : `<div class="v49-invite-select">先に「相手」プロフィールを作っておくと、回答後にそのプロフィールへ自動反映できます。</div>`;
-  return `<div class="v36-share-explain"><b>流れ：</b>あなたが先に36問 → リンクを相手へ送る → 相手が本人として36問 → 相手が結果を共有 → あなたの「相手」プロフィールへ自動登録 → 2人の比較を表示します。</div>${select}<button id="v23CreateInviteBtn" class="primary">🔗 相手に特性チェックをお願いする</button>`;
+  return `<div class="v36-share-explain"><b>流れ：</b>自分がチェック済み → リンクを送る → 相手が本人として36問 → 相手が共有ON → <b>「相手の回答」</b>プロフィールが自動作成され、2人比較に使えます。</div>
+<div class="v36-check"><input id="v23HostShare" type="checkbox" checked><label for="v23HostShare"><b>自分の結果も相手に見せる</b><br>オフにすると、相手にはあなたの結果は見えません。</label></div>
+<button id="v23CreateInviteBtn" class="primary">🔗 相手に特性チェックをお願いする</button>`;
 }
 function v23BindCreateInvite(){
   const b=document.getElementById('v23CreateInviteBtn');if(!b)return;
@@ -1056,7 +1124,7 @@ function v23CurrentProfilePayload(p){
 async function v23CreateInvite(){
   if(!loadDiagRadar("my")){alert("先に自分の前半18問の特性チェックを終えてね。");return}
   const shareMy=!!document.getElementById("v23HostShare")?.checked;
-  const partnerProfileName=document.getElementById('v49InvitePartnerProfile')?.value||activeProfile('partner')||'';
+  const partnerProfileName='相手の回答';
   const owner=v23OwnerToken();
   const payload={ownerToken:owner,host:v23CurrentProfilePayload("my"),hostShare:shareMy};
   const r=await fetch("/api/invite",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
@@ -1261,18 +1329,8 @@ loadSharedFromUrl();
       document.getElementById(which==='my'?'profileMyPane':'profilePartnerPane')?.scrollIntoView({behavior:'smooth',block:'start'});
     },80);
   }
-  function goCheck(which){
-    target=which;
-    selfDiag.classList.toggle('on',which==='my');
-    otherDiag.classList.toggle('on',which==='partner');
-    targetNote.textContent=which==='my'?'自分自身について回答してください。':'相手について、分かる範囲で回答してください。本人の回答ではないため参考程度に。';
-    restoreDiagAnswers(which);
-    document.getElementById('diagQuestionPanel')?.scrollIntoView({behavior:'smooth',block:'start'});
-  }
-  document.getElementById('v52MyManual')?.addEventListener('click',()=>goProfile('my'));
-  document.getElementById('v52PartnerManual')?.addEventListener('click',()=>goProfile('partner'));
-  document.getElementById('v52MyCheck')?.addEventListener('click',()=>goCheck('my'));
-  document.getElementById('v52PartnerCheck')?.addEventListener('click',()=>goCheck('partner'));
+  document.getElementById('cl55MyManual')?.addEventListener('click',()=>goProfile('my'));
+  document.getElementById('cl55PartnerManual')?.addEventListener('click',()=>goProfile('partner'));
 })();
 </script>
 <script>
