@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CoreLingual v52</title>
+<title>CoreLingual v54</title>
 <style>
 body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
 .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
@@ -671,19 +671,33 @@ function sharedTraitsFromScores(scores){
   (scores||[]).forEach(x=>{if(Number(x.score)<=35)(map[x.key]||[]).slice(0,1).forEach(t=>selected.add(t));if(Number(x.score)>=65)(map[x.key]||[]).slice(-1).forEach(t=>selected.add(t))});
   return [...selected];
 }
+function scoresFromInviteProfile(profile){
+  if(!profile||typeof profile!=='object')return [];
+  if(Array.isArray(profile.scores)&&profile.scores.length)return profile.scores;
+  if(Array.isArray(profile.answers)&&profile.answers.length===Q.length){
+    try{return axisScore(Q,profile.answers)}catch(e){console.warn(e)}
+  }
+  if(Array.isArray(profile.radar)&&profile.radar.length){
+    const ids=(typeof CoreLingual_v36!=='undefined'&&CoreLingual_v36.axes)?CoreLingual_v36.axes.map(a=>a.id):Object.keys(AXES);
+    return ids.map((id,i)=>({key:id,score:Math.max(0,Math.min(100,Number(profile.radar[i])||50))}));
+  }
+  return [];
+}
 function savePartnerSharedProfile(profile,targetName){
   if(!profile)return;
-  const scores=Array.isArray(profile.scores)?profile.scores:[];
+  const scores=scoresFromInviteProfile(profile);
   const deep=Array.isArray(profile.deepScores)?profile.deepScores:[];
+  const answers=Array.isArray(profile.answers)?profile.answers:[];
   if(scores.length){
-    localStorage.setItem('cl_diag_result_partner',JSON.stringify({scores,answers:Array.isArray(profile.answers)?profile.answers:[],updatedAt:Date.now()}));
-    localStorage.setItem('cl_diag_radar_partner',JSON.stringify(axisValuesFromScores(scores)));
+    localStorage.setItem('cl_diag_result_partner',JSON.stringify({scores,answers,updatedAt:Date.now()}));
+    const radar=Array.isArray(profile.radar)&&profile.radar.length?profile.radar.map(v=>Math.max(0,Math.min(100,Number(v)||50))):axisValuesFromScores(scores);
+    localStorage.setItem('cl_diag_radar_partner',JSON.stringify(radar));
   }
   if(deep.length){
-    localStorage.setItem('cl_extra_result_partner',JSON.stringify({kind:'deep',scores:deep,answers:Array.isArray(profile.deepAnswers)?profile.deepAnswers:[],free:profile.free||'',updatedAt:Date.now()}));
+    localStorage.setItem('cl_extra_result_partner',JSON.stringify({kind:'deep',scores:deep,answers:Array.isArray(profile.deepAnswers)?profile.deepAnswers:[],free:profile.free||profile.summary||'',updatedAt:Date.now()}));
     localStorage.setItem('cl_extra_radar_partner',JSON.stringify({deep}));
   }
-  const summary=buildAiProfileText(scores,'相手',deep,profile.free||'');
+  const summary=buildAiProfileText(scores,'相手',deep,profile.free||profile.summary||'');
   if(summary)localStorage.setItem('cl_diag_summary_partner',summary);
 
   const desired=String(targetName||'').trim();
@@ -693,8 +707,8 @@ function savePartnerSharedProfile(profile,targetName){
     const arr=list('partner');
     const idx=arr.findIndex(x=>x.name===target);
     if(idx>=0){
-      const traits=sharedTraitsFromScores(scores);
-      arr[idx]={...arr[idx],state:{traits,free:summary||profile.free||''}};
+      const traits=typeof sharedTraitsFromScores==='function'?sharedTraitsFromScores(scores):(Array.isArray(profile.traits)?profile.traits:[]);
+      arr[idx]={...arr[idx],state:{traits,free:summary||profile.free||profile.summary||''}};
       localStorage.setItem('cl_partner',JSON.stringify(arr));
       setActiveProfile('partner',target);
       apply('partner',arr[idx].state);
@@ -703,7 +717,7 @@ function savePartnerSharedProfile(profile,targetName){
       return;
     }
   }
-  try{ applyDiagToProfile('partner',scores,deep); }catch(e){ console.warn('partner profile apply failed',e); }
+  try{ if(scores.length) applyDiagToProfile('partner',scores,deep); }catch(e){ console.warn('partner profile apply failed',e); }
   renderTwoPersonComparison();
 }
 function renderPartnerResultOnly(container,profile,label='相手'){
@@ -982,11 +996,11 @@ runDiag.onclick=()=>{const answers=[];for(let i=0;i<Q.length;i++){const x=docume
 /* v49 — two-person trait-check invitation flow */
 const V22_INVITE_KEY="cl_v23_invite";
 const V22_OWNER_KEY="cl_v23_owner";
-function v23OwnerToken(){let x=localStorage.getItem(V22_OWNER_KEY);if(!x){x=crypto.randomUUID().replace(/-/g,"")+crypto.randomUUID().replace(/-/g,"");localStorage.setItem(V22_OWNER_KEY,x)}return x}
+function v23OwnerToken(){let x=localStorage.getItem(V22_OWNER_KEY);if(!x||!/^[A-Za-z0-9_-]{40,60}$/.test(x)){x=(crypto.randomUUID()+crypto.randomUUID()).replace(/-/g,"").slice(0,48);localStorage.setItem(V22_OWNER_KEY,x)}return x}
 function v23InviteToken(){return new URLSearchParams(location.search).get("invite")||null}
 function v23SetInviteState(x){try{localStorage.setItem(V22_INVITE_KEY,JSON.stringify(x))}catch{}}
 function v23GetInviteState(){try{return JSON.parse(localStorage.getItem(V22_INVITE_KEY)||"null")}catch{return null}}
-function v23NewPartnerKey(){return crypto.randomUUID().replace(/-/g,"").slice(0,48)}
+function v23NewPartnerKey(){return (crypto.randomUUID()+crypto.randomUUID()).replace(/-/g,"").slice(0,48)}
 function v23EnsurePartnerKey(token){
   const inv=v23GetInviteState();
   if(inv?.token===token && inv.partnerKey && /^[A-Za-z0-9_-]{40,60}$/.test(inv.partnerKey))return inv.partnerKey;
@@ -1036,7 +1050,8 @@ function v23CurrentProfilePayload(p){
   const base=(()=>{try{return JSON.parse(localStorage.getItem("cl_diag_result_"+p)||"null")}catch{return null}})();
   const extra=(()=>{try{return JSON.parse(localStorage.getItem("cl_extra_result_"+p)||"null")}catch{return null}})();
   const deepScores=Array.isArray(extra?.scores)?extra.scores.slice(0,18):[];
-  return {name:p==="my"?"あなた":"相手",radar:radar||null,extraRadar:ex||null,traits:state(p).traits,summary:document.getElementById(p+"Free")?.value||"",answers:Array.isArray(base?.answers)?base.answers.slice(0,18):[],extraAnswers:Array.isArray(extra?.answers)?extra.answers.slice(0,18):[],deepScores:deepScores.map(x=>({key:x.key,score:x.score,count:x.count})),deepAnswers:Array.isArray(extra?.answers)?extra.answers.slice(0,18):[]};
+  const scores=Array.isArray(base?.scores)?base.scores:[];
+  return {name:p==="my"?"あなた":"相手",radar:radar||null,extraRadar:ex||null,traits:state(p).traits,summary:document.getElementById(p+"Free")?.value||"",scores:scores.map(x=>({key:x.key,score:Number(x.score)||50})),answers:Array.isArray(base?.answers)?base.answers.slice(0,18):[],extraAnswers:Array.isArray(extra?.answers)?extra.answers.slice(0,18):[],deepScores:deepScores.map(x=>({key:x.key,score:x.score,count:x.count})),deepAnswers:Array.isArray(extra?.answers)?extra.answers.slice(0,18):[]};
 }
 async function v23CreateInvite(){
   if(!loadDiagRadar("my")){alert("先に自分の前半18問の特性チェックを終えてね。");return}
@@ -1269,16 +1284,7 @@ loadSharedFromUrl();
 (function(){
   const box=document.getElementById("v23InviteControls");
   if(box && !v23InviteToken()){box.innerHTML=v23InviteCreateControls();v23BindCreateInvite();}
-  const oldRun=window.__cl_v23_runWrapped;
-  if(!oldRun){
-    window.__cl_v23_runWrapped=true;
-    runDiag.addEventListener("click",()=>{
-      const inv=v23GetInviteState();
-      if(inv?.token && !inv?.ownerToken && target==="my"){
-        setTimeout(async()=>{try{await v23SubmitPartner()}catch(e){alert(e.message||"2人用チェックの送信に失敗しました。")}},150);
-      }
-    });
-  }
+  // v54: 招待パートナーの送信は後半18問完了後のみ（script末尾の capture handler）
   v23CheckInvite();
   v23LoadHost();
   v26StartHostPolling();
