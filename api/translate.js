@@ -2,8 +2,8 @@ const MODEL = process.env.GEMINI_MODEL || "gemini-3.7-flash";
 const API_KEY = process.env.GEMINI_API_KEY;
 const MAX_MESSAGE = 60000;
 const MAX_IMAGES = 8;
-const MAX_TOTAL_IMAGE_CHARS = 3200000;
-const TIMEOUT_MS = 45000;
+const MAX_TOTAL_IMAGE_CHARS = 2400000;
+const TIMEOUT_MS = 55000;
 
 const json = (status, body) => ({ statusCode: status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" }, body: JSON.stringify(body) });
 
@@ -139,14 +139,14 @@ async function generate(body) {
         contents: [{ role: "user", parts }],
         generationConfig: {
           temperature: 0.35,
-          maxOutputTokens: 1800,
+          maxOutputTokens: 1400,
           responseMimeType: "application/json"
         }
       })
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      console.error("Gemini request failed", { status: res.status, model: MODEL });
+      console.error("Gemini request failed", { status: res.status, model: MODEL, error: data?.error?.message || data?.error?.status || "unknown" });
       throw new Error("gemini_request_failed");
     }
     const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("") || "";
