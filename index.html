@@ -1,10 +1,10 @@
-<!-- CoreLingual_v60 -->
+<!-- CoreLingual_v61 -->
 <!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CoreLingual v60</title>
+<title>CoreLingual v61</title>
 <style>
 body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
 .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
@@ -209,7 +209,7 @@ body.invite-complete-mode #targetNote{display:none!important}
 <section id="talk">
 <div class="panel"><b>会話を入力</b><p style="font-size:12px;color:#717983">スクショは <b>右側＝自分</b>、<b>左側＝相手</b> として扱います。</p>
 <div class="actions"><button id="textMode" class="action on">⌨️ テキスト入力</button><button id="imageMode" class="action">🖼️ スクショ送信</button></div>
-<div id="textArea"><label class="small">この文章は誰の発言？</label><div class="actions"><button id="speakerMe" class="action on">👤 自分</button><button id="speakerPartner" class="action">👥 相手</button><button id="speakerUnknown" class="action">❓ 不明</button></div><textarea id="message" placeholder="気になったメッセージや会話を入力…"></textarea></div>
+<div id="textArea"><label class="small">この文章は誰の発言？</label><div class="actions"><button id="speakerMe" class="action on">👤 自分</button><button id="speakerPartner" class="action">👥 相手</button><button id="speakerUnknown" class="action">❓ 不明</button></div><textarea id="message" placeholder="気になったメッセージや会話を入力…"></textarea><div id="v61MsgHint" class="v61-msg-hint" style="display:none;font-size:11px;color:#996070;margin-top:6px;line-height:1.5"></div></div>
 <div id="imageArea" style="display:none"><label class="upload" for="images">🖼️ <b>スクショを追加</b><br><small>LINE・DM・SMSなど、最大5枚</small></label><input id="images" type="file" accept="image/*" multiple style="display:none"><div id="thumbs" class="thumbs"></div><div id="imageControls" style="display:none;margin-top:8px"><button id="clearImages" class="action">🗑️ 選択したスクショを全部削除</button></div><label class="small">このスクショについて聞きたいこと</label><textarea id="imageQuestion" placeholder="例：最後の「了解」はどういうニュアンスに見える？"></textarea><div class="ad-slot small" id="imageAd"><strong>📺 スクショ分析前の広告枠</strong>短い広告を表示する場所です。現在は広告未接続。<div class="ad-countdown" id="imageAdCountdown"></div></div></div></div>
 <div class="panel"><b>👤 プロフィール</b><p style="font-size:12px;color:#717983">会話の中で見えやすい「傾向」を、自分と相手に分けて保存できます。診断名ではなく、コミュニケーションの特徴として扱います。</p>
 <div class="actions"><button id="profileMyTab" class="action on">👤 自分</button><button id="profilePartnerTab" class="action">👥 相手</button></div>
@@ -311,6 +311,20 @@ const PROFILE_TRAITS=[
 ];
 function makeTraits(id){const e=document.getElementById(id);PROFILE_TRAITS.forEach(t=>{const b=document.createElement("button");b.className="chip";b.type="button";b.textContent=t;b.onclick=()=>b.classList.toggle("on");e.appendChild(b)})}
 makeTraits("myTraits");makeTraits("partnerTraits");
+
+(function(){
+  const ta=document.getElementById("message");
+  const hint=document.getElementById("v61MsgHint");
+  if(!ta||!hint)return;
+  const upd=()=>{
+    const n=(ta.value||"").length;
+    if(n>12000){hint.style.display="block";hint.textContent="文字数が多めです（"+n+"）。解析に時間がかかることがあります。直近のやりとりに絞ると安定しやすいです。";}
+    else if(n>6000){hint.style.display="block";hint.textContent="やや長めの入力です（"+n+"文字）。必要なら直近の会話だけにすると速くなります。";}
+    else{hint.style.display="none";hint.textContent="";}
+  };
+  ta.addEventListener("input",upd);upd();
+})();
+
 profileMyTab.onclick=()=>{profileMyTab.classList.add("on");profilePartnerTab.classList.remove("on");profileMyPane.style.display="block";profilePartnerPane.style.display="none"};
 profilePartnerTab.onclick=()=>{profilePartnerTab.classList.add("on");profileMyTab.classList.remove("on");profilePartnerPane.style.display="block";profileMyPane.style.display="none"};
 textMode.onclick=()=>setMode("text");imageMode.onclick=()=>setMode("image");function setMode(x){textMode.classList.toggle("on",x==="text");imageMode.classList.toggle("on",x==="image");textArea.style.display=x==="text"?"block":"none";imageArea.style.display=x==="image"?"block":"none"}
@@ -422,7 +436,16 @@ function buildAiProfileTextFromStorage(p){
     return buildAiProfileText(base.scores,p==='my'?'あなた':'相手',ex?.scores||[],free);
   }catch{return ''}
 }
-analyze.onclick=async()=>{analyze.disabled=true;const originalText=analyze.innerHTML;analyze.innerHTML='<span class="spinner"></span>準備中…';let note=document.getElementById("loadingNote");if(!note){note=document.createElement("div");note.id="loadingNote";note.className="loading-note";analyze.after(note)}note.textContent="会話を読み込んでいます…";try{let body={inputMode:textArea.style.display!=="none"?"text":"image",message:message.value,speaker:currentSpeaker,imageQuestion:(document.getElementById("imageQuestion")||{}).value||"",myTraits:state("my").traits,partnerTraits:state("partner").traits,myFree:myFree.value,partnerFree:partnerFree.value,diagnosisContext:{my:buildAiProfileTextFromStorage("my"),partner:buildAiProfileTextFromStorage("partner")},images:[]};
+analyze.onclick=async()=>{const msgLen=(message.value||"").length;
+// v61: 長文の事前警告（API上限は維持。体感とタイムアウト対策）
+if(msgLen>12000){
+  const ok=confirm("入力が長めです（約"+msgLen+"文字）。\n解析に時間がかかったり、途中までしか使われないことがあります。\nこのまま続けますか？");
+  if(!ok)return;
+}else if(msgLen>6000){
+  // 軽い注意のみ（止めない）
+  console.info("[CoreLingual] long message",msgLen);
+}
+analyze.disabled=true;const originalText=analyze.innerHTML;analyze.innerHTML='<span class="spinner"></span>準備中…';let note=document.getElementById("loadingNote");if(!note){note=document.createElement("div");note.id="loadingNote";note.className="loading-note";analyze.after(note)}note.textContent="会話を読み込んでいます…";try{let body={inputMode:textArea.style.display!=="none"?"text":"image",message:message.value,speaker:currentSpeaker,imageQuestion:(document.getElementById("imageQuestion")||{}).value||"",myTraits:state("my").traits,partnerTraits:state("partner").traits,myFree:myFree.value,partnerFree:partnerFree.value,diagnosisContext:{my:buildAiProfileTextFromStorage("my"),partner:buildAiProfileTextFromStorage("partner")},images:[]};
   if(body.inputMode==="image"){
     if(!selectedImages.length)throw Error("スクショを1枚以上追加してね。");
     analyze.innerHTML='<span class="spinner"></span>広告を表示中…';
