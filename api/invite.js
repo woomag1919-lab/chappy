@@ -48,7 +48,8 @@ export default async function handler(req,res){
     if(req.method === "POST"){
       const body=req.body||{};
       const ownerToken=String(body.ownerToken||"");
-      if(!validToken(ownerToken) && ownerToken.length<32) return res.status(400).json({error:"所有者キーが不正です。"});
+      // v61: ownerToken も招待トークンと同じ 40–60 文字ルールに統一
+      if(!validToken(ownerToken)) return res.status(400).json({error:"所有者キーが不正です。ページを再読み込みしてから、もう一度招待を作成してください。"});
       const host=cleanProfile(body.host);
       if(!host || profileBytes(host)>30000) return res.status(400).json({error:"プロフィール情報が不正です。"});
       const token=randomToken(32);
@@ -62,6 +63,7 @@ export default async function handler(req,res){
     }
 
     if(req.method === "PATCH"){
+      // v61: 先着1人ロック — partner_hash が空のときだけ新規回答者を受け付ける
       const body=req.body||{};
       const token=String(body.token||"");
       const partnerKey=String(body.partnerKey||"");
@@ -70,12 +72,35 @@ export default async function handler(req,res){
       const rows=await sql`SELECT id,partner_hash FROM corelingual_invites WHERE token_hash=${tokenHash(token)} AND expires_at > NOW() LIMIT 1`;
       if(!rows.length) return res.status(404).json({error:"招待リンクが見つからないか、期限切れです。"});
       const row=rows[0];
-      let key=partnerKey;
+
+      // 既に別の回答者がいる
       if(row.partner_hash){
-        if(!validToken(partnerKey) || tokenHash(partnerKey)!==row.partner_hash) return res.status(403).json({error:"この招待への回答者キーが一致しません。"});
-      }else key=randomToken(32);
-      await sql`UPDATE corelingual_invites SET partner_profile=${JSON.stringify(partner)},partner_share=${!!body.partnerShare},partner_hash=${row.partner_hash||tokenHash(key)},updated_at=NOW() WHERE id=${row.id} AND expires_at > NOW()`;
-      return res.status(200).json({ok:true,joined:true,partnerKey:key});
+        if(!validToken(partnerKey) || tokenHash(partnerKey)!==row.partner_hash){
+          return res.status(403).json({error:"この招待にはすでに別の方が回答しています。リンクの持ち主に確認してください。"});
+        }
+        // 同一回答者の再送・更新
+        await sql`UPDATE corelingual_invites SET partner_profile=${JSON.stringify(partner)},partner_share=${!!body.partnerShare},updated_at=NOW() WHERE id=${row.id} AND partner_hash=${row.partner_hash} AND expires_at > NOW()`;
+        return res.status(200).json({ok:true,joined:true,partnerKey,updated:true});
+      }
+
+      // 初回回答者（先着）
+      let key = validToken(partnerKey) ? partnerKey : randomToken(32);
+      const hash = tokenHash(key);
+      const updated = await sql`
+        UPDATE corelingual_invites
+        SET partner_profile=${JSON.stringify(partner)},
+            partner_share=${!!body.partnerShare},
+            partner_hash=${hash},
+            updated_at=NOW()
+        WHERE id=${row.id}
+          AND expires_at > NOW()
+          AND partner_hash IS NULL
+        RETURNING id`;
+      if(!updated.length){
+        // ほぼ同時に別人が先に入った
+        return res.status(409).json({error:"直前に別の方が回答を完了しました。このリンクでは回答できません。"});
+      }
+      return res.status(200).json({ok:true,joined:true,partnerKey:key,created:true});
     }
 
     if(req.method === "GET"){
