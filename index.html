@@ -1,10 +1,10 @@
-<!-- CoreLingual_v58 -->
+<!-- CoreLingual_v59 -->
 <!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CoreLingual v57</title>
+<title>CoreLingual v59</title>
 <style>
 body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
 .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
@@ -165,7 +165,7 @@ window.CoreLingual_v36 = {
 .v57-compare-pick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 4px}
 .v57-pick{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#59616b}
 .v57-pick select{width:100%;padding:9px 10px;border:1px solid #dfe3e9;border-radius:10px;font:inherit;font-weight:600;background:#fff}
-.v57-compare-now{font-size:12px;color:#c74369;font-weight:700;margin:0 0 8px}
+.v57-compare-now{font-size:12px;color:#c74369;font-weight:700;margin:0 0 8px}.v57-compare-meta{font-size:12px;line-height:1.6;color:#59616b;margin:6px 0 10px;padding:9px 10px;border-radius:10px;background:#fff7fa;border:1px solid #f0dce3}.v57-compare-meta b{color:#c74369}
 
 .v52-guide{background:#fff;border:1px solid #eadfe4;border-radius:16px;padding:14px;margin-bottom:12px}
 .v52-guide h2{font-size:18px;margin:0 0 5px;color:#c74369}
@@ -247,14 +247,14 @@ body.invite-complete-mode #targetNote{display:none!important}
     <p class="cl55-desc">相手について気づいていることを、自由に書いてOKです。</p>
     <button type="button" id="cl55PartnerManual" class="action cl55-subbtn">相手プロフィールを手で書く</button>
   </div>
-  <div class="card cl55-block">
-    <b>🧩 分からないときは診断してみる</b>
-    <p class="cl55-desc">自分から見た相手を36問で整理します。本人の回答ではないので、参考程度に使ってください。</p>
-  </div>
   <div id="v23InviteCard" class="card cl55-block cl55-invite">
     <b>🔗 相手本人にチェックしてもらう</b>
     <p id="v23InviteIntro" class="cl55-desc">リンクを送ると、相手が本人として36問に答えられます。結果は相手が「共有する」を選んだときだけ、あなたの側に「相手の回答」として登録されます。この画面に共有ボタンはありません。</p>
     <div id="v23InviteControls"></div>
+  </div>
+  <div class="card cl55-block">
+    <b>🧩 分からないときは診断してみる</b>
+    <p class="cl55-desc">自分から見た相手を36問で整理します。本人の回答ではないので、参考程度に使ってください。</p>
   </div>
 </div>
 
@@ -285,7 +285,16 @@ body.invite-complete-mode #targetNote{display:none!important}
 
 <div id="v21CompareCard" class="card v21-compare-card" style="display:none">
   <div class="v21-compare-title">👥 2人のコミュニケーション比較</div>
-  <div class="v21-compare-sub">2人分の結果が揃うと、傾向を「あなた／相手」で並べて見比べられます。</div>
+  <div class="v21-compare-sub">比較するプロフィールを選べます。下の表示を変えると、その組み合わせで比較します。</div>
+  <div id="v21ComparePick" class="v57-compare-pick" style="display:none">
+    <label class="v57-pick">あなた
+      <select id="v21CompareMy" aria-label="比較するあなた側のプロフィール"></select>
+    </label>
+    <label class="v57-pick">相手
+      <select id="v21ComparePartner" aria-label="比較する相手側のプロフィール"></select>
+    </label>
+  </div>
+  <div id="v21CompareMeta" class="v57-compare-meta"></div>
   <div id="v21CompareGrid" class="v21-compare-grid"></div>
   <div id="v21CompareList" class="v21-compare-list"></div>
 </div>
@@ -992,7 +1001,7 @@ function renderTwoPersonComparison(){
   const myPick=myOpts.find(o=>o.id===getCompareSelection('my',myOpts))||myOpts[0];
   const paPick=paOpts.find(o=>o.id===getCompareSelection('partner',paOpts))||paOpts[0];
   if(meta){
-    meta.innerHTML=`<div class="v57-compare-now">いま比較中：${escapeHtml(myPick.label)} × ${escapeHtml(paPick.label)}</div>組み合わせを変えると、下の比較が切り替わります。`;
+    meta.innerHTML=`<div class="v57-compare-now">いま比較中</div><div><b>あなた：</b> ${escapeHtml(myPick.label)}</div><div><b>相手：</b> ${escapeHtml(paPick.label)}</div>`;
   }
   const pair=buildPairComparisonCard(myPick.scores,paPick.scores,paPick.deep,myPick.deep);
   if(pair)listEl.appendChild(pair);
