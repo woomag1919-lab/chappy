@@ -1,4 +1,4 @@
-<!-- CoreLingual_v57 -->
+<!-- CoreLingual_v58 -->
 <!doctype html>
 <html lang="ja">
 <head>
@@ -162,6 +162,11 @@ window.CoreLingual_v36 = {
 .cl55-subbtn{width:100%;padding:11px;border-radius:11px;border:1px solid #ddd;background:#fff;font-weight:700}
 .cl55-invite{background:#fffafc;border-color:#f0dce3}
 .cl55-check-panel{margin-top:4px}
+.v57-compare-pick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 4px}
+.v57-pick{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#59616b}
+.v57-pick select{width:100%;padding:9px 10px;border:1px solid #dfe3e9;border-radius:10px;font:inherit;font-weight:600;background:#fff}
+.v57-compare-now{font-size:12px;color:#c74369;font-weight:700;margin:0 0 8px}
+
 .v52-guide{background:#fff;border:1px solid #eadfe4;border-radius:16px;padding:14px;margin-bottom:12px}
 .v52-guide h2{font-size:18px;margin:0 0 5px;color:#c74369}
 .v52-guide .lead{font-size:12px;color:#717983;line-height:1.7;margin:0 0 12px}
@@ -242,14 +247,14 @@ body.invite-complete-mode #targetNote{display:none!important}
     <p class="cl55-desc">相手について気づいていることを、自由に書いてOKです。</p>
     <button type="button" id="cl55PartnerManual" class="action cl55-subbtn">相手プロフィールを手で書く</button>
   </div>
+  <div class="card cl55-block">
+    <b>🧩 分からないときは診断してみる</b>
+    <p class="cl55-desc">自分から見た相手を36問で整理します。本人の回答ではないので、参考程度に使ってください。</p>
+  </div>
   <div id="v23InviteCard" class="card cl55-block cl55-invite">
     <b>🔗 相手本人にチェックしてもらう</b>
     <p id="v23InviteIntro" class="cl55-desc">リンクを送ると、相手が本人として36問に答えられます。結果は相手が「共有する」を選んだときだけ、あなたの側に「相手の回答」として登録されます。この画面に共有ボタンはありません。</p>
     <div id="v23InviteControls"></div>
-  </div>
-  <div class="card cl55-block">
-    <b>🧩 分からないときは診断してみる</b>
-    <p class="cl55-desc">自分から見た相手を36問で整理します。本人の回答ではないので、参考程度に使ってください。</p>
   </div>
 </div>
 
@@ -301,19 +306,6 @@ textMode.onclick=()=>setMode("text");imageMode.onclick=()=>setMode("image");func
 talkTab.onclick=()=>{talk.style.display="block";diag.style.display="none";talkTab.classList.add("on");diagTab.classList.remove("on")};diagTab.onclick=()=>{talk.style.display="none";diag.style.display="block";diagTab.classList.add("on");talkTab.classList.remove("on")};
 let selectedImages=[];
 let compressedImages=[];
-let analysisRunning=false;
-let analysisCompleted=false;
-let reanalyzeBtn=null;
-function removeReanalyzeButton(){
-  if(reanalyzeBtn?.parentNode)reanalyzeBtn.parentNode.removeChild(reanalyzeBtn);
-  reanalyzeBtn=null;
-}
-function resetAnalysisState(){
-  analysisCompleted=false;
-  const btn=document.getElementById("analyze");
-  if(btn&&!analysisRunning){btn.disabled=false;btn.innerHTML="✨ 分析・アドバイスを表示する";}
-  removeReanalyzeButton();
-}
 function drawImages(){
   thumbs.innerHTML="";
   selectedImages.forEach((f,idx)=>{
@@ -325,7 +317,6 @@ function drawImages(){
     wrap.appendChild(i);wrap.appendChild(x);thumbs.appendChild(wrap);
   });
   imageControls.style.display=selectedImages.length?"block":"none";
-  resetAnalysisState();
 }
 async function compressImage(file){
   const bitmap=await createImageBitmap(file);
@@ -355,9 +346,8 @@ images.onchange=async()=>{
   finally{imageMode.disabled=false;imageMode.innerHTML=oldText;images.value=""}
 };
 clearImages.onclick=()=>{selectedImages=[];drawImages()};
-message.addEventListener("input",resetAnalysisState);
 let currentSpeaker="me";
-function setSpeaker(x){currentSpeaker=x;speakerMe.classList.toggle("on",x==="me");speakerPartner.classList.toggle("on",x==="partner");speakerUnknown.classList.toggle("on",x==="unknown");resetAnalysisState()}
+function setSpeaker(x){currentSpeaker=x;speakerMe.classList.toggle("on",x==="me");speakerPartner.classList.toggle("on",x==="partner");speakerUnknown.classList.toggle("on",x==="unknown")}
 speakerMe.onclick=()=>setSpeaker("me");speakerPartner.onclick=()=>setSpeaker("partner");speakerUnknown.onclick=()=>setSpeaker("unknown");
 function state(p){return{traits:[...document.querySelectorAll("#"+p+"Traits .on")].map(x=>x.textContent),free:document.getElementById(p+"Free").value}}
 function apply(p,s){document.getElementById(p+"Free").value=s.free||"";document.querySelectorAll("#"+p+"Traits .chip").forEach(x=>x.classList.toggle("on",(s.traits||[]).includes(x.textContent)))}
@@ -421,13 +411,7 @@ function buildAiProfileTextFromStorage(p){
     return buildAiProfileText(base.scores,p==='my'?'あなた':'相手',ex?.scores||[],free);
   }catch{return ''}
 }
-analyze.onclick=async()=>{
-  if(analysisRunning||analysisCompleted)return;
-  analysisRunning=true;
-  analyze.disabled=true;
-  removeReanalyzeButton();
-  const originalText=analyze.innerHTML;
-  analyze.innerHTML='<span class="spinner"></span>準備中…';let note=document.getElementById("loadingNote");if(!note){note=document.createElement("div");note.id="loadingNote";note.className="loading-note";analyze.after(note)}note.textContent="会話を読み込んでいます…";try{let body={inputMode:textArea.style.display!=="none"?"text":"image",message:message.value,speaker:currentSpeaker,imageQuestion:(document.getElementById("imageQuestion")||{}).value||"",myTraits:state("my").traits,partnerTraits:state("partner").traits,myFree:myFree.value,partnerFree:partnerFree.value,diagnosisContext:{my:buildAiProfileTextFromStorage("my"),partner:buildAiProfileTextFromStorage("partner")},images:[]};
+analyze.onclick=async()=>{analyze.disabled=true;const originalText=analyze.innerHTML;analyze.innerHTML='<span class="spinner"></span>準備中…';let note=document.getElementById("loadingNote");if(!note){note=document.createElement("div");note.id="loadingNote";note.className="loading-note";analyze.after(note)}note.textContent="会話を読み込んでいます…";try{let body={inputMode:textArea.style.display!=="none"?"text":"image",message:message.value,speaker:currentSpeaker,imageQuestion:(document.getElementById("imageQuestion")||{}).value||"",myTraits:state("my").traits,partnerTraits:state("partner").traits,myFree:myFree.value,partnerFree:partnerFree.value,diagnosisContext:{my:buildAiProfileTextFromStorage("my"),partner:buildAiProfileTextFromStorage("partner")},images:[]};
   if(body.inputMode==="image"){
     if(!selectedImages.length)throw Error("スクショを1枚以上追加してね。");
     analyze.innerHTML='<span class="spinner"></span>広告を表示中…';
@@ -440,31 +424,9 @@ analyze.onclick=async()=>{
   note.textContent="会話を読み込んでいます。スクショが多い場合は少し時間がかかります…";
   let r=await fetch("/api/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:requestBody});
   const responseText=await r.text();let d;try{d=JSON.parse(responseText)}catch{throw Error(r.status===413?"スクショの容量が大きすぎます。枚数を減らして、もう一度試してください。":"サーバーから正常な応答を受け取れませんでした（HTTP "+r.status+"）。")}
-  if(!r.ok)throw Error(d.error||"APIエラー");
-    render(d);
-    analysisCompleted=true;
-    analyze.disabled=true;
-    analyze.innerHTML="✅ 分析済み";
-    note.textContent="分析が完了しました。もう一度分析したい場合は下のボタンから実行できます。";
-    reanalyzeBtn=document.createElement("button");
-    reanalyzeBtn.type="button";
-    reanalyzeBtn.className="action";
-    reanalyzeBtn.style.cssText="width:100%;margin-top:8px;padding:11px;border:1px solid #dfe3e9;border-radius:12px;background:#fff;color:#59616b;font-weight:bold";
-    reanalyzeBtn.textContent="🔄 同じ内容でもう一度分析する";
-    reanalyzeBtn.onclick=()=>{
-      resetAnalysisState();
-      analyze.click();
-    };
-    note.after(reanalyzeBtn);
-  }catch(e){
-    result.innerHTML='<div class="card"><b>エラー</b><p></p></div>';
-    result.querySelector("p").textContent=e.message;
-    note.textContent="分析に失敗しました。";
-  }finally{
-    analysisRunning=false;
-    if(!analysisCompleted){analyze.disabled=false;analyze.innerHTML=originalText;}
-    imageAdCountdown.textContent="";
-  }};
+  if(!r.ok)throw Error(d.error||"APIエラー");render(d);note.textContent="分析が完了しました。"}
+  catch(e){result.innerHTML='<div class="card"><b>エラー</b><p></p></div>';result.querySelector("p").textContent=e.message;note.textContent="分析に失敗しました。"}
+  finally{analyze.disabled=false;analyze.innerHTML=originalText;imageAdCountdown.textContent=""}};
 
 const AXES={
  language:{label:"情報の受け取り方",left:"言葉を具体的に確認",right:"文脈や全体像から理解",icon:"🗣️"},
@@ -616,7 +578,17 @@ function applyDiagToProfile(p,scores,extraScoresOverride){
   const active=activeProfile(p);
   if(active){
     const arr=list(p);const idx=arr.findIndex(x=>x.name===active);
-    if(idx>=0){arr[idx]={...arr[idx],state:state(p)};localStorage.setItem('cl_'+p,JSON.stringify(arr));}
+    if(idx>=0){
+      arr[idx]={
+        ...arr[idx],
+        state:state(p),
+        scores:Array.isArray(scores)?scores.map(x=>({key:x.key,score:Number(x.score)||50})):[],
+        deepScores:Array.isArray(extra)?extra.map(x=>({key:x.key,score:Number(x.score)||50})):[],
+        updatedAt:Date.now()
+      };
+      localStorage.setItem('cl_'+p,JSON.stringify(arr));
+      draw(p);
+    }
   }
 }
 
@@ -807,7 +779,7 @@ function savePartnerSharedProfile(profile,targetName){
     if(idx<0){
       const traits=typeof sharedTraitsFromScores==='function'?sharedTraitsFromScores(scores):(Array.isArray(profile.traits)?profile.traits:[]);
       const st={traits,free:summary||profile.free||profile.summary||''};
-      arr.push({name:target,state:st});
+      arr.push({name:target,state:st,scores:scores.map(x=>({key:x.key,score:Number(x.score)||50})),deepScores:deep.map(x=>({key:x.key,score:Number(x.score)||50})),updatedAt:Date.now()});
       localStorage.setItem('cl_partner',JSON.stringify(arr));
       setActiveProfile('partner',target);
       apply('partner',st);
@@ -817,7 +789,7 @@ function savePartnerSharedProfile(profile,targetName){
     }
     if(idx>=0){
       const traits=typeof sharedTraitsFromScores==='function'?sharedTraitsFromScores(scores):(Array.isArray(profile.traits)?profile.traits:[]);
-      arr[idx]={...arr[idx],state:{traits,free:summary||profile.free||profile.summary||''}};
+      arr[idx]={...arr[idx],state:{traits,free:summary||profile.free||profile.summary||''},scores:scores.map(x=>({key:x.key,score:Number(x.score)||50})),deepScores:deep.map(x=>({key:x.key,score:Number(x.score)||50})),updatedAt:Date.now()};
       localStorage.setItem('cl_partner',JSON.stringify(arr));
       setActiveProfile('partner',target);
       apply('partner',arr[idx].state);
@@ -838,15 +810,15 @@ function deepDirectionText(key,score){
   if(score>=65)return a.right;
   return "場面・相手に応じて使い分けやすい";
 }
-function buildPairComparisonCard(myScores,partnerScores,partnerDeep){
+function buildPairComparisonCard(myScores,partnerScores,partnerDeep,myDeepScores){
   if(!myScores?.length||!partnerScores?.length)return null;
   const sec=document.createElement('section');sec.className='v46-pair-card';
-  sec.innerHTML='<div class="v46-pair-head">👥 2人のコミュニケーション比較</div><div class="v46-pair-note">同じ場面でも、2人が自然に選びやすい受け取り方・考え方・伝え方が違うと、すれ違いが起きることがあります。グラフではなく、違いそのものを見比べます。</div><div class="v46-side-by-side"></div><div class="v46-pair-insights"></div>';
+  sec.innerHTML='<div class="v46-pair-note">同じ場面でも、2人が自然に選びやすい受け取り方・考え方・伝え方が違うと、すれ違いが起きることがあります。違いそのものを見比べます。</div><div class="v46-side-by-side"></div><div class="v46-pair-insights"></div>';
   const grid=sec.querySelector('.v46-side-by-side');
   const by=(arr)=>Object.fromEntries((arr||[]).map(x=>[x.key,Number(x.score)]));
   const bm=by(myScores),bp=by(partnerScores),bd=by(partnerDeep||[]);
-  // 深掘りは「自分」の保存結果がある場合だけ比較に追加する
-  let myDeep={};try{myDeep=by(JSON.parse(localStorage.getItem('cl_extra_result_my')||'null')?.scores||[])}catch{}
+  let myDeep=by(myDeepScores||[]);
+  if(!Object.keys(myDeep).length){try{myDeep=by(JSON.parse(localStorage.getItem('cl_extra_result_my')||'null')?.scores||[])}catch{}}
   const allRows=[];
   Object.keys(AXES).forEach(key=>allRows.push({type:'base',key,diff:Math.abs((bm[key]??50)-(bp[key]??50))}));
   if(Object.keys(myDeep).length && Object.keys(bd).length){Object.keys(DEEP_AXES).forEach(key=>allRows.push({type:'deep',key,diff:Math.abs((myDeep[key]??50)-(bd[key]??50))}));}
@@ -955,17 +927,75 @@ function clearV29InviteView(){
   ['cl_v29_invite_partner_radar','cl_v29_invite_partner_extra','cl_v29_invite_partner_profile'].forEach(k=>{try{localStorage.removeItem(k)}catch{}});
   ['cl_shared_partner_profile'].forEach(k=>{try{localStorage.removeItem(k)}catch{}});
 }
+function compareSourceOptions(side){
+  const out=[];
+  try{
+    const live=JSON.parse(localStorage.getItem('cl_diag_result_'+side)||'null');
+    if(Array.isArray(live?.scores)&&live.scores.length){
+      const deep=(()=>{try{return JSON.parse(localStorage.getItem('cl_extra_result_'+side)||'null')?.scores||[]}catch{return[]}})();
+      out.push({id:'live:'+side,label:side==='my'?'いまの自分チェック':'いまの相手チェック',scores:live.scores,deep});
+    }
+  }catch{}
+  list(side).forEach(p=>{
+    if(Array.isArray(p.scores)&&p.scores.length){
+      out.push({id:'prof:'+side+':'+p.name,label:p.name,scores:p.scores,deep:Array.isArray(p.deepScores)?p.deepScores:[]});
+    }
+  });
+  // de-dupe by label preferring live first
+  const seen=new Set();
+  return out.filter(x=>{if(seen.has(x.label))return false;seen.add(x.label);return true});
+}
+function getCompareSelection(side,options){
+  const key='cl_compare_sel_'+side;
+  let id=null;try{id=localStorage.getItem(key)}catch{}
+  if(id&&options.some(o=>o.id===id))return id;
+  return options[0]?.id||'';
+}
+function setCompareSelection(side,id){try{localStorage.setItem('cl_compare_sel_'+side,id)}catch{}}
 function renderTwoPersonComparison(){
-  const card=document.getElementById('v21CompareCard'),grid=document.getElementById('v21CompareGrid'),listEl=document.getElementById('v21CompareList');if(!card||!grid||!listEl)return;
-  const my=loadDiagRadar('my');
-  const partner=loadDiagRadar('partner');
-  if(!my||!partner){card.style.display='none';grid.innerHTML='';listEl.innerHTML='';return}
+  const card=document.getElementById('v21CompareCard');
+  const grid=document.getElementById('v21CompareGrid');
+  const listEl=document.getElementById('v21CompareList');
+  const meta=document.getElementById('v21CompareMeta');
+  const pick=document.getElementById('v21ComparePick');
+  const selMy=document.getElementById('v21CompareMy');
+  const selPa=document.getElementById('v21ComparePartner');
+  if(!card||!grid||!listEl)return;
+
+  const myOpts=compareSourceOptions('my');
+  const paOpts=compareSourceOptions('partner');
+  if(!myOpts.length||!paOpts.length){
+    card.style.display='none';grid.innerHTML='';listEl.innerHTML='';
+    if(pick)pick.style.display='none';
+    return;
+  }
+
   card.hidden=false;card.style.removeProperty('display');card.style.display='block';card.classList.add('v46-compare-only');
   grid.innerHTML='';listEl.innerHTML='';
-  const myScores=(()=>{try{return JSON.parse(localStorage.getItem('cl_diag_result_my')||'null')?.scores||[]}catch{return[]}})();
-  const partnerScores=(()=>{try{return JSON.parse(localStorage.getItem('cl_diag_result_partner')||'null')?.scores||[]}catch{return[]}})();
-  const deep=(()=>{try{return JSON.parse(localStorage.getItem('cl_extra_result_partner')||'null')?.scores||[]}catch{return[]}})();
-  const pair=buildPairComparisonCard(myScores,partnerScores,deep);if(pair)listEl.appendChild(pair);
+
+  if(pick&&selMy&&selPa){
+    pick.style.display='grid';
+    const myId=getCompareSelection('my',myOpts);
+    const paId=getCompareSelection('partner',paOpts);
+    selMy.innerHTML=myOpts.map(o=>`<option value="${escapeHtml(o.id)}" ${o.id===myId?'selected':''}>${escapeHtml(o.label)}</option>`).join('');
+    selPa.innerHTML=paOpts.map(o=>`<option value="${escapeHtml(o.id)}" ${o.id===paId?'selected':''}>${escapeHtml(o.label)}</option>`).join('');
+    if(!selMy._clBound){
+      selMy._clBound=true;
+      selMy.addEventListener('change',()=>{setCompareSelection('my',selMy.value);renderTwoPersonComparison()});
+    }
+    if(!selPa._clBound){
+      selPa._clBound=true;
+      selPa.addEventListener('change',()=>{setCompareSelection('partner',selPa.value);renderTwoPersonComparison()});
+    }
+  }
+
+  const myPick=myOpts.find(o=>o.id===getCompareSelection('my',myOpts))||myOpts[0];
+  const paPick=paOpts.find(o=>o.id===getCompareSelection('partner',paOpts))||paOpts[0];
+  if(meta){
+    meta.innerHTML=`<div class="v57-compare-now">いま比較中：${escapeHtml(myPick.label)} × ${escapeHtml(paPick.label)}</div>組み合わせを変えると、下の比較が切り替わります。`;
+  }
+  const pair=buildPairComparisonCard(myPick.scores,paPick.scores,paPick.deep,myPick.deep);
+  if(pair)listEl.appendChild(pair);
 }
 
 function showRadar(before,after,caption){
