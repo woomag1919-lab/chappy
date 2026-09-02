@@ -1,10 +1,10 @@
-<!-- CoreLingual_v55 -->
+<!-- CoreLingual_v57 -->
 <!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CoreLingual v56</title>
+<title>CoreLingual v57</title>
 <style>
 body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
 .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
@@ -242,14 +242,14 @@ body.invite-complete-mode #targetNote{display:none!important}
     <p class="cl55-desc">相手について気づいていることを、自由に書いてOKです。</p>
     <button type="button" id="cl55PartnerManual" class="action cl55-subbtn">相手プロフィールを手で書く</button>
   </div>
-  <div class="card cl55-block">
-    <b>🧩 分からないときは診断してみる</b>
-    <p class="cl55-desc">自分から見た相手を36問で整理します。本人の回答ではないので、参考程度に使ってください。</p>
-  </div>
   <div id="v23InviteCard" class="card cl55-block cl55-invite">
     <b>🔗 相手本人にチェックしてもらう</b>
     <p id="v23InviteIntro" class="cl55-desc">リンクを送ると、相手が本人として36問に答えられます。結果は相手が「共有する」を選んだときだけ、あなたの側に「相手の回答」として登録されます。この画面に共有ボタンはありません。</p>
     <div id="v23InviteControls"></div>
+  </div>
+  <div class="card cl55-block">
+    <b>🧩 分からないときは診断してみる</b>
+    <p class="cl55-desc">自分から見た相手を36問で整理します。本人の回答ではないので、参考程度に使ってください。</p>
   </div>
 </div>
 
@@ -301,6 +301,19 @@ textMode.onclick=()=>setMode("text");imageMode.onclick=()=>setMode("image");func
 talkTab.onclick=()=>{talk.style.display="block";diag.style.display="none";talkTab.classList.add("on");diagTab.classList.remove("on")};diagTab.onclick=()=>{talk.style.display="none";diag.style.display="block";diagTab.classList.add("on");talkTab.classList.remove("on")};
 let selectedImages=[];
 let compressedImages=[];
+let analysisRunning=false;
+let analysisCompleted=false;
+let reanalyzeBtn=null;
+function removeReanalyzeButton(){
+  if(reanalyzeBtn?.parentNode)reanalyzeBtn.parentNode.removeChild(reanalyzeBtn);
+  reanalyzeBtn=null;
+}
+function resetAnalysisState(){
+  analysisCompleted=false;
+  const btn=document.getElementById("analyze");
+  if(btn&&!analysisRunning){btn.disabled=false;btn.innerHTML="✨ 分析・アドバイスを表示する";}
+  removeReanalyzeButton();
+}
 function drawImages(){
   thumbs.innerHTML="";
   selectedImages.forEach((f,idx)=>{
@@ -312,6 +325,7 @@ function drawImages(){
     wrap.appendChild(i);wrap.appendChild(x);thumbs.appendChild(wrap);
   });
   imageControls.style.display=selectedImages.length?"block":"none";
+  resetAnalysisState();
 }
 async function compressImage(file){
   const bitmap=await createImageBitmap(file);
@@ -341,8 +355,9 @@ images.onchange=async()=>{
   finally{imageMode.disabled=false;imageMode.innerHTML=oldText;images.value=""}
 };
 clearImages.onclick=()=>{selectedImages=[];drawImages()};
+message.addEventListener("input",resetAnalysisState);
 let currentSpeaker="me";
-function setSpeaker(x){currentSpeaker=x;speakerMe.classList.toggle("on",x==="me");speakerPartner.classList.toggle("on",x==="partner");speakerUnknown.classList.toggle("on",x==="unknown")}
+function setSpeaker(x){currentSpeaker=x;speakerMe.classList.toggle("on",x==="me");speakerPartner.classList.toggle("on",x==="partner");speakerUnknown.classList.toggle("on",x==="unknown");resetAnalysisState()}
 speakerMe.onclick=()=>setSpeaker("me");speakerPartner.onclick=()=>setSpeaker("partner");speakerUnknown.onclick=()=>setSpeaker("unknown");
 function state(p){return{traits:[...document.querySelectorAll("#"+p+"Traits .on")].map(x=>x.textContent),free:document.getElementById(p+"Free").value}}
 function apply(p,s){document.getElementById(p+"Free").value=s.free||"";document.querySelectorAll("#"+p+"Traits .chip").forEach(x=>x.classList.toggle("on",(s.traits||[]).includes(x.textContent)))}
@@ -406,7 +421,13 @@ function buildAiProfileTextFromStorage(p){
     return buildAiProfileText(base.scores,p==='my'?'あなた':'相手',ex?.scores||[],free);
   }catch{return ''}
 }
-analyze.onclick=async()=>{analyze.disabled=true;const originalText=analyze.innerHTML;analyze.innerHTML='<span class="spinner"></span>準備中…';let note=document.getElementById("loadingNote");if(!note){note=document.createElement("div");note.id="loadingNote";note.className="loading-note";analyze.after(note)}note.textContent="会話を読み込んでいます…";try{let body={inputMode:textArea.style.display!=="none"?"text":"image",message:message.value,speaker:currentSpeaker,imageQuestion:(document.getElementById("imageQuestion")||{}).value||"",myTraits:state("my").traits,partnerTraits:state("partner").traits,myFree:myFree.value,partnerFree:partnerFree.value,diagnosisContext:{my:buildAiProfileTextFromStorage("my"),partner:buildAiProfileTextFromStorage("partner")},images:[]};
+analyze.onclick=async()=>{
+  if(analysisRunning||analysisCompleted)return;
+  analysisRunning=true;
+  analyze.disabled=true;
+  removeReanalyzeButton();
+  const originalText=analyze.innerHTML;
+  analyze.innerHTML='<span class="spinner"></span>準備中…';let note=document.getElementById("loadingNote");if(!note){note=document.createElement("div");note.id="loadingNote";note.className="loading-note";analyze.after(note)}note.textContent="会話を読み込んでいます…";try{let body={inputMode:textArea.style.display!=="none"?"text":"image",message:message.value,speaker:currentSpeaker,imageQuestion:(document.getElementById("imageQuestion")||{}).value||"",myTraits:state("my").traits,partnerTraits:state("partner").traits,myFree:myFree.value,partnerFree:partnerFree.value,diagnosisContext:{my:buildAiProfileTextFromStorage("my"),partner:buildAiProfileTextFromStorage("partner")},images:[]};
   if(body.inputMode==="image"){
     if(!selectedImages.length)throw Error("スクショを1枚以上追加してね。");
     analyze.innerHTML='<span class="spinner"></span>広告を表示中…';
@@ -419,9 +440,31 @@ analyze.onclick=async()=>{analyze.disabled=true;const originalText=analyze.inner
   note.textContent="会話を読み込んでいます。スクショが多い場合は少し時間がかかります…";
   let r=await fetch("/api/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:requestBody});
   const responseText=await r.text();let d;try{d=JSON.parse(responseText)}catch{throw Error(r.status===413?"スクショの容量が大きすぎます。枚数を減らして、もう一度試してください。":"サーバーから正常な応答を受け取れませんでした（HTTP "+r.status+"）。")}
-  if(!r.ok)throw Error(d.error||"APIエラー");render(d);note.textContent="分析が完了しました。"}
-  catch(e){result.innerHTML='<div class="card"><b>エラー</b><p></p></div>';result.querySelector("p").textContent=e.message;note.textContent="分析に失敗しました。"}
-  finally{analyze.disabled=false;analyze.innerHTML=originalText;imageAdCountdown.textContent=""}};
+  if(!r.ok)throw Error(d.error||"APIエラー");
+    render(d);
+    analysisCompleted=true;
+    analyze.disabled=true;
+    analyze.innerHTML="✅ 分析済み";
+    note.textContent="分析が完了しました。もう一度分析したい場合は下のボタンから実行できます。";
+    reanalyzeBtn=document.createElement("button");
+    reanalyzeBtn.type="button";
+    reanalyzeBtn.className="action";
+    reanalyzeBtn.style.cssText="width:100%;margin-top:8px;padding:11px;border:1px solid #dfe3e9;border-radius:12px;background:#fff;color:#59616b;font-weight:bold";
+    reanalyzeBtn.textContent="🔄 同じ内容でもう一度分析する";
+    reanalyzeBtn.onclick=()=>{
+      resetAnalysisState();
+      analyze.click();
+    };
+    note.after(reanalyzeBtn);
+  }catch(e){
+    result.innerHTML='<div class="card"><b>エラー</b><p></p></div>';
+    result.querySelector("p").textContent=e.message;
+    note.textContent="分析に失敗しました。";
+  }finally{
+    analysisRunning=false;
+    if(!analysisCompleted){analyze.disabled=false;analyze.innerHTML=originalText;}
+    imageAdCountdown.textContent="";
+  }};
 
 const AXES={
  language:{label:"情報の受け取り方",left:"言葉を具体的に確認",right:"文脈や全体像から理解",icon:"🗣️"},
