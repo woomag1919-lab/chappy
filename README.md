@@ -1,8 +1,8 @@
-# CoreLingual v61
+# CoreLingual v62
 
 アーリーアクセス向けの守り強化。
 
-## v61 の変更
+## v62 の変更
 1. **招待 PATCH の先着1人ロック**（`partner_hash IS NULL` のときだけ新規回答者を受け付け）
    - 同一 `partnerKey` の再送は更新可能
    - 別人が既に回答済み → 403

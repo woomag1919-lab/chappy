@@ -1,10 +1,10 @@
-<!-- CoreLingual_v61 -->
+<!-- CoreLingual_v62 -->
 <!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CoreLingual v61</title>
+<title>CoreLingual v62</title>
 <style>
 body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
 .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
@@ -345,14 +345,14 @@ function drawImages(){
 }
 async function compressImage(file){
   const bitmap=await createImageBitmap(file);
-  const maxSide=2200;
+  const maxSide=1800;
   const scale=Math.min(1,maxSide/Math.max(bitmap.width,bitmap.height));
   const w=Math.max(1,Math.round(bitmap.width*scale)),h=Math.max(1,Math.round(bitmap.height*scale));
   const canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;
   const ctx=canvas.getContext("2d",{alpha:false});
   ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h);ctx.drawImage(bitmap,0,0,w,h);
   bitmap.close();
-  const blob=await new Promise(ok=>canvas.toBlob(ok,"image/jpeg",0.72));
+  const blob=await new Promise(ok=>canvas.toBlob(ok,"image/jpeg",0.65));
   if(!blob)throw Error("スクショの圧縮に失敗しました。");
   return blob;
 }
@@ -453,7 +453,7 @@ analyze.disabled=true;const originalText=analyze.innerHTML;analyze.innerHTML='<s
     for(const f of selectedImages){const r=await new Promise(ok=>{let fr=new FileReader();fr.onload=()=>ok(fr.result.split(",")[1]);fr.readAsDataURL(f)});body.images.push({data:r,mime_type:f.type||"image/jpeg"})}
   }
   const requestBody=JSON.stringify(body);
-  if(requestBody.length>3900000)throw Error("スクショの容量がまだ大きすぎます。枚数を減らして、もう一度試してください。");
+  if(requestBody.length>3000000)throw Error("スクショの容量が大きすぎます。枚数を減らして、もう一度試してください。");
   analyze.innerHTML='<span class="spinner"></span>分析中…';
   note.textContent="会話を読み込んでいます。スクショが多い場合は少し時間がかかります…";
   let r=await fetch("/api/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:requestBody});
