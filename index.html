@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CoreLingual v55</title>
+<title>CoreLingual v56</title>
 <style>
 body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
 .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
@@ -47,9 +47,15 @@ body.invite-ended-mode #cl55PanePartner{display:block!important}
 body.invite-ended-mode #cl55PanePartner > .cl55-note,body.invite-ended-mode #cl55PanePartner > .cl55-block:not(.cl55-invite){display:none!important}
 body.invite-ended-mode #v23InviteCard{display:block!important;margin-top:0}
 body.invite-complete-mode #diagQuestionPanel,body.invite-complete-mode #diagResult,body.invite-complete-mode #moreDiag,body.invite-complete-mode .cl55-check-panel{display:none!important}
-body.invite-complete-mode .cl55-tabs,body.invite-complete-mode #cl55PaneMy{display:none!important}
+body.invite-complete-mode .cl55-head,body.invite-complete-mode .cl55-tabs,body.invite-complete-mode #cl55PaneMy,body.invite-complete-mode #v21CompareCard{display:none!important}
 body.invite-complete-mode #cl55PanePartner{display:block!important}
-body.invite-complete-mode #v23InviteCard{display:block!important;margin-top:0}
+body.invite-complete-mode #cl55PanePartner > .cl55-note,body.invite-complete-mode #cl55PanePartner > .cl55-block:not(.cl55-invite){display:none!important}
+body.invite-complete-mode #v23InviteCard{display:block!important;margin-top:12px;border:none;background:transparent;padding:0}
+body.invite-complete-mode #v23InviteCard > b,body.invite-complete-mode #v23InviteIntro{display:none!important}
+.v55-done{padding:18px 16px;background:#fff;border:1px solid #eadfe4;border-radius:16px}
+.v55-done .v36-status{margin-bottom:12px}
+.v55-done .v36-check{margin:10px 0 16px}
+.v55-done .primary{width:100%}
 body.shared-mode nav,body.shared-mode #talk > *:not(#result),body.shared-mode #diag{display:none!important}
 body.shared-mode #result{display:block!important}
 .v36-shared-result{margin-top:14px}
@@ -814,12 +820,76 @@ function buildPairComparisonCard(myScores,partnerScores,partnerDeep){
   const ins=sec.querySelector('.v46-pair-insights');
   allRows.sort((a,b)=>b.diff-a.diff).slice(0,3).forEach(row=>{
     if(row.diff<15)return;
-    let label,mine,theirs;
-    if(row.type==='base'){label=AXES[row.key].label;mine=directionText(row.key,bm[row.key]??50);theirs=directionText(row.key,bp[row.key]??50);}
-    else{label=DEEP_AXES[row.key].label;mine=deepDirectionText(row.key,myDeep[row.key]??50);theirs=deepDirectionText(row.key,bd[row.key]??50);}
-    const c=document.createElement('div');c.className='v46-insight';c.innerHTML=`<b>💬 ${escapeHtml(label)}</b><p><strong>あなた：</strong>${escapeHtml(mine)}<br><strong>相手：</strong>${escapeHtml(theirs)}</p><p>この違いがあると、同じやり取りでも「どうしてそうなるの？」と感じやすいかもしれません。必要な情報・時間・距離・伝え方の違いとして見ると整理しやすくなります。</p>`;ins.appendChild(c);
+    let label,mine,theirs,mySc,thSc;
+    if(row.type==='base'){
+      label=AXES[row.key].label;mySc=bm[row.key]??50;thSc=bp[row.key]??50;
+      mine=directionText(row.key,mySc);theirs=directionText(row.key,thSc);
+    }else{
+      label=DEEP_AXES[row.key].label;mySc=myDeep[row.key]??50;thSc=bd[row.key]??50;
+      mine=deepDirectionText(row.key,mySc);theirs=deepDirectionText(row.key,thSc);
+    }
+    const tip=pairAxisTip(row.key,mySc,thSc,row.type);
+    const c=document.createElement('div');c.className='v46-insight';
+    c.innerHTML=`<b>💬 ${escapeHtml(label)}</b><p><strong>あなた：</strong>${escapeHtml(mine)}<br><strong>相手：</strong>${escapeHtml(theirs)}</p><p>${escapeHtml(tip)}</p>`;
+    ins.appendChild(c);
   });
   return sec;
+}
+function pairSide(score){if(score<=35)return'left';if(score>=65)return'right';return'mid'}
+function pairAxisTip(key,myScore,theirScore,type){
+  const a=pairSide(myScore),b=pairSide(theirScore);
+  const tips={
+    language:{
+      'left-right':'あなたは言葉の意味や条件をはっきりさせたくなりやすく、相手は前後の流れから察しやすいことがあります。確認の回数や「言わなくても分かるはず」の期待がズレやすいポイントです。',
+      'right-left':'あなたは文脈や全体像から受け取りやすく、相手は具体的な言葉や条件を求めやすいことがあります。説明が短いと相手が不安になり、長いとあなたがくどく感じることがあります。',
+      'default':'情報の受け取り方が違うと、「伝わったつもり」と「まだ分からない」が同時に起きやすくなります。大事なことは一度、具体と意図の両方で確認すると安心です。'
+    },
+    thinking:{
+      'left-right':'あなたは根拠を揃えてから進みたく、相手は感覚や可能性から動きたくなることがあります。結論の速さや「ちゃんと考えた？」の温度差が出やすいです。',
+      'right-left':'あなたは直感や複数の可能性から考えやすく、相手は理由を整理してから決めたいことがあります。話が飛ぶ／固い、の印象差になりやすいです。',
+      'default':'考え方の順番が違うと、同じ議題でも「まだ早い」「もう遅い」と感じることがあります。先にゴールか、先に材料か、を短く共有すると噛み合いやすいです。'
+    },
+    emotion:{
+      'left-right':'あなたは気持ちを言葉にして整理したく、相手は一度内省してから話したいことがあります。すぐ話したいか、間が欲しいかですれ違いやすいです。',
+      'right-left':'あなたは時間を置いてから感情を整理したく、相手は早めに言葉にしたいことがあります。「冷たい」「詰まる」と誤解されやすい組み合わせです。',
+      'default':'感情の扱い方が違うと、沈黙やペースの差が拒絶に見えやすくなります。今は話したいか、少し置きたいかを一言あるだけで楽になります。'
+    },
+    distance:{
+      'left-right':'あなたはその場で共有・相談したく、相手は自分の時間を確保したくなりやすいことがあります。連絡の頻度や「今話す？」のタイミングがズレやすいです。',
+      'right-left':'あなたは一人の時間を大切にしやすく、相手は早めに共有して安心したくなりやすいことがあります。距離の取り方が、慎重と孤独の取り違えになりやすいです。',
+      'default':'距離感の好みが違うと、近づき方も引き方も「温度差」に感じられます。今どのくらい繋がりたいかを、回数や時間で具体化すると衝突が減ります。'
+    },
+    change:{
+      'left-right':'あなたは見通しや慣れを重視しやすく、相手は新しいやり方を試したくなりやすいことがあります。予定変更のストレスの感じ方が大きく違います。',
+      'right-left':'あなたは変化や新しい方法に乗りやすく、相手は流れが決まっていると安心しやすいことがあります。「柔軟」と「不安」が同時に出やすい組み合わせです。',
+      'default':'変化への耐性が違うと、同じ変更でも一方はチャンス、他方は負荷に感じます。変更点を一つに絞って伝えると、お互いに動きやすくなります。'
+    },
+    communication:{
+      'left-right':'あなたは共感や気持ちを先に受け取りたく、相手は具体策や結論を求めたくなりやすいことがあります。「分かってほしい」と「どうすればいい」がすれ違いやすいです。',
+      'right-left':'あなたは次の一手や具体策を考えやすく、相手はまず気持ちを受け止めてほしがりやすいことがあります。解決が早く感じる／冷たく感じる、の差が出やすいです。',
+      'default':'伝え方の優先が違うと、善意のアドバイスがズレた反応になります。先に「聞いてほしい／案がほしい」を確認すると噛み合いやすいです。'
+    },
+    attach:{
+      'left-right':'あなたは気になるとつながりを確かめやすく、相手は一度距離を置いて整理したくなりやすいことがあります。追いかけと後退が同時に起きやすい典型です。',
+      'right-left':'あなたは自分の中で整理してから距離を調整しやすく、相手は早めに反応や安心を求めやすいことがあります。静かにするほど相手の不安が増えることがあります。',
+      'default':'近づき方と引き方が違うと、会話の開始タイミングそのものが衝突しやすいです。「今すぐ／あとで」を先に決めるだけでも楽になります。'
+    },
+    sensory:{
+      'left-right':'あなたは刺激や情報量が多いと一度減らしたくなりやすく、相手はその場で切り替えながら対応しやすいことがあります。休憩の必要性の感じ方が違います。',
+      'right-left':'あなたは刺激があっても切り替えやすく、相手は情報量が重なると整理したくなりやすいことがあります。予定の密度で疲れ方に差が出やすいです。',
+      'default':'刺激への反応が違うと、同じ場所・同じ予定でも回復の必要量が変わります。今日の余裕を一言共有すると、無理の押し付けが減ります。'
+    },
+    process:{
+      'left-right':'あなたは順番や見通しを整えてから進みたく、相手はまず動いて途中で調整したくなりやすいことがあります。「準備不足」と「固すぎ」の印象差が出やすいです。',
+      'right-left':'あなたは動きながら決めやすく、相手は手順が見えてから安心しやすいことがあります。計画の粒度でストレスの方向が逆になります。',
+      'default':'進め方の好みが違うと、同じゴールでもプロセスの不満が残りやすいです。固定する部分と自由にしてよい部分を分けると衝突が減ります。'
+    }
+  };
+  const bag=tips[key]||{};
+  const pair=a+'-'+b;
+  if(bag[pair])return bag[pair];
+  if(a===b&&a!=='mid')return bag['default']||'似た方向でも、強さやタイミングが違うとすれ違うことがあります。具体的な場面で「今どうしたい？」を短く合わせるとよいです。';
+  return bag['default']||'この違いは、性格の優劣ではなく、場面ごとの得意な進め方の差として見ると扱いやすくなります。';
 }
 function buildPairNarrative(myScores,partnerScores){
   const byMy=Object.fromEntries((myScores||[]).map(x=>[x.key,Number(x.score)]));
@@ -1228,18 +1298,28 @@ async function v23SubmitPartner(){
     if(!shareResp.ok){const sd=await shareResp.json().catch(()=>({}));throw new Error(sd.error||'共有設定を保存できませんでした。もう一度試してね。');}
     v23SetInviteState({...inv,shareMy:share});
     const box=document.getElementById("v23InviteControls");
-    if(box){box.innerHTML=`<div class="v36-status"><b>✅ 回答を送信しました</b><br>${share?"自分の結果を相手に共有しています。相手はあなたの結果を確認でき、2人の比較結果も表示できます。":"自分の結果は相手にはまだ見えません。共有しない限り、2人の比較結果も作成されません。"}</div><div class="v36-check"><input id="v26PartnerShareToggle" type="checkbox" ${share?'checked':''}><label for="v26PartnerShareToggle"><b>相手に自分の結果を見せる</b><br>あとから変更できます。</label></div><div class="v36-share-explain"><b>共有ON：</b>相手に結果を見せて、2人の比較を利用できます。<br><b>共有OFF：</b>相手には結果を見せず、比較も利用できません。</div><div id="v26PartnerSharedPreview"></div>`;
-      document.getElementById('v26PartnerShareToggle')?.addEventListener('change',async e=>{try{const rr=await fetch('/api/invite',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:inv.token,who:'partner',share:e.target.checked,partnerKey:inv.partnerKey||key})});if(!rr.ok)throw new Error('共有設定を更新できませんでした。');inv.shareMy=e.target.checked;v23SetInviteState(inv);}catch(err){e.target.checked=!e.target.checked;alert(err.message)}});
-      if(d.hostProfile&&d.hostProfile.radar){
-        savePartnerSharedProfile(d.hostProfile);
-        const prev=document.getElementById('v26PartnerSharedPreview');
-        prev.innerHTML='<div class="v36-status"><b>👀 相手が共有した結果</b><br>相手の36問の結果を確認できます。</div>';
-        const tmp=document.createElement('div');renderPartnerResultOnly(tmp,d.hostProfile,'相手');prev.appendChild(tmp);
-      }
+    if(box){
+      box.innerHTML=`<div class="v55-done">
+        <div class="v36-status"><b>✅ 回答を送信しました</b><br>${share?"結果を相手に共有しています。":"結果はまだ相手には共有していません。下のスイッチで変更できます。"}</div>
+        <div class="v36-check"><input id="v26PartnerShareToggle" type="checkbox" ${share?'checked':''}><label for="v26PartnerShareToggle"><b>相手に自分の結果を見せる</b></label></div>
+        <button type="button" id="v55UseCoreLingualBtn" class="primary">🌱 自分でも CoreLingual を使ってみる</button>
+      </div>`;
+      document.getElementById('v26PartnerShareToggle')?.addEventListener('change',async e=>{
+        try{
+          const rr=await fetch('/api/invite',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:inv.token,who:'partner',share:e.target.checked,partnerKey:inv.partnerKey||key})});
+          if(!rr.ok)throw new Error('共有設定を更新できませんでした。');
+          inv.shareMy=e.target.checked;v23SetInviteState(inv);
+        }catch(err){e.target.checked=!e.target.checked;alert(err.message)}
+      });
+      document.getElementById('v55UseCoreLingualBtn')?.addEventListener('click',()=>{
+        try{localStorage.removeItem(V22_INVITE_KEY)}catch{}
+        const u=new URL(location.href);u.search='';u.hash='';location.href=u.toString();
+      });
       document.getElementById('diagQuestionPanel')?.style.setProperty('display','none','important');
       document.getElementById('moreDiag')?.style.setProperty('display','none','important');
       document.getElementById('diagResult')?.style.setProperty('display','none','important');
       document.body.classList.remove('invite-questions-mode');
+      document.body.classList.add('invite-complete-mode');
     }
   })();
   try{return await v23PartnerSubmitPromise}finally{v23PartnerSubmitPromise=null}
