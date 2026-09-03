@@ -495,13 +495,35 @@ analyze.onclick=async()=>{analyze.disabled=true;const originalText=analyze.inner
   const requestBody=JSON.stringify(body);
   if(requestBody.length>3900000)throw Error("スクショの容量が大きすぎます。枚数を減らすか、画像を小さくしてもう一度試してください。");
   analyze.innerHTML='<span class="spinner"></span>分析中…';
-  note.textContent=body.inputMode==="image" ? ("スクショ"+body.images.length+"枚をAIに送っています。枚数が多い場合は少し時間がかかります…") : "会話をAIに送っています…";
+  note.textContent=body.inputMode==="image"
+    ? ("スクショ"+body.images.length+"枚をAIに送っています。"+(body.images.length>=4?"時間がかかる場合は、AIが自動で別モデルへ切り替えて再試行します…":"少し時間がかかる場合があります…"))
+    : "会話をAIに送っています…";
   let r=await fetch("/api/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:requestBody});
   const responseText=await r.text();let d;try{d=JSON.parse(responseText)}catch{d={}};
   if(!r.ok){
     if(r.status===413)throw Error("スクショの容量が大きすぎます。枚数を減らすか、画像を小さくしてもう一度試してください。");
     if(r.status===429)throw Error(d.error||"AIサービスが429（利用制限）を返しました。少し時間をおいて、もう一度試してください。");
-    if(r.status===504)throw Error("解析に時間がかかりすぎました。スクショが多い場合は枚数を減らして、しばらくしてからもう一度試してください。");
+    if(r.status===504){
+      let msg=d.error||"解析に時間がかかりすぎました。スクショが多い場合は枚数を減らして、しばらくしてからもう一度試してください。";
+      const dg=d.diagnostic;
+      if(dg && (dg.providerStatus||dg.providerMessage)){
+        const parts=[];
+        if(dg.providerCode)parts.push("HTTP "+dg.providerCode);
+        if(dg.providerStatus)parts.push(dg.providerStatus);
+        if(dg.providerMessage)parts.push(dg.providerMessage);
+        msg += "\n\n【Gemini診断情報】\n"+parts.join(" / ");
+        if(Array.isArray(dg.attempts) && dg.attempts.length){
+          const tries=dg.attempts.map(a=>{
+            const model=a.model||"unknown";
+            const reason=a.reason?" / "+a.reason:"";
+            const st=a.providerStatus||a.status||"";
+            return model+reason+(st?" / "+st:"");
+          }).join(" → ");
+          if(tries)msg += "\n試行: "+tries;
+        }
+      }
+      throw Error(msg);
+    }
     if(r.status===400)throw Error(d.error||"送信した内容をAIが受け取れませんでした。スクショを減らすか、画像を小さくしてもう一度試してください。");
     if(r.status===422)throw Error(d.error||"AIから解析結果を受け取れませんでした。文字が読み取りにくい可能性があります。");
     if(r.status>=500){
