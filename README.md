@@ -37,3 +37,12 @@ v73_fixed をベースにした改善版。
 - Added card-only sections: pair title, strengths, likely friction, how each person may be perceived, what each person may need for reassurance, and practical tips for both people.
 - Kept the existing 5-second ad gate and download flow; app comparison UI remains unchanged.
 - Softened the trait-check disclaimer: removed repeated per-card disclaimer text and added one gentle overall note.
+
+## v79
+- Reworked the downloadable 2-person communication card into a poster-like, share-first design rather than a report layout.
+- Removed stacked report sections, axis label, score-style framing, and repeated "good/bad" disclaimer from the downloadable card.
+- Card now focuses on: brand, short relationship title, two-person contrast, one central story, and one practical tip for each person.
+- Added short rule-based copy per comparison axis; no additional Gemini call is used for card generation.
+- Kept the existing 5-second ad gate and SVG-to-PNG download flow.
+- Kept the in-app comparison UI unchanged.
+- Softened diagnosis-related explanatory copy in trait/profile helper text; user-facing labels remain communication-feature oriented.
