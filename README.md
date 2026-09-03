@@ -23,3 +23,11 @@ v73_fixed をベースにした改善版。
 - Opening a new profile no longer auto-focuses the name field, preventing the mobile keyboard from covering the actions.
 - Profile editor order is now: name → trait check → collapsible conversation tendencies → memo → delete.
 - The trait-check action is moved into the active profile pane between the name/save row and the collapsible tendencies section.
+
+## v76 changes
+- Profile save redesigned: name input no longer has an inline save button; one full-width save action is placed below memo and above delete.
+- Successful save closes the profile sheet and shows a small toast instead of the blocking save-confirm dialog.
+- The saved form values are no longer cleared on successful save.
+- User-facing ASD/ADHD wording in trait explanations was softened to neutral "関連する特性" language; internal calculation keys remain unchanged.
+
+- V77: ユーザー向け表示からASD/ADHD/HSPの名称を外し、関連するコミュニケーション上の特徴・傾向として表現。Geminiの解析出力にも同名称が出ないよう指示し、万一出力された場合もAPI側で表示前に中立表現へ置換。愛着パターンは現状維持。

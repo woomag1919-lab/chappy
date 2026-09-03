@@ -269,8 +269,8 @@ body.v72-active nav{display:none!important}.v72-shell{height:calc(100vh - 92px);
 <div id="imageArea" style="display:none"><label class="upload" for="images">🖼️ <b>スクショを追加</b><br><small>LINE・DM・SMSなど、最大3枚</small></label><input id="images" type="file" accept="image/*" multiple style="display:none"><div id="thumbs" class="thumbs"></div><div id="imageControls" style="display:none;margin-top:8px"><button id="clearImages" class="action">🗑️ 選択したスクショを全部削除</button></div><label class="small">このスクショについて聞きたいこと</label><textarea id="imageQuestion" placeholder="例：最後の「了解」はどういうニュアンスに見える？"></textarea><div class="ad-slot small" id="imageAd"><strong>📺 スクショ分析前の広告枠</strong>短い広告を表示する場所です。現在は広告未接続。<div class="ad-countdown" id="imageAdCountdown"></div></div></div></div>
 <div class="panel v74-profile-panel">
 <div class="v73-hidden-compat" aria-hidden="true"><button type="button" id="profileMyTab">自分</button><button type="button" id="profilePartnerTab">相手</button></div>
-<div id="profileMyPane" class="person"><button type="button" id="v72OpenDiag" class="v72-more-link v74-diag-entry">🧩 特性チェックをする</button><label class="small v73-name-label">名前をつける</label><div class="savebar"><input id="myName" type="text" placeholder="名前を入力" autocomplete="off"><button id="saveMy" class="save">保存</button></div><details class="v74-traits-fold"><summary>会話の傾向 <span>選択して補足できます</span></summary><div id="myTraits" class="chips"></div></details><label class="small">メモ</label><textarea id="myFree" class="profile-memo" placeholder="自分について、会話で大切にしていることなど…"></textarea><button type="button" id="deleteMyProfile" class="v73-delete-profile">このプロフィールを削除する</button></div>
-<div id="profilePartnerPane" class="person" style="display:none"><label class="small v73-name-label">名前をつける</label><div class="savebar"><input id="partnerName" type="text" placeholder="名前を入力" autocomplete="off"><button id="savePartner" class="save">保存</button></div><details class="v74-traits-fold"><summary>会話の傾向 <span>選択して補足できます</span></summary><div id="partnerTraits" class="chips"></div></details><label class="small">メモ</label><textarea id="partnerFree" class="profile-memo" placeholder="相手について、会話で気づいていることなど…"></textarea><button type="button" id="deletePartnerProfile" class="v73-delete-profile">このプロフィールを削除する</button></div></div>
+<div id="profileMyPane" class="person"><label class="small v73-name-label">名前をつける</label><input id="myName" type="text" placeholder="名前を入力" autocomplete="off"><button type="button" id="v72OpenDiag" class="v72-more-link v74-diag-entry">🧩 特性チェックをする</button><details class="v74-traits-fold"><summary>会話の傾向 <span>選択して補足できます</span></summary><div id="myTraits" class="chips"></div></details><label class="small">メモ</label><textarea id="myFree" class="profile-memo" placeholder="自分について、会話で大切にしていることなど…"></textarea><button type="button" id="saveMy" class="v76-save-profile">💾 プロフィールを保存する</button><button type="button" id="deleteMyProfile" class="v73-delete-profile">このプロフィールを削除する</button></div>
+<div id="profilePartnerPane" class="person" style="display:none"><label class="small v73-name-label">名前をつける</label><input id="partnerName" type="text" placeholder="名前を入力" autocomplete="off"><details class="v74-traits-fold"><summary>会話の傾向 <span>選択して補足できます</span></summary><div id="partnerTraits" class="chips"></div></details><label class="small">メモ</label><textarea id="partnerFree" class="profile-memo" placeholder="相手について、会話で気づいていることなど…"></textarea><button type="button" id="savePartner" class="v76-save-profile">💾 プロフィールを保存する</button><button type="button" id="deletePartnerProfile" class="v73-delete-profile">このプロフィールを削除する</button></div></div>
 <button id="analyze" class="primary">✨ 分析・アドバイスを表示する</button><div class="ad-slot" id="bannerAd"><strong>📢 広告バナー予定エリア</strong>将来ここに常時バナー広告を表示します。現在は広告未接続。</div><div id="result"></div>
 </section>
 <section id="diag" style="display:none">
@@ -398,7 +398,6 @@ function list(p){try{return JSON.parse(localStorage.getItem("cl_"+p)||"[]")}catc
 function activeProfile(p){try{return JSON.parse(localStorage.getItem("cl_"+p+"_active")||"null")}catch{return null}}
 function setActiveProfile(p,name){localStorage.setItem("cl_"+p+"_active",JSON.stringify(name))}
 function draw(p){const e=document.getElementById(p+"Profiles");if(!e)return;e.innerHTML="";const active=activeProfile(p);list(p).forEach((x,idx)=>{let b=document.createElement("button");b.className="profile"+(active===x.name?" active":"");b.type="button";b.textContent=(active===x.name?"● ":"")+x.name;let timer=null,longPressed=false;const cancel=()=>{if(timer){clearTimeout(timer);timer=null}};b.addEventListener("pointerdown",()=>{longPressed=false;timer=setTimeout(()=>{longPressed=true;if(confirm("「"+x.name+"」を削除しますか？")){let a=list(p);a.splice(idx,1);localStorage.setItem("cl_"+p,JSON.stringify(a));if(active===x.name)localStorage.removeItem("cl_"+p+"_active");draw(p)}},650)});b.addEventListener("pointerup",cancel);b.addEventListener("pointercancel",cancel);b.addEventListener("pointerleave",cancel);b.addEventListener("click",()=>{if(longPressed)return;setActiveProfile(p,x.name);apply(p,x.state);draw(p)});e.appendChild(b)})}
-function showSaveConfirm(p,name){const overlay=document.getElementById("saveConfirmOverlay");const text=document.getElementById("saveConfirmText");if(!overlay)return;if(text)text.textContent=(p==="my"?"自分":"相手")+"のプロフィール「"+name+"」を保存しました。";overlay.classList.add("show");const ok=document.getElementById("saveConfirmOk");if(ok){ok.focus();ok.onclick=()=>overlay.classList.remove("show")}overlay.onclick=(e)=>{if(e.target===overlay)overlay.classList.remove("show")}}
 function showSaveConfirm(p,name){
   const overlay=document.getElementById("saveConfirmOverlay");
   const title=document.getElementById("saveConfirmTitle");
@@ -447,10 +446,16 @@ function save(p){
   a=a.slice(-5);
   localStorage.setItem("cl_"+p,JSON.stringify(a));
   setActiveProfile(p,name);
-  input.value="";
   draw(p);
   renderTwoPersonComparison();
-  showSaveConfirm(p,name);
+  // 保存成功後は入力欄をリセットせず、そのまま閉じて完了を小さく知らせる。
+  document.getElementById('v72ProfileOverlay')?.classList.remove('show');
+  setNames();
+  const toast=document.createElement('div');
+  toast.className='v76-profile-toast';
+  toast.textContent='✓ プロフィールを保存しました';
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(),1800);
   if(btn)setTimeout(()=>{btn.dataset.saving="0"},300);
 }
 
@@ -674,8 +679,6 @@ function deepNarrative(key,score){
  if(score>=65)return {main:a.right,use:uses[key].right};
  return {main:`${a.left}と${a.right}の両方が、場面によって出やすい`,use:uses[key].middle};
 }
-function directionText(key,score){const a=AXES[key];if(score<=35)return a.left;if(score>=65)return a.right;return "場面・相手に応じて使い分ける"}
-function directionShort(key,score){if(score<=35)return "左寄り";if(score>=65)return "右寄り";return "中間"}
 function axisValuesFromScores(scores){const by={};(scores||[]).forEach(x=>by[x.key]=Number(x.score));return CoreLingual_v36.axes.map(a=>Math.round(by[a.id]??50))}
 function extraAxisValues(extraScores){
  const by={};
@@ -778,9 +781,9 @@ function buildTraitOverlapCards(baseScores,deepScores){
   const adhd=Math.max(0,Math.min(100,50 + ((get('thinking')??50)-50)*.24 + ((get('change')??50)-50)*.20 + ((get('process')??50)-50)*.28 + ((get('sensory')??50)-50)*.14));
   const hsp=Math.max(0,Math.min(100,50 + (50-(get('emotion')??50))*.22 + (50-(get('sensory')??50))*.38 + (50-(get('language')??50))*.12 + (50-(get('distance')??50))*.10));
   const defs=[
-    {key:'asd',icon:'🧩',title:'具体性・見通しを好む傾向',score:asd,note:'この傾向は、ASDの説明で語られる特徴と重なることがあります。',why:'曖昧さより具体性、理由や順序、予定変更後の見通しを重視する回答が重なると、この傾向が出やすくなります。'},
-    {key:'adhd',icon:'⚡',title:'切り替え・動きながら進めやすい傾向',score:adhd,note:'この傾向は、ADHDの説明で語られる特徴と重なることがあります。',why:'可能性を広げる、変化に合わせる、まず動いて調整する、といった回答が重なると、この傾向が出やすくなります。'},
-    {key:'hsp',icon:'🌿',title:'刺激や情報量に敏感な傾向',score:hsp,note:'この傾向は、HSPについて語られる特徴と重なることがあります。',why:'音・人の多さ・情報量などの刺激を強く受け取り、いったん減らして整理したいという回答が重なると、この傾向が出やすくなります.'}
+    {key:'asd',icon:'🧩',title:'具体性・見通しを好む傾向',score:asd,note:'この傾向は、関連する特性の説明と重なることがあります。',why:'曖昧さより具体性、理由や順序、予定変更後の見通しを重視する回答が重なると、この傾向が出やすくなります。'},
+    {key:'adhd',icon:'⚡',title:'切り替え・動きながら進めやすい傾向',score:adhd,note:'この傾向は、関連する特性の説明と重なることがあります。',why:'可能性を広げる、変化に合わせる、まず動いて調整する、といった回答が重なると、この傾向が出やすくなります。'},
+    {key:'hsp',icon:'🌿',title:'刺激や情報量に敏感な傾向',score:hsp,note:'この傾向は、関連する特性の説明と重なることがあります。',why:'音・人の多さ・情報量などの刺激を強く受け取り、いったん減らして整理したいという回答が重なると、この傾向が出やすくなります.'}
   ];
   return defs.map(d=>{const el=document.createElement('section');el.className='v36-attachment-card';el.innerHTML=`<div class="v36-asd-head">${d.icon} ${d.title}</div><div class="v36-asd-body"><p><b>${overlapLevel(d.score)}</b></p><p>${escapeHtml(d.why)}</p><div class="v36-cause">${escapeHtml(d.note)} これは診断・判定ではなく、今回の回答と説明上の特徴との重なりを見る参考情報です。</div></div>`;return el;});
 }
@@ -827,7 +830,7 @@ function buildTraitOverlapData(baseScores,deepScores){
  const hsp=Math.max(0,Math.min(100,50 + (50-(b.emotion??50))*.22 + (50-(d.sensory??50))*.38 + (50-(b.language??50))*.12 + (50-(b.distance??50))*.10));
  const a=Object.fromEntries((deepScores||[]).map(x=>[x.key,Number(x.score)]));
  const att=a.attach??50; const type=att<=35?'不安型':att>=65?'回避型':'安定型';
- return `・具体性・見通しを好む傾向：${overlapLevel(asd)}（ASDの説明で語られる特徴との重なり）\n・切り替え・動きながら進めやすい傾向：${overlapLevel(adhd)}（ADHDの説明で語られる特徴との重なり）\n・刺激や情報量に敏感な傾向：${overlapLevel(hsp)}（HSPについて語られる特徴との重なり）\n・愛着パターン：${type}の特徴と重なる傾向`;
+ return `・具体性・見通しを好む傾向：${overlapLevel(asd)}（関連する特性の説明との重なり）\n・切り替え・動きながら進めやすい傾向：${overlapLevel(adhd)}（関連する特性の説明との重なり）\n・刺激や情報量に敏感な傾向：${overlapLevel(hsp)}（関連する特性の説明との重なり）\n・愛着パターン：${type}の特徴と重なる傾向`;
 }
 function buildAiProfileText(scores,label,extraScores,free){
   const sorted=[...(scores||[])].sort((a,b)=>Math.abs(b.score-50)-Math.abs(a.score-50));
@@ -841,10 +844,10 @@ ${top}${deep?`
 【深掘り18問】
 ${deep}`:''}${overlap?`
 
-【特徴との重なり（参考情報）】
+【関連する特性の説明との重なり（参考情報）】
 ${overlap}`:''}
 
-この情報は会話解析の補助情報です。実際の発言内容を最優先し、特性名・愛着パターン・診断名から心理や行動を断定しません。${free?`
+この情報は会話解析の補助情報です。実際の発言内容を最優先し、特定の診断名や愛着パターンなどから心理や行動を断定しません。${free?`
 
 【本人が追加したメモ】
 ${free.trim()}`:''}`;
@@ -2026,6 +2029,7 @@ loadSharedFromUrl();
 .v74-traits-fold summary span{font-size:10px;font-weight:500;color:#8a919a;margin-left:6px}
 .v74-traits-fold .chips{padding:0 12px 12px}
 .v74-diag-entry{width:100%;margin:10px 0 4px;padding:13px 14px!important;border-radius:13px!important;font-weight:800!important;background:linear-gradient(100deg,#fff0f5,#ffeaf0)!important;border:1px solid #df6684!important;color:#c74369!important}
+.v76-save-profile{width:100%;margin-top:14px;padding:13px 12px;border:1px solid #df6684;border-radius:12px;background:linear-gradient(100deg,#fff0f5,#ffeaf0);color:#c74369;font-weight:800}.v76-save-profile:disabled{opacity:.6}.v76-profile-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#343b44;color:#fff;padding:10px 15px;border-radius:999px;font-size:12px;z-index:12000;box-shadow:0 5px 18px rgba(0,0,0,.2);white-space:nowrap}
 .v74-card-note{max-width:520px;margin:8px auto 0;font-size:11px;line-height:1.6;color:#8a919a;text-align:center}
 </style>
 </body></html>
