@@ -500,7 +500,7 @@ analyze.onclick=async()=>{analyze.disabled=true;const originalText=analyze.inner
   const responseText=await r.text();let d;try{d=JSON.parse(responseText)}catch{d={}};
   if(!r.ok){
     if(r.status===413)throw Error("スクショの容量が大きすぎます。枚数を減らすか、画像を小さくしてもう一度試してください。");
-    if(r.status===429)throw Error("AIサービスへのアクセスが集中しています。少し時間をおいて、もう一度試してください。");
+    if(r.status===429)throw Error(d.error||"AIサービスが429（利用制限）を返しました。少し時間をおいて、もう一度試してください。");
     if(r.status===504)throw Error("解析に時間がかかりすぎました。スクショが多い場合は枚数を減らして、しばらくしてからもう一度試してください。");
     if(r.status===400)throw Error(d.error||"送信した内容をAIが受け取れませんでした。スクショを減らすか、画像を小さくしてもう一度試してください。");
     if(r.status===422)throw Error(d.error||"AIから解析結果を受け取れませんでした。文字が読み取りにくい可能性があります。");
