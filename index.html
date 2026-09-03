@@ -1409,7 +1409,7 @@ function v23RenderHostStatus(d){
   const s=d?.status||{};
   box.innerHTML=`<div class="v36-status"><b>🔗 2人用チェックを作成しました</b><br>${s.joined?'相手が回答を完了しています。':'まだ相手の回答待ちです。'}<br>${s.partnerShared?'相手の結果を共有しています。':'相手は結果を共有していないため、比較結果はまだ表示できません。'}</div><div class="invite-partner-name" style="margin:10px 0;">
   <label for="invitePartnerName" style="display:block;margin-bottom:6px;">相手の名前</label>
-  <input id="invitePartnerName" type="text" maxlength="50" placeholder="例：あき" autocomplete="off">
+  <input id="invitePartnerName" type="text" maxlength="50" placeholder="例：友達A" autocomplete="off">
   <div style="font-size:12px;color:#7b838c;margin-top:4px;">この名前は招待相手には表示されません。</div>
 </div>
 <button id="v23ResetInviteBtn" type="button" style="margin-top:8px;width:100%;padding:10px;border:1px solid #ddd;border-radius:11px;background:#fff;color:#59616b">↩️ 招待を終了して戻る</button>`;
