@@ -13,3 +13,10 @@
 
 ## v61-safe build
 v60を動作基準として、v61 Grok版から招待の先着1人ロックのみを移植。Gemini/会話解析関連ファイルはv60から変更していない。
+
+
+## v64 changes
+- Based on v61-safe_savedialog_v2.
+- Profile save confirmation and empty-name validation retained.
+- Added a 60,000-character live counter to the main analysis text input.
+- Added host-side invite partner-name field only when the invite-create UI could be safely identified; the name is intended to remain host-side and is not shown to invite respondents.
