@@ -168,7 +168,14 @@ async function generate(body) {
         throw err;
       }
       if (res.status === 401 || res.status === 403) throw new Error("gemini_auth");
-      if (res.status >= 500) throw new Error("gemini_unavailable");
+      if (res.status >= 500) {
+        const err = new Error("gemini_unavailable");
+        err.providerCode = Number.isFinite(providerError.code) ? providerError.code : res.status;
+        err.providerStatus = providerStatus;
+        err.providerMessage = providerMessage;
+        err.retryAfter = retryAfter;
+        throw err;
+      }
       throw new Error("gemini_request_failed");
     }
     const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("") || "";
@@ -204,7 +211,17 @@ export default async function handler(req, res) {
       });
     }
     if (e?.message === "gemini_auth") return res.status(502).json({ error: "AIサービスの接続設定を確認できませんでした。しばらくしてからもう一度試してください。", code: "service_config" });
-    if (e?.message === "gemini_unavailable") return res.status(503).json({ error: "AIサービスが一時的に利用できません。しばらく時間をおいて、もう一度試してください。", code: "service_unavailable" });
+    if (e?.message === "gemini_unavailable") {
+      const providerStatus = typeof e?.providerStatus === "string" ? e.providerStatus.slice(0, 80) : "";
+      const providerMessage = typeof e?.providerMessage === "string" ? e.providerMessage.replace(/[\u0000-\u001F\u007F]/g, " ").slice(0, 500) : "";
+      const providerCode = Number.isFinite(e?.providerCode) ? e.providerCode : 503;
+      const retryAfter = typeof e?.retryAfter === "string" ? e.retryAfter.slice(0, 80) : "";
+      return res.status(503).json({
+        error: "AIサービスが一時的に利用できません。しばらく時間をおいて、もう一度試してください。",
+        code: "service_unavailable",
+        diagnostic: { providerCode, providerStatus, providerMessage, retryAfter }
+      });
+    }
     if (e?.message === "gemini_bad_request") return res.status(400).json({ error: "送信した内容をAIが受け取れませんでした。スクショを減らすか、画像を小さくしてもう一度試してください。", code: "bad_request" });
     if (e?.message === "empty_model_response" || e?.message === "invalid_json") return res.status(422).json({ error: "AIから解析結果を受け取れませんでした。スクショの文字が読み取りにくい可能性があります。画像を減らすか、文字が見やすいスクショで試してください。", code: "read_failed" });
     console.error("translate error", e?.message || e);
