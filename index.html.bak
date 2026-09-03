@@ -2023,13 +2023,9 @@ loadSharedFromUrl();
     // SVGのforeignObjectはXMLとして解析されるため、HTMLのvoid要素（br/img/input等）を
     // XML互換の自己終了タグへ正規化してから埋め込む。これをしないとAndroidの画像ビューア等で
     // 「Opening and ending tag mismatch: br ... p」のようなXMLエラーになる。
-    // XMLSerializerでXHTMLとして直列化する。outerHTMLのHTML表記（<br>など）を
-    // 正規表現だけで直す方式はAndroidのXMLパーサーで取りこぼしが起きるため使わない。
-    const serializer=new XMLSerializer();
-    let html=serializer.serializeToString(clone).replace(/&nbsp;/g,' ');
-    // HTML→XHTML変換で残る可能性のあるvoid要素を念のため自己終了化。
-    html=html.replace(/<(br|hr|img|input|meta|link|source|area|base|col|embed|param|track|wbr)(\s[^<>]*?)?\s*>/gi,(_,tag,attrs='')=>`<${tag}${attrs || ''} />`);
-    return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="100%" height="100%" fill="#ffffff"/><foreignObject x="0" y="0" width="${w}" height="${h}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:${w}px;box-sizing:border-box;background:#fff;">${html}</div></foreignObject></svg>`;
+    let html=clone.outerHTML.replace(/&nbsp;/g,' ');
+    html=html.replace(/<(br|hr|img|input|meta|link|source|area|base|col|embed|param|track|wbr)(\s[^<>]*?)?>/gi,(_,tag,attrs='')=>`<${tag}${attrs || ''} />`);
+    return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="100%" height="100%" fill="#ffffff"/><foreignObject x="0" y="0" width="${w}" height="${h}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:${w}px;background:#fff;">${html}</div></foreignObject></svg>`;
   }
   async function downloadCompareCard(){
     const data=getActiveCompareData();if(!data.my||!data.partner){alert('2人分の比較データがまだありません。');return;}
