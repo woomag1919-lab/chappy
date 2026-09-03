@@ -17,3 +17,9 @@ v73_fixed をベースにした改善版。
 - v73_fixed のイベント登録・既存機能は基本的に維持。
 - 比較カードは生成ロジックを置き換えるだけで、アプリ内比較UIそのものは変更していない。
 - v73で発生した「存在しない要素へのonclick参照」による全画面操作不能バグは再導入していない。
+
+## V75 profile editor polish
+- Profile editor sheet is vertically centered instead of bottom-anchored, so it appears higher on mobile.
+- Opening a new profile no longer auto-focuses the name field, preventing the mobile keyboard from covering the actions.
+- Profile editor order is now: name → trait check → collapsible conversation tendencies → memo → delete.
+- The trait-check action is moved into the active profile pane between the name/save row and the collapsible tendencies section.
