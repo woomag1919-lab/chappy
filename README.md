@@ -53,3 +53,10 @@ v73_fixed をベースにした改善版。
 - Removed report-style horizontal rules and stacked boxes.
 - Uses a warm ivory/rose background, large relationship title, two-person contrast, short story, and compact two-person prescription.
 - Keeps existing ad gate, SVG-to-PNG download flow, and in-app comparison UI unchanged.
+
+
+## V82 比較ページ整理
+- 2人比較を「特に違いが出やすい3つ → 9つの傾向 → この2人がラクになるポイント」に再構成。
+- 9項目の各行で「あなた／相手」を繰り返さず、上部で名前を一度表示。
+- 旧「上の比較＋下の詳細3カード」の重複を廃止し、下部は実践的なヒントへ変更。
+- ダウンロード機能そのものはV81のまま。比較ページの内容整理を優先。

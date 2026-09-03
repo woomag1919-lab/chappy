@@ -233,6 +233,27 @@ body.v72-active nav{display:none!important}.v72-shell{height:calc(100vh - 92px);
 .v72-page-dots{position:fixed;right:8px;top:50%;transform:translateY(-50%);z-index:9000;display:flex;flex-direction:column;gap:7px}.v72-dot{width:7px;height:7px;border-radius:50%;background:#cfd5dc;border:0;padding:0}.v72-dot.on{background:#d94788;transform:scale(1.35)}
 .v72-mini-nav{display:flex;gap:7px;margin-top:16px}.v72-mini-nav button{flex:1;padding:10px;border:1px solid #e1e5ea;border-radius:11px;background:#fff;font-weight:bold}.v72-mini-nav .primary-mini{background:#343b44;color:#fff;border-color:#343b44}
 @media(max-width:600px){.v72-person-row{grid-template-columns:1fr}.v72-title{font-size:25px}.v72-page{padding-top:18px}}
+
+/* v82: 比較ページを「要約→一覧→実践」に再構成。重複説明を減らし、左右の名前はヘッダーで一度だけ表示。 */
+.v82-pair-card{margin:14px 0;border:1px solid #e5e8ed;border-radius:18px;background:#fff;overflow:hidden;padding:18px 16px 16px;box-sizing:border-box}
+.v82-compare-head{padding-bottom:12px}
+.v82-kicker{font-size:20px;font-weight:800;color:#30343b;line-height:1.4}
+.v82-lead{margin:7px 0 12px;color:#717983;font-size:12px;line-height:1.75}
+.v82-name-head{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 0 2px;border-top:1px solid #eee}
+.v82-name-head>div{min-width:0}.v82-name-head>div+div{text-align:right}
+.v82-name-head span{display:block;color:#c74369;font-size:11px;font-weight:800;margin-bottom:3px}.v82-name-head b{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v82-section-title{margin:10px 0 8px;color:#c74369;font-size:14px;font-weight:800}
+.v82-top3{display:grid;gap:8px}
+.v82-top-item{display:grid;grid-template-columns:30px 1fr;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #f0edf0}
+.v82-top-num{font-size:12px;color:#c74369;font-weight:800;letter-spacing:.04em}.v82-top-axis{font-size:12px;color:#717983;font-weight:700;margin-bottom:3px}.v82-top-contrast{display:flex;align-items:center;gap:7px;min-width:0}.v82-top-contrast b{font-size:15px;line-height:1.4;color:#30343b}.v82-top-contrast span{color:#c74369;font-weight:800}
+.v82-similar{padding:11px 0;color:#59616b;font-size:13px;line-height:1.7}
+.v82-list-title{margin-top:18px}
+.v82-axis-head,.v82-axis-row{display:grid;grid-template-columns:minmax(130px,1.15fr) 1fr 1fr;gap:8px;align-items:center}
+.v82-axis-head{padding:0 0 5px;color:#c74369;font-size:10px;text-align:left}.v82-axis-head b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v82-axis-head b:nth-child(3){text-align:left}
+.v82-axis-row{padding:9px 0;border-top:1px solid #f0edf0;font-size:11px;line-height:1.45}.v82-axis-name{font-weight:800;color:#39424d}.v82-axis-row>div:not(.v82-axis-name){color:#4d5660}
+.v82-advice{margin-top:18px;padding-top:2px}.v82-advice-grid{display:grid;gap:9px}.v82-advice-item{padding:11px 12px;background:#fff7fa;border-radius:12px;border:1px solid #f0dce3}.v82-advice-item b{font-size:12px;color:#39424d}.v82-advice-item p{margin:5px 0 0;font-size:12px;line-height:1.6;color:#4d5660}.v82-footer-note{margin-top:14px;padding-top:12px;border-top:1px solid #eee;text-align:center;color:#8a919a;font-size:10px;line-height:1.7}
+@media(max-width:600px){.v82-pair-card{padding:16px 12px}.v82-kicker{font-size:19px}.v82-top-contrast b{font-size:14px}.v82-axis-head,.v82-axis-row{grid-template-columns:minmax(112px,1.08fr) 1fr 1fr}.v82-axis-row{font-size:10px}}
+
 .v73-hidden-compat{display:none!important}.v74-diag-entry{margin:10px 0}.v73-name-label{font-size:12px}.v73-delete-profile{width:100%;margin-top:14px;padding:10px 12px;border:1px solid #e4b4bf;border-radius:11px;background:#fff7fa;color:#b83e62;font-weight:800}.v73-compare-page{justify-content:flex-start;padding-top:30px}.v73-compare-page .v21-compare-card{margin-top:0}.v73-download-btn{width:100%;margin-top:14px;padding:13px 12px;border:1px solid #df6684;border-radius:12px;background:#fff0f5;color:#c74369;font-weight:800}.v73-screenshot-note{font-size:11px;color:#7b838c;line-height:1.6;text-align:center;margin:8px 4px 0}.v73-ad-overlay{position:fixed;inset:0;background:rgba(20,24,30,.48);z-index:11000;display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}.v73-ad-overlay.show{display:flex}.v73-ad-box{width:min(340px,100%);background:#fff;border-radius:18px;padding:22px;text-align:center;box-shadow:0 15px 50px rgba(0,0,0,.25)}.v73-ad-box b{display:block;font-size:17px;margin-bottom:8px}.v73-ad-box p{font-size:12px;color:#717983;line-height:1.6;margin:0}.v73-ad-count{font-size:28px;font-weight:800;color:#c74369;margin-top:12px}.v73-download-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#343b44;color:#fff;padding:10px 14px;border-radius:999px;font-size:12px;z-index:12000;box-shadow:0 5px 18px rgba(0,0,0,.2)}.v72-page #message{min-height:310px}</style></head>
 <body>
 <div class="app">
@@ -963,44 +984,102 @@ function deepDirectionText(key,score){
   if(score>=65)return a.right;
   return "場面・相手に応じて使い分けやすい";
 }
-function buildPairComparisonCard(myScores,partnerScores,partnerDeep,myDeepScores){
+function buildPairComparisonCard(myScores,partnerScores,partnerDeep,myDeepScores,myName='あなた',partnerName='相手'){
   if(!myScores?.length||!partnerScores?.length)return null;
-  const sec=document.createElement('section');sec.className='v46-pair-card';
-  sec.innerHTML='<div class="v46-pair-note">同じ場面でも、2人が自然に選びやすい受け取り方・考え方・伝え方が違うと、すれ違いが起きることがあります。違いそのものを見比べます。</div><div class="v46-side-by-side"></div><div class="v46-pair-insights"></div>';
-  const grid=sec.querySelector('.v46-side-by-side');
+  const sec=document.createElement('section');sec.className='v82-pair-card';
   const by=(arr)=>Object.fromEntries((arr||[]).map(x=>[x.key,Number(x.score)]));
   const bm=by(myScores),bp=by(partnerScores),bd=by(partnerDeep||[]);
   let myDeep=by(myDeepScores||[]);
   if(!Object.keys(myDeep).length){try{myDeep=by(JSON.parse(localStorage.getItem('cl_extra_result_my')||'null')?.scores||[])}catch{}}
+
   const allRows=[];
   Object.keys(AXES).forEach(key=>allRows.push({type:'base',key,diff:Math.abs((bm[key]??50)-(bp[key]??50))}));
-  if(Object.keys(myDeep).length && Object.keys(bd).length){Object.keys(DEEP_AXES).forEach(key=>allRows.push({type:'deep',key,diff:Math.abs((myDeep[key]??50)-(bd[key]??50))}));}
+  if(Object.keys(myDeep).length && Object.keys(bd).length){
+    Object.keys(DEEP_AXES).forEach(key=>allRows.push({type:'deep',key,diff:Math.abs((myDeep[key]??50)-(bd[key]??50))}));
+  }
+
+  const sideFor=(score)=>score<=35?'left':score>=65?'right':'middle';
+  const short={
+    language:{left:'言葉ではっきり',right:'流れから受け取る',middle:'言葉と流れを使い分け'},
+    thinking:{left:'筋道を整理',right:'ひらめきを広げる',middle:'整理と発想を行き来'},
+    emotion:{left:'話して整理',right:'時間を置いて整理',middle:'話す・考えるを使い分け'},
+    distance:{left:'一緒に整理',right:'ひとりで整理',middle:'状況に合わせて距離調整'},
+    change:{left:'見通してから',right:'動きながら',middle:'見通しと柔軟さを両立'},
+    communication:{left:'まず気持ち',right:'まず具体策',middle:'気持ちと具体策を両方見る'},
+    attach:{left:'つながりを確認',right:'自分で整理してから',middle:'近さと距離を調整'},
+    sensory:{left:'刺激を減らして整理',right:'その場で切り替える',middle:'刺激量で切り替える'},
+    process:{left:'順番を整えてから',right:'まず動いて調整',middle:'計画と柔軟さを使い分け'}
+  };
+  const getLabel=(row,score)=>{
+    const dict=short[row.key]||{};return dict[sideFor(score)]||'場面に応じて使い分け';
+  };
+  const getAxis=(row)=>row.type==='base'?AXES[row.key]:DEEP_AXES[row.key];
+  const getScores=(row)=>row.type==='base'?[bm[row.key]??50,bp[row.key]??50]:[myDeep[row.key]??50,bd[row.key]??50];
+
+  const ranked=allRows.slice().sort((a,b)=>b.diff-a.diff);
+  const top=ranked.slice(0,3);
+  const topRows=top.filter(r=>r.diff>=8);
+
+  sec.innerHTML=`
+    <div class="v82-compare-head">
+      <div class="v82-kicker">👥 2人のコミュニケーション比較</div>
+      <p class="v82-lead">同じ会話でも、自然に選びやすい「入口」が違うと、すれ違いが起きることがあります。</p>
+      <div class="v82-name-head"><div><span>自分</span><b>${escapeHtml(myName||'あなた')}</b></div><div><span>相手</span><b>${escapeHtml(partnerName||'相手')}</b></div></div>
+    </div>
+    <div class="v82-section-title">特に違いが出やすい3つ</div>
+    <div class="v82-top3"></div>
+    <div class="v82-section-title v82-list-title">9つのコミュニケーション傾向</div>
+    <div class="v82-axis-head"><span></span><b>${escapeHtml(myName||'自分')}</b><b>${escapeHtml(partnerName||'相手')}</b></div>
+    <div class="v82-axis-list"></div>
+    <div class="v82-advice">
+      <div class="v82-section-title">💡 この2人がラクになるポイント</div>
+      <div class="v82-advice-grid"></div>
+    </div>
+    <div class="v82-footer-note">違いは、良し悪しではなく会話の入口の違い。相手の入口が分かると、伝え方も少し変えられます。</div>`;
+
+  const topEl=sec.querySelector('.v82-top3');
+  if(topRows.length){
+    topRows.forEach((row,i)=>{
+      const axis=getAxis(row),[ms,ps]=getScores(row),ml=getLabel(row,ms),pl=getLabel(row,ps);
+      const el=document.createElement('div');el.className='v82-top-item';
+      el.innerHTML=`<div class="v82-top-num">0${i+1}</div><div class="v82-top-main"><div class="v82-top-axis">${axis.icon||''} ${escapeHtml(axis.label)}</div><div class="v82-top-contrast"><b>${escapeHtml(ml)}</b><span>×</span><b>${escapeHtml(pl)}</b></div></div>`;
+      topEl.appendChild(el);
+    });
+  }else{
+    topEl.innerHTML='<div class="v82-similar">大きな差は少なめ。似た入口から会話を進めやすい2人です。</div>';
+  }
+
+  const list=sec.querySelector('.v82-axis-list');
   allRows.forEach(row=>{
-    let label,icon,mine,theirs;
-    if(row.type==='base'){
-      const a=AXES[row.key];label=a.label;icon=a.icon;mine=directionText(row.key,bm[row.key]??50);theirs=directionText(row.key,bp[row.key]??50);
-    }else{
-      const a=DEEP_AXES[row.key];label=a.label;icon=a.icon;mine=deepDirectionText(row.key,myDeep[row.key]??50);theirs=deepDirectionText(row.key,bd[row.key]??50);
-    }
-    const card=document.createElement('div');card.className='v46-compare-row';
-    card.innerHTML=`<div class="v46-compare-axis">${icon} ${escapeHtml(label)}</div><div class="v46-two-col"><div><b>あなた</b><p>${escapeHtml(mine)}</p></div><div><b>相手</b><p>${escapeHtml(theirs)}</p></div></div>`;grid.appendChild(card);
+    const axis=getAxis(row),[ms,ps]=getScores(row),ml=getLabel(row,ms),pl=getLabel(row,ps);
+    const el=document.createElement('div');el.className='v82-axis-row';
+    el.innerHTML=`<div class="v82-axis-name">${axis.icon||''} ${escapeHtml(axis.label)}</div><div>${escapeHtml(ml)}</div><div>${escapeHtml(pl)}</div>`;
+    list.appendChild(el);
   });
-  const ins=sec.querySelector('.v46-pair-insights');
-  allRows.sort((a,b)=>b.diff-a.diff).slice(0,3).forEach(row=>{
-    if(row.diff<15)return;
-    let label,mine,theirs,mySc,thSc;
-    if(row.type==='base'){
-      label=AXES[row.key].label;mySc=bm[row.key]??50;thSc=bp[row.key]??50;
-      mine=directionText(row.key,mySc);theirs=directionText(row.key,thSc);
-    }else{
-      label=DEEP_AXES[row.key].label;mySc=myDeep[row.key]??50;thSc=bd[row.key]??50;
-      mine=deepDirectionText(row.key,mySc);theirs=deepDirectionText(row.key,thSc);
-    }
-    const tip=pairAxisTip(row.key,mySc,thSc,row.type);
-    const c=document.createElement('div');c.className='v46-insight';
-    c.innerHTML=`<b>💬 ${escapeHtml(label)}</b><p><strong>あなた：</strong>${escapeHtml(mine)}<br><strong>相手：</strong>${escapeHtml(theirs)}</p><p>${escapeHtml(tip)}</p>`;
-    ins.appendChild(c);
-  });
+
+  const adviceEl=sec.querySelector('.v82-advice-grid');
+  const adviceMap={
+    language:{left:'大事なことは、言葉を短くして確認する',right:'大事なことは、最後に一言だけ確認する'},
+    thinking:{left:'案を出す前に、まずゴールを共有する',right:'広げた案は、最後に一つへ絞る'},
+    emotion:{left:'「今は聞いてほしい」と先に伝える',right:'時間が必要なら「あとで話したい」と伝える'},
+    distance:{left:'今話したい理由を一言添える',right:'離れたい時は「落ち着いたら話す」と伝える'},
+    change:{left:'変更があるなら、先に知らせて余白を残す',right:'変える前に「ここまではこのまま」と伝える'},
+    communication:{left:'「まず聞いてほしい」と先に伝える',right:'解決策の前に「まず聞くよ」を一言添える'},
+    attach:{left:'確認したい時は、何を知りたいかを一つに絞る',right:'距離を置く時は、戻るタイミングを伝える'},
+    sensory:{left:'情報が重なったら、いったん量を減らす',right:'相手の余裕を見て、話す量を調整する'},
+    process:{left:'先に「次に何をするか」を一つ決める',right:'まず小さく始めて、途中で調整する'}
+  };
+  const adviceRows=ranked.slice(0,2);
+  if(adviceRows.length){
+    adviceRows.forEach(row=>{
+      const axis=getAxis(row),[ms,ps]=getScores(row),dict=adviceMap[row.key]||{},ml=sideFor(ms),pl=sideFor(ps);
+      const leftTip=dict[ml]||dict.left||'相手に伝わりやすい形を一つ選ぶ';
+      const rightTip=dict[pl]||dict.right||'相手のペースも一度確認する';
+      const el=document.createElement('div');el.className='v82-advice-item';
+      el.innerHTML=`<b>${axis.icon||'💬'} ${escapeHtml(axis.label)}</b><p>${escapeHtml(leftTip)}。</p><p>${escapeHtml(rightTip)}。</p>`;
+      adviceEl.appendChild(el);
+    });
+  }
   return sec;
 }
 function pairSide(score){if(score<=35)return'left';if(score>=65)return'right';return'mid'}
@@ -1168,7 +1247,7 @@ function renderTwoPersonComparison(){
   if(dl)dl.style.display='block';
   card.hidden=false;card.style.removeProperty('display');card.style.display='block';card.classList.add('v46-compare-only');
   grid.innerHTML='';listEl.innerHTML='';
-  const pair=buildPairComparisonCard(myPick.scores,paPick.scores,paPick.deep,myPick.deep);
+  const pair=buildPairComparisonCard(myPick.scores,paPick.scores,paPick.deep,myPick.deep,myName||'あなた',paName||'相手');
   if(pair)listEl.appendChild(pair);
 }
 
