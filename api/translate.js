@@ -33,14 +33,24 @@ function normalizeAdvice(value) {
   })).filter(x => x.cause || x.suggestion);
 }
 
+function sanitizeUserFacingText(value, max = 3000) {
+  return cleanText(value, max)
+    .replace(/\bASD\b/gi, "関連する特性")
+    .replace(/\bADHD\b/gi, "関連する特性")
+    .replace(/\bHSP\b/gi, "関連する特性");
+}
+
 function normalizeResult(raw) {
   const x = raw && typeof raw === "object" ? raw : {};
   return {
-    partner: cleanText(x.partner, 2200),
-    me: cleanText(x.me, 2200),
-    mismatch: cleanText(x.mismatch, 3000),
-    advice: normalizeAdvice(x.advice),
-    caution: cleanText(x.caution, 1600)
+    partner: sanitizeUserFacingText(x.partner, 2200),
+    me: sanitizeUserFacingText(x.me, 2200),
+    mismatch: sanitizeUserFacingText(x.mismatch, 3000),
+    advice: normalizeAdvice(x.advice).map(a => ({
+      cause: sanitizeUserFacingText(a.cause, 900),
+      suggestion: sanitizeUserFacingText(a.suggestion, 900)
+    })),
+    caution: sanitizeUserFacingText(x.caution, 1600)
   };
 }
 
@@ -70,8 +80,8 @@ function buildPrompt(body) {
 【最重要ルール】
 - 実際の会話・発言内容を最優先する。
 - 特性プロフィールは「解釈の補助材料」であり、発言より優先しない。
-- ASD、ADHD、HSP、愛着パターンなどの名称から、診断・病気・障害・性格を断定しない。
-- 「ASDだから」「不安型だから」のように因果関係を決めつけない。
+- 特定の診断名・心理ラベル・愛着パターンなどの名称から、診断・病気・障害・性格を断定しない。
+- 特定のラベルだからという理由で因果関係を決めつけない。
 - プロフィールと会話が関係しているときだけ、「今回の場面では、その傾向が影響した可能性があります」と慎重に述べる。
 - 関係が確認できない特性は無理に使わない。
 - 相手を悪者にしない。双方にとって自然な受け取り方の違いとして説明する。
@@ -116,8 +126,9 @@ ${message || "（テキストなし。画像を参照）"}
 【画像についての補足】
 ${imageQuestion || "なし"}
 
-特性プロフィールには、基本18問の6軸、深掘り18問の3軸、ASD/ADHD/HSPとの特徴上の重なり、愛着パターンが含まれることがあります。
+特性プロフィールには、基本18問の6軸、深掘り18問の3軸、関連する特性の説明との重なり、愛着パターンが含まれることがあります。
 それらは「この人を分類するラベル」ではなく、「この会話をどう受け取りやすかったかを考えるための補助情報」として使ってください。
+- ユーザー向けの出力では、ASD・ADHD・HSPなどの診断名・アルファベット名称を使わず、具体的なコミュニケーション上の特徴や傾向として表現する。
 `;
 }
 
