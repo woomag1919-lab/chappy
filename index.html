@@ -493,12 +493,21 @@ analyze.onclick=async()=>{analyze.disabled=true;const originalText=analyze.inner
     for(const f of selectedImages){const r=await new Promise(ok=>{let fr=new FileReader();fr.onload=()=>ok(fr.result.split(",")[1]);fr.readAsDataURL(f)});body.images.push({data:r,mime_type:f.type||"image/jpeg"})}
   }
   const requestBody=JSON.stringify(body);
-  if(requestBody.length>3900000)throw Error("スクショの容量がまだ大きすぎます。枚数を減らして、もう一度試してください。");
+  if(requestBody.length>3900000)throw Error("スクショの容量が大きすぎます。枚数を減らすか、画像を小さくしてもう一度試してください。");
   analyze.innerHTML='<span class="spinner"></span>分析中…';
-  note.textContent="会話を読み込んでいます。スクショが多い場合は少し時間がかかります…";
+  note.textContent=body.inputMode==="image" ? ("スクショ"+body.images.length+"枚をAIに送っています。枚数が多い場合は少し時間がかかります…") : "会話をAIに送っています…";
   let r=await fetch("/api/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:requestBody});
-  const responseText=await r.text();let d;try{d=JSON.parse(responseText)}catch{throw Error(r.status===413?"スクショの容量が大きすぎます。枚数を減らして、もう一度試してください。":"サーバーから正常な応答を受け取れませんでした（HTTP "+r.status+"）。")}
-  if(!r.ok)throw Error(d.error||"APIエラー");render(d);note.textContent="分析が完了しました。"}
+  const responseText=await r.text();let d;try{d=JSON.parse(responseText)}catch{d={}};
+  if(!r.ok){
+    if(r.status===413)throw Error("スクショの容量が大きすぎます。枚数を減らすか、画像を小さくしてもう一度試してください。");
+    if(r.status===429)throw Error("AIサービスへのアクセスが集中しています。少し時間をおいて、もう一度試してください。");
+    if(r.status===504)throw Error("解析に時間がかかりすぎました。スクショが多い場合は枚数を減らして、しばらくしてからもう一度試してください。");
+    if(r.status===400)throw Error(d.error||"送信した内容をAIが受け取れませんでした。スクショを減らすか、画像を小さくしてもう一度試してください。");
+    if(r.status===422)throw Error(d.error||"AIから解析結果を受け取れませんでした。文字が読み取りにくい可能性があります。");
+    if(r.status>=500)throw Error(d.error||"AIサービスが一時的に利用できません。しばらく時間をおいて、もう一度試してください。");
+    throw Error(d.error||"解析に失敗しました（HTTP "+r.status+"）。");
+  }
+  render(d);note.textContent="分析が完了しました。"}
   catch(e){result.innerHTML='<div class="card"><b>エラー</b><p></p></div>';result.querySelector("p").textContent=e.message;note.textContent="分析に失敗しました。"}
   finally{analyze.disabled=false;analyze.innerHTML=originalText;imageAdCountdown.textContent=""}};
 

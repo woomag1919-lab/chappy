@@ -20,3 +20,10 @@ v60を動作基準として、v61 Grok版から招待の先着1人ロックの�
 - Profile save confirmation and empty-name validation retained.
 - Added a 60,000-character live counter to the main analysis text input.
 - Added host-side invite partner-name field only when the invite-create UI could be safely identified; the name is intended to remain host-side and is not shown to invite respondents.
+
+
+## v65 changes
+- Based on v64_noaki.
+- Keeps the working v60-based analysis stack unchanged in normal successful requests.
+- Adds actionable error messages for image-size limits, AI rate limiting, timeouts, temporary service failures, unreadable/empty AI results, and invalid requests.
+- Frontend now maps HTTP errors to user-friendly guidance instead of a single generic analysis error.
