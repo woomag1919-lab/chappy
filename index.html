@@ -514,6 +514,15 @@ analyze.onclick=async()=>{analyze.disabled=true;const originalText=analyze.inner
         if(dg.providerMessage)parts.push(dg.providerMessage);
         msg += "\n\n【Gemini診断情報】\n"+parts.join(" / ");
         if(dg.retryAfter)msg += "\nRetry-After: "+dg.retryAfter;
+        if(Array.isArray(dg.attempts) && dg.attempts.length){
+          const tries=dg.attempts.map(a=>{
+            const model=a.model||"unknown";
+            const reason=a.reason?" / "+a.reason:"";
+            const st=a.providerStatus||a.status||"";
+            return model+reason+(st?" / "+st:"");
+          }).join(" → ");
+          if(tries) msg += "\n試行: "+tries;
+        }
       }
       throw Error(msg);
     }

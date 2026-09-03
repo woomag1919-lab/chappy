@@ -29,8 +29,15 @@ v60を動作基準として、v61 Grok版から招待の先着1人ロックの�
 - Frontend now maps HTTP errors to user-friendly guidance instead of a single generic analysis error.
 
 
-## v67
+## v68
 - Geminiの5xxエラー時に、HTTP code / provider status / provider message / Retry-After を安全に診断情報として返します。
 - 画面にも「Gemini診断情報」として表示し、原因特定をしやすくしました。
 - APIキーや画像データなどの秘密情報は表示しません。
 - 解析プロンプト、画像圧縮、通常成功時の結果処理は変更していません。
+
+
+## v68
+- Gemini 503/UNAVAILABLE の一時的な高負荷に対して、同一モデルを1回自動再試行。
+- それでも503の場合は `GEMINI_FALLBACK_MODEL`（既定: `gemini-3.6-flash`）へ自動フォールバック。
+- Gemini 3.xの非推奨サンプリング設定 `temperature` を送信しない構成に整理。
+- 503時は安全な診断情報と試行モデルを画面に表示。APIキーや画像データは表示しない。
