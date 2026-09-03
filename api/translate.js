@@ -9,7 +9,7 @@ const FALLBACK_MODELS = [
 const RETRY_DELAY_MS = 800;
 const API_KEY = process.env.GEMINI_API_KEY;
 const MAX_MESSAGE = 60000;
-const MAX_IMAGES = 8;
+const MAX_IMAGES = 3;
 const MAX_TOTAL_IMAGE_CHARS = 3200000;
 const TIMEOUT_MS = 45000;
 
