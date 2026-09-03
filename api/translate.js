@@ -1,4 +1,6 @@
 const MODEL = process.env.GEMINI_MODEL || "gemini-3.7-flash";
+const FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || "gemini-3.6-flash";
+const RETRY_DELAY_MS = 800;
 const API_KEY = process.env.GEMINI_API_KEY;
 const MAX_MESSAGE = 60000;
 const MAX_IMAGES = 8;
@@ -113,6 +115,77 @@ ${imageQuestion || "なし"}
 `;
 }
 
+async function sleep(ms) {
+  await new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function buildRequestPayload(parts) {
+  return {
+    contents: [{ role: "user", parts }],
+    generationConfig: {
+      maxOutputTokens: 1800,
+      responseMimeType: "application/json"
+    }
+  };
+}
+
+async function callGemini(model, parts) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": API_KEY },
+      signal: controller.signal,
+      body: JSON.stringify(buildRequestPayload(parts))
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const providerError = data?.error || {};
+      const providerStatus = typeof providerError.status === "string" ? providerError.status : "";
+      const providerMessage = typeof providerError.message === "string" ? providerError.message : "";
+      const retryAfter = res.headers.get("retry-after") || "";
+      const info = {
+        model,
+        status: res.status,
+        providerCode: providerError.code,
+        providerStatus,
+        providerMessage,
+        details: providerError.details,
+        retryAfter
+      };
+      console.error("Gemini request failed", info);
+
+      const err = new Error(
+        res.status === 400 ? "gemini_bad_request" :
+        res.status === 413 ? "gemini_payload_too_large" :
+        (res.status === 401 || res.status === 403) ? "gemini_auth" :
+        res.status === 429 ? "gemini_rate_limited" :
+        res.status >= 500 ? "gemini_unavailable" :
+        "gemini_request_failed"
+      );
+      err.model = model;
+      err.httpStatus = res.status;
+      err.providerCode = Number.isFinite(providerError.code) ? providerError.code : res.status;
+      err.providerStatus = providerStatus;
+      err.providerMessage = providerMessage;
+      err.retryAfter = retryAfter;
+      throw err;
+    }
+
+    const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("") || "";
+    if (!text) {
+      const err = new Error("empty_model_response");
+      err.model = model;
+      throw err;
+    }
+    return normalizeResult(parseJson(text));
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function generate(body) {
   if (!API_KEY) throw new Error("missing_api_key");
   const images = Array.isArray(body.images) ? body.images.slice(0, MAX_IMAGES) : [];
@@ -127,62 +200,49 @@ async function generate(body) {
     parts.push({ inline_data: { mime_type: mime, data } });
   }
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-  try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(MODEL)}:generateContent`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": API_KEY },
-      signal: controller.signal,
-      body: JSON.stringify({
-        contents: [{ role: "user", parts }],
-        generationConfig: {
-          temperature: 0.35,
-          maxOutputTokens: 1800,
-          responseMimeType: "application/json"
-        }
-      })
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      const providerError = data?.error || {};
-      const providerStatus = typeof providerError.status === "string" ? providerError.status : "";
-      const providerMessage = typeof providerError.message === "string" ? providerError.message : "";
-      const retryAfter = res.headers.get("retry-after") || "";
-      console.error("Gemini request failed", {
-        status: res.status,
-        model: MODEL,
-        providerCode: providerError.code,
-        providerStatus,
-        providerMessage,
-        details: providerError.details,
-        retryAfter
+  const attempts = [];
+  const tryModel = async (model, reason) => {
+    try {
+      const result = await callGemini(model, parts);
+      return { result, model };
+    } catch (e) {
+      attempts.push({
+        model,
+        reason,
+        status: e?.httpStatus || "",
+        providerStatus: e?.providerStatus || "",
+        providerMessage: e?.providerMessage || ""
       });
-      if (res.status === 400) throw new Error("gemini_bad_request");
-      if (res.status === 413) throw new Error("gemini_payload_too_large");
-      if (res.status === 429) {
-        const err = new Error("gemini_rate_limited");
-        err.providerStatus = providerStatus;
-        err.providerMessage = providerMessage;
-        throw err;
-      }
-      if (res.status === 401 || res.status === 403) throw new Error("gemini_auth");
-      if (res.status >= 500) {
-        const err = new Error("gemini_unavailable");
-        err.providerCode = Number.isFinite(providerError.code) ? providerError.code : res.status;
-        err.providerStatus = providerStatus;
-        err.providerMessage = providerMessage;
-        err.retryAfter = retryAfter;
-        throw err;
-      }
-      throw new Error("gemini_request_failed");
+      throw e;
     }
-    const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("") || "";
-    if (!text) throw new Error("empty_model_response");
-    return normalizeResult(parseJson(text));
-  } finally {
-    clearTimeout(timer);
+  };
+
+  try {
+    return (await tryModel(MODEL, "primary")).result;
+  } catch (firstError) {
+    // Gemini 503/UNAVAILABLE with a high-demand message is usually transient.
+    // Retry the same model once, then fall back to a stable Flash model.
+    const is503 = firstError?.message === "gemini_unavailable" && firstError?.httpStatus === 503;
+    if (!is503) {
+      firstError.attempts = attempts;
+      throw firstError;
+    }
+
+    await sleep(RETRY_DELAY_MS);
+    try {
+      return (await tryModel(MODEL, "retry")).result;
+    } catch (retryError) {
+      if (FALLBACK_MODEL && FALLBACK_MODEL !== MODEL) {
+        try {
+          return (await tryModel(FALLBACK_MODEL, "fallback")).result;
+        } catch (fallbackError) {
+          fallbackError.attempts = attempts;
+          throw fallbackError;
+        }
+      }
+      retryError.attempts = attempts;
+      throw retryError;
+    }
   }
 }
 
@@ -216,10 +276,16 @@ export default async function handler(req, res) {
       const providerMessage = typeof e?.providerMessage === "string" ? e.providerMessage.replace(/[\u0000-\u001F\u007F]/g, " ").slice(0, 500) : "";
       const providerCode = Number.isFinite(e?.providerCode) ? e.providerCode : 503;
       const retryAfter = typeof e?.retryAfter === "string" ? e.retryAfter.slice(0, 80) : "";
+      const attempts = Array.isArray(e?.attempts) ? e.attempts.slice(0, 3).map(a => ({
+        model: typeof a?.model === "string" ? a.model.slice(0, 80) : "",
+        reason: typeof a?.reason === "string" ? a.reason.slice(0, 20) : "",
+        status: a?.status || "",
+        providerStatus: typeof a?.providerStatus === "string" ? a.providerStatus.slice(0, 80) : ""
+      })) : [];
       return res.status(503).json({
-        error: "AIサービスが一時的に利用できません。しばらく時間をおいて、もう一度試してください。",
+        error: "AIサービスが一時的に混雑しています。自動で再試行しましたが、まだ利用できませんでした。少し時間をおいて、もう一度試してください。",
         code: "service_unavailable",
-        diagnostic: { providerCode, providerStatus, providerMessage, retryAfter }
+        diagnostic: { providerCode, providerStatus, providerMessage, retryAfter, attempts }
       });
     }
     if (e?.message === "gemini_bad_request") return res.status(400).json({ error: "送信した内容をAIが受け取れませんでした。スクショを減らすか、画像を小さくしてもう一度試してください。", code: "bad_request" });
