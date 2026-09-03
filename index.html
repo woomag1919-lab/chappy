@@ -67,7 +67,7 @@ body.shared-mode #result{display:block!important}
 .analysis-char-count{margin-top:6px;text-align:right;font-size:12px;color:#7b838c}.analysis-char-count.warn{font-weight:700}
 </style>
 
-<div id="v73DownloadAdOverlay" class="v73-ad-overlay" aria-hidden="true"><div class="v73-ad-box"><b>📺 広告表示中…</b><p>広告表示後、広告なしの比較カードを保存できます。</p><div id="v73DownloadAdCount" class="v73-ad-count">5</div></div></div>
+<div id="v73DownloadAdOverlay" class="v73-ad-overlay" aria-hidden="true"><div class="v73-ad-box"><b>📺 広告表示中…</b><p>広告表示後、現在の比較結果を1枚の画像として保存できます。</p><div id="v73DownloadAdCount" class="v73-ad-count">5</div></div></div>
 <div id="saveConfirmOverlay" class="save-confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="saveConfirmTitle">
   <div class="save-confirm-dialog">
     <b id="saveConfirmTitle">保存されました</b>
@@ -254,7 +254,7 @@ body.v72-active nav{display:none!important}.v72-shell{height:calc(100vh - 92px);
   </section>
   <section class="v72-page" id="v72Page2"><div class="v72-page-inner"><div class="v72-kicker">STEP 2</div><h2 class="v72-title">会話を入れる</h2><p class="v72-lead" id="v72ContextLine">未設定のプロフィール同士で解析します。</p><div id="v72ConversationMount" class="v72-section-wrap"></div><div id="v72AnalyzeMount"></div><div id="v72BannerMount"></div><div class="v72-swipe-hint"><div class="v72-arrow">↑</div>上へスワイプ / スクロールで解析結果へ</div></div></section>
   <section class="v72-page" id="v72Page3"><div class="v72-page-inner"><div class="v72-kicker">STEP 3</div><h2 class="v72-title">解析結果</h2><p class="v72-lead">今回の会話から見えた、すれ違いのポイントとヒントです。</p><div id="v72ResultMount"><div id="v72ResultEmpty" class="v72-result-empty">まだ解析結果はありません。<br>前のページから会話を解析してみてください。</div></div><div class="v72-mini-nav"><button type="button" id="v72BackToInput">← 会話を修正</button><button type="button" id="v72ToCompare" class="primary-mini">2人の違いを見る →</button></div></div></section>
-  <section class="v72-page v73-compare-page" id="v72Page4"><div class="v72-page-inner"><div id="v72CompareMount"></div><button type="button" id="v73DownloadCompare" class="v73-download-btn">📸 比較カードを画像で保存</button><div class="v73-screenshot-note">画像保存では広告表示後に、広告なしの比較カードを作成します。画面をそのままスクリーンショットすることもできます。</div><div class="v72-mini-nav"><button type="button" id="v72BackToResult">← 解析結果へ</button></div></div></section>
+  <section class="v72-page v73-compare-page" id="v72Page4"><div class="v72-page-inner"><div id="v72CompareMount"></div><button type="button" id="v73DownloadCompare" class="v73-download-btn">📸 比較結果を画像で保存</button><div class="v73-screenshot-note">画像保存では広告表示後に、現在の比較結果を1枚の画像にします。</div><div class="v72-mini-nav"><button type="button" id="v72BackToResult">← 解析結果へ</button></div></div></section>
 </div>
 <div class="v72-page-dots" aria-hidden="true"><button class="v72-dot on" data-page="0"></button><button class="v72-dot" data-page="1"></button><button class="v72-dot" data-page="2"></button><button class="v72-dot" data-page="3"></button></div>
 <div id="v72PickerOverlay" class="v72-picker-overlay"><div class="v72-sheet"><div class="v72-sheet-head"><b id="v72PickerTitle">プロフィールを選ぶ</b><button type="button" class="v72-close" id="v72PickerClose">×</button></div><div id="v72PickerChoices"></div></div></div>
@@ -1985,57 +1985,65 @@ loadSharedFromUrl();
     const lines=svgTextLines(text,maxChars);const fill=opts.fill||'#39424d',size=opts.size||25,weight=opts.weight||500,anchor=opts.anchor||'start';
     return lines.map((line,i)=>`<text x="${x}" y="${y+i*lineH}" font-size="${size}" font-weight="${weight}" fill="${fill}" text-anchor="${anchor}">${escSvg(line)}</text>`).join('');
   }
-  function buildCompareSvg(data){
-    const copy=buildCardCopy(data);const width=1080,height=1920;
-    const nameA=escSvg(copy.myName),nameB=escSvg(copy.paName);
-    const titleLines=svgTextLines(copy.title,15),storyLines=svgTextLines(copy.story,31),aFeat=svgTextLines(copy.myFeature,17),bFeat=svgTextLines(copy.paFeature,17),aTip=svgTextLines(copy.myTip,23),bTip=svgTextLines(copy.paTip,23);
-    const bg='#fbf7f8',rose='#c74369',ink='#30343b',muted='#7f8790',soft='#fff0f5';
-    let body='';
-    body+=`<rect width="${width}" height="${height}" fill="${bg}"/>`;
-    body+=`<circle cx="910" cy="250" r="190" fill="#fff0f5" opacity=".72"/><circle cx="180" cy="1560" r="150" fill="#f8e7ed" opacity=".6"/>`;
-    body+=`<text x="78" y="92" font-size="27" font-weight="800" fill="${rose}">CoreLingual</text>`;
-    body+=`<text x="1002" y="92" font-size="16" fill="${muted}" text-anchor="end">2人のコミュニケーションカード</text>`;
-    let y=205;
-    titleLines.forEach((line,i)=>{body+=`<text x="78" y="${y+i*64}" font-size="48" font-weight="850" fill="${ink}">${escSvg(line)}</text>`});
-    y+=titleLines.length*64+58;
-    body+=`<text x="78" y="${y}" font-size="17" fill="${rose}" font-weight="800">${nameA}</text>`;
-    body+=`<text x="1002" y="${y}" font-size="17" fill="${rose}" font-weight="800" text-anchor="end">${nameB}</text>`;
-    body+=`<line x1="78" y1="${y+24}" x2="1002" y2="${y+24}" stroke="#eadfe4" stroke-width="2"/>`;
-    y+=78;
-    const featTop=y;
-    body+=`<text x="78" y="${featTop}" font-size="31" font-weight="850" fill="${ink}">${escSvg(copy.myShort)}</text>`;
-    body+=`<text x="1002" y="${featTop}" font-size="31" font-weight="850" fill="${ink}" text-anchor="end">${escSvg(copy.paShort)}</text>`;
-    body+=svgParagraph(copy.myFeature,78,featTop+42,17,31,{size:20,weight:550,fill:ink});
-    body+=svgParagraph(copy.paFeature,1002,featTop+42,17,31,{size:20,weight:550,fill:ink,anchor:'end'});
-    body+=`<circle cx="540" cy="${featTop+5}" r="7" fill="${rose}"/><line x1="540" y1="${featTop+20}" x2="540" y2="${featTop+112}" stroke="#eadfe4" stroke-width="2"/>`;
-    y=featTop+150;
-    body+=`<text x="540" y="${y}" font-size="16" font-weight="800" fill="${rose}" text-anchor="middle">この2人、こんなところが違う</text>`;
-    y+=48;
-    body+=svgParagraph(copy.story,540,y,31,38,{size:25,weight:650,fill:ink,anchor:'middle'});
-    y+=Math.max(92,storyLines.length*38)+48;
-    body+=`<line x1="78" y1="${y}" x2="1002" y2="${y}" stroke="#eadfe4" stroke-width="2"/>`;
-    y+=58;
-    body+=`<text x="78" y="${y}" font-size="20" font-weight="850" fill="${rose}">今日使えるヒント</text>`;
-    y+=55;
-    const tipY=y;
-    body+=`<text x="78" y="${tipY}" font-size="17" font-weight="800" fill="${rose}">${nameA}へ</text>`;
-    body+=`<text x="1002" y="${tipY}" font-size="17" font-weight="800" fill="${rose}" text-anchor="end">${nameB}へ</text>`;
-    body+=svgParagraph(copy.myTip,78,tipY+42,23,34,{size:21,weight:650,fill:ink});
-    body+=svgParagraph(copy.paTip,1002,tipY+42,23,34,{size:21,weight:650,fill:ink,anchor:'end'});
-    y+=Math.max(aTip.length,bTip.length)*34+88;
-    body+=`<path d="M78 ${y} C280 ${y-22},360 ${y+22},540 ${y} C720 ${y-22},800 ${y+22},1002 ${y}" fill="none" stroke="#e8c6d1" stroke-width="3"/>`;
-    y+=70;
-    body+=`<text x="540" y="${y}" font-size="20" font-weight="800" fill="${ink}" text-anchor="middle">違いは、会話の入口が違うだけ。</text>`;
-    body+=`<text x="540" y="${y+38}" font-size="16" fill="${muted}" text-anchor="middle">相手の入口が分かると、伝え方も少し変えられます。</text>`;
-    body+=`<text x="78" y="1830" font-size="18" fill="${muted}">CoreLingual</text><text x="1002" y="1830" font-size="15" fill="${muted}" text-anchor="end">会話のすれ違いを、やさしく読み解く</text>`;
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${body}</svg>`;
+  function copyComputedStyles(src,dst){
+    if(!src||!dst)return;
+    const cs=getComputedStyle(src);
+    const props=['box-sizing','display','position','width','height','min-height','max-width','margin','padding','border','border-radius','background','background-color','color','font-family','font-size','font-weight','line-height','letter-spacing','text-align','vertical-align','white-space','word-break','overflow','grid-template-columns','grid-template-rows','gap','align-items','justify-content'];
+    props.forEach(k=>{const v=cs.getPropertyValue(k);if(v)dst.style.setProperty(k,v);});
+    const sc=src.children,dc=dst.children;
+    for(let i=0;i<sc.length;i++)if(dc[i])copyComputedStyles(sc[i],dc[i]);
+  }
+  function buildCompareImageSvg(){
+    const source=document.getElementById('v21CompareCard');
+    if(!source)throw new Error('比較結果が見つかりません');
+    const clone=source.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.style.display='block';
+    clone.style.visibility='visible';
+    clone.style.width='1000px';
+    clone.style.maxWidth='1000px';
+    clone.style.margin='0';
+    clone.style.padding='42px';
+    clone.style.background='#ffffff';
+    clone.style.border='0';
+    clone.style.borderRadius='0';
+    copyComputedStyles(source,clone);
+    clone.style.display='block';
+    clone.style.width='1000px';
+    clone.style.maxWidth='1000px';
+    clone.style.padding='42px';
+    clone.style.background='#ffffff';
+    clone.style.border='0';
+    clone.style.borderRadius='0';
+    clone.querySelectorAll('button,select,input,[aria-hidden="true"]').forEach(el=>el.remove());
+    const holder=document.createElement('div');
+    holder.style.position='fixed';holder.style.left='-100000px';holder.style.top='0';holder.style.width='1084px';holder.style.background='#fff';holder.style.padding='0';holder.style.visibility='hidden';holder.appendChild(clone);document.body.appendChild(holder);
+    const w=1084,h=Math.max(900,Math.ceil(clone.scrollHeight||clone.getBoundingClientRect().height)+8);
+    holder.remove();
+    const html=clone.outerHTML.replace(/&nbsp;/g,' ');
+    const esc=html.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="100%" height="100%" fill="#ffffff"/><foreignObject x="0" y="0" width="${w}" height="${h}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:${w}px;background:#fff;">${html}</div></foreignObject></svg>`;
   }
   async function downloadCompareCard(){
     const data=getActiveCompareData();if(!data.my||!data.partner){alert('2人分の比較データがまだありません。');return;}
     const overlay=document.getElementById('v73DownloadAdOverlay'),count=document.getElementById('v73DownloadAdCount');overlay?.classList.add('show');
     for(let n=5;n>=1;n--){if(count)count.textContent=String(n);await new Promise(r=>setTimeout(r,1000));}overlay?.classList.remove('show');
-    const svg=buildCompareSvg(data);const svgBlob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'});const svgUrl=URL.createObjectURL(svgBlob);try{const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=svgUrl;});const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1920;const ctx=canvas.getContext('2d');ctx.fillStyle='#fbf7f8';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);const png=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('PNG生成に失敗しました')), 'image/png'));const url=URL.createObjectURL(png);const a=document.createElement('a');a.href=url;a.download='CoreLingual_2人のコミュニケーション比較.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){const a=document.createElement('a');a.href=svgUrl;a.download='CoreLingual_2人のコミュニケーション比較.svg';document.body.appendChild(a);a.click();a.remove();}finally{setTimeout(()=>URL.revokeObjectURL(svgUrl),1000);}
-    const toast=document.createElement('div');toast.className='v73-download-toast';toast.textContent='比較カードを保存しました';document.body.appendChild(toast);setTimeout(()=>toast.remove(),2200);
+    let svgUrl='';
+    try{
+      const svg=buildCompareImageSvg();
+      const svgBlob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'});svgUrl=URL.createObjectURL(svgBlob);
+      const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=svgUrl;});
+      const width=img.naturalWidth||img.width||1084,height=img.naturalHeight||img.height||900;
+      const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+      const ctx=canvas.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,width,height);ctx.drawImage(img,0,0,width,height);
+      const png=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('PNG生成に失敗しました')),'image/png'));
+      const url=URL.createObjectURL(png),a=document.createElement('a');a.href=url;a.download='CoreLingual_2人のコミュニケーション比較.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+    }catch(e){
+      console.error('comparison image export failed',e);
+      if(svgUrl){const a=document.createElement('a');a.href=svgUrl;a.download='CoreLingual_2人のコミュニケーション比較.svg';document.body.appendChild(a);a.click();a.remove();}
+      else alert('画像の作成に失敗しました。もう一度お試しください。');
+    }finally{if(svgUrl)setTimeout(()=>URL.revokeObjectURL(svgUrl),1500);}
+    const toast=document.createElement('div');toast.className='v73-download-toast';toast.textContent='比較結果を保存しました';document.body.appendChild(toast);setTimeout(()=>toast.remove(),2200);
   }
   document.getElementById('v73DownloadCompare')?.addEventListener('click',downloadCompareCard);
   // Page tracking.
