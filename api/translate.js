@@ -1,5 +1,11 @@
 const MODEL = process.env.GEMINI_MODEL || "gemini-3.7-flash";
 const FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || "gemini-3.6-flash";
+const FALLBACK_MODELS = [
+  FALLBACK_MODEL,
+  "gemini-3.5-flash",
+  "gemini-3.5-flash-lite",
+  "gemini-3.1-flash-lite"
+];
 const RETRY_DELAY_MS = 800;
 const API_KEY = process.env.GEMINI_API_KEY;
 const MAX_MESSAGE = 60000;
@@ -217,13 +223,17 @@ async function generate(body) {
     }
   };
 
+  const isTransientProviderError = (err) => {
+    const status = Number(err?.httpStatus);
+    return status === 429 || status === 500 || status === 503 || status === 504;
+  };
+
   try {
     return (await tryModel(MODEL, "primary")).result;
   } catch (firstError) {
-    // Gemini 503/UNAVAILABLE with a high-demand message is usually transient.
-    // Retry the same model once, then fall back to a stable Flash model.
-    const is503 = firstError?.message === "gemini_unavailable" && firstError?.httpStatus === 503;
-    if (!is503) {
+    // When Gemini is temporarily busy/rate-limited, keep walking down the
+    // fallback chain instead of making the user press the button again.
+    if (!isTransientProviderError(firstError)) {
       firstError.attempts = attempts;
       throw firstError;
     }
@@ -232,16 +242,27 @@ async function generate(body) {
     try {
       return (await tryModel(MODEL, "retry")).result;
     } catch (retryError) {
-      if (FALLBACK_MODEL && FALLBACK_MODEL !== MODEL) {
+      if (!isTransientProviderError(retryError)) {
+        retryError.attempts = attempts;
+        throw retryError;
+      }
+
+      let lastError = retryError;
+      const seen = new Set([MODEL]);
+      for (const fallbackModel of FALLBACK_MODELS) {
+        if (!fallbackModel || seen.has(fallbackModel)) continue;
+        seen.add(fallbackModel);
         try {
-          return (await tryModel(FALLBACK_MODEL, "fallback")).result;
+          // Small pause between model switches so we don't hammer the API.
+          await sleep(RETRY_DELAY_MS);
+          return (await tryModel(fallbackModel, "fallback")).result;
         } catch (fallbackError) {
-          fallbackError.attempts = attempts;
-          throw fallbackError;
+          lastError = fallbackError;
+          if (!isTransientProviderError(fallbackError)) break;
         }
       }
-      retryError.attempts = attempts;
-      throw retryError;
+      lastError.attempts = attempts;
+      throw lastError;
     }
   }
 }
