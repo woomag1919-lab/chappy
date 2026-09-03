@@ -147,6 +147,11 @@ async function generate(body) {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       console.error("Gemini request failed", { status: res.status, model: MODEL });
+      if (res.status === 400) throw new Error("gemini_bad_request");
+      if (res.status === 413) throw new Error("gemini_payload_too_large");
+      if (res.status === 429) throw new Error("gemini_rate_limited");
+      if (res.status === 401 || res.status === 403) throw new Error("gemini_auth");
+      if (res.status >= 500) throw new Error("gemini_unavailable");
       throw new Error("gemini_request_failed");
     }
     const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("") || "";
@@ -168,9 +173,14 @@ export default async function handler(req, res) {
     const result = await generate({ ...body, message, images });
     return res.status(200).json(result);
   } catch (e) {
-    if (e?.name === "AbortError") return res.status(504).json({ error: "解析に時間がかかりすぎました。もう一度試してください。" });
-    if (e?.message === "image_too_large") return res.status(413).json({ error: "画像の容量が大きすぎます。枚数を減らしてください。" });
+    if (e?.name === "AbortError") return res.status(504).json({ error: "解析に時間がかかりすぎました。スクショが多い場合は枚数を減らして、しばらくしてからもう一度試してください。", code: "timeout" });
+    if (e?.message === "image_too_large" || e?.message === "gemini_payload_too_large") return res.status(413).json({ error: "スクショの容量が大きすぎます。枚数を減らすか、画像を小さくしてもう一度試してください。", code: "image_size" });
+    if (e?.message === "gemini_rate_limited") return res.status(429).json({ error: "AIサービスへのアクセスが集中しています。少し時間をおいて、もう一度試してください。", code: "busy" });
+    if (e?.message === "gemini_auth") return res.status(502).json({ error: "AIサービスの接続設定を確認できませんでした。しばらくしてからもう一度試してください。", code: "service_config" });
+    if (e?.message === "gemini_unavailable") return res.status(503).json({ error: "AIサービスが一時的に利用できません。しばらく時間をおいて、もう一度試してください。", code: "service_unavailable" });
+    if (e?.message === "gemini_bad_request") return res.status(400).json({ error: "送信した内容をAIが受け取れませんでした。スクショを減らすか、画像を小さくしてもう一度試してください。", code: "bad_request" });
+    if (e?.message === "empty_model_response" || e?.message === "invalid_json") return res.status(422).json({ error: "AIから解析結果を受け取れませんでした。スクショの文字が読み取りにくい可能性があります。画像を減らすか、文字が見やすいスクショで試してください。", code: "read_failed" });
     console.error("translate error", e?.message || e);
-    return res.status(500).json({ error: "会話の解析に失敗しました。もう一度試してください。" });
+    return res.status(500).json({ error: "会話の解析に失敗しました。しばらくしてからもう一度試してください。", code: "unknown" });
   }
 }
