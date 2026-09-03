@@ -206,20 +206,66 @@ body.invite-questions-mode #moreDiag .v36-more-note + .card{display:none!importa
 body.invite-complete-mode #selfDiag,
 body.invite-complete-mode #otherDiag,
 body.invite-complete-mode #targetNote{display:none!important}
+
+/* v72 — vertical page-snap home */
+body.v72-active nav{display:none!important}.v72-shell{height:calc(100vh - 92px);min-height:520px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;background:#fafbfc}
+.v72-page{min-height:calc(100vh - 92px);box-sizing:border-box;scroll-snap-align:start;scroll-snap-stop:always;padding:22px 14px 54px;display:flex;flex-direction:column;justify-content:center}
+.v72-page-inner{width:min(760px,100%);margin:0 auto}
+.v72-kicker{font-size:12px;color:#8a919a;margin-bottom:7px}
+.v72-title{font-size:28px;line-height:1.35;margin:0 0 10px;color:#30343b}
+.v72-lead{font-size:13px;line-height:1.75;color:#717983;margin:0 0 18px}
+.v72-person-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 18px}
+.v72-person-card{width:100%;text-align:left;background:#fff;border:1px solid #e5e8ed;border-radius:18px;padding:16px;box-sizing:border-box;box-shadow:0 3px 12px rgba(0,0,0,.04)}
+.v72-person-card:active{transform:scale(.99)}
+.v72-person-role{font-size:11px;color:#8a919a;margin-bottom:5px}.v72-person-name{font-size:18px;font-weight:800}.v72-person-action{font-size:11px;color:#c74369;margin-top:8px}
+.v72-swipe-hint{text-align:center;color:#8a919a;font-size:12px;margin-top:20px}.v72-arrow{font-size:22px;line-height:1;margin-bottom:5px}
+.v72-section-wrap{background:#fff;border:1px solid #e5e8ed;border-radius:18px;padding:14px;box-shadow:0 3px 12px rgba(0,0,0,.03)}
+.v72-page .panel{margin:0}.v72-page #analyze{margin-top:12px}.v72-page #bannerAd{margin-bottom:0}
+.v72-result-empty{padding:22px;text-align:center;color:#8a919a;font-size:13px;background:#fff;border:1px dashed #dfe3e9;border-radius:16px}
+.v72-profile-overlay,.v72-picker-overlay,.v72-diag-overlay{position:fixed;inset:0;background:rgba(20,24,30,.42);z-index:10000;display:none;align-items:flex-end;justify-content:center;padding:12px;box-sizing:border-box}
+.v72-profile-overlay.show,.v72-picker-overlay.show,.v72-diag-overlay.show{display:flex}
+.v72-sheet{width:min(760px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px;padding:16px;box-sizing:border-box;box-shadow:0 15px 50px rgba(0,0,0,.24)}
+.v72-sheet-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.v72-sheet-head b{font-size:18px}.v72-close{border:0;background:#f1f3f5;border-radius:999px;width:36px;height:36px;font-size:20px}
+.v72-choice{width:100%;padding:14px;margin:7px 0;border:1px solid #e1e5ea;border-radius:13px;background:#fff;text-align:left;font-weight:700}.v72-choice small{display:block;color:#8a919a;font-weight:400;margin-top:4px}
+.v72-new{background:#fff7fa;border-color:#efcbd7;color:#c74369}.v72-editor-note{font-size:12px;color:#717983;line-height:1.7;background:#fafbfc;border-radius:11px;padding:10px;margin-bottom:10px}
+.v72-more-link{width:100%;padding:11px;border:1px solid #e1c7d0;border-radius:12px;background:#fff7fa;color:#c74369;font-weight:bold;margin-top:8px}
+.v72-page-dots{position:fixed;right:8px;top:50%;transform:translateY(-50%);z-index:9000;display:flex;flex-direction:column;gap:7px}.v72-dot{width:7px;height:7px;border-radius:50%;background:#cfd5dc;border:0;padding:0}.v72-dot.on{background:#d94788;transform:scale(1.35)}
+.v72-mini-nav{display:flex;gap:7px;margin-top:16px}.v72-mini-nav button{flex:1;padding:10px;border:1px solid #e1e5ea;border-radius:11px;background:#fff;font-weight:bold}.v72-mini-nav .primary-mini{background:#343b44;color:#fff;border-color:#343b44}
+@media(max-width:600px){.v72-person-row{grid-template-columns:1fr}.v72-title{font-size:25px}.v72-page{padding-top:18px}}
 </style></head>
 <body>
 <div class="app">
 <header><h1>CoreLingual</h1><div class="sub">会話と「特性」の違いを読み解くサポートアプリ</div></header>
 <nav><button id="talkTab" class="on">💬 会話を読み解く</button><button id="diagTab">🧩 特性チェック</button></nav>
 <main>
-
+<div id="v72Shell" class="v72-shell">
+  <section class="v72-page" id="v72Page1">
+    <div class="v72-page-inner">
+      <div class="v72-kicker">CoreLingual</div>
+      <h2 class="v72-title">だれと、だれの会話？</h2>
+      <p class="v72-lead">まず今回の会話に登場する2人を選びます。プロフィールや特性チェックを使わなくても、そのまま会話を解析できます。</p>
+      <div class="v72-person-row">
+        <button type="button" class="v72-person-card" id="v72MyPicker"><div class="v72-person-role">👤 自分</div><div class="v72-person-name" id="v72MyName">未設定</div><div class="v72-person-action">タップして選ぶ・作る →</div></button>
+        <button type="button" class="v72-person-card" id="v72PartnerPicker"><div class="v72-person-role">👥 相手</div><div class="v72-person-name" id="v72PartnerName">未設定</div><div class="v72-person-action">タップして選ぶ・作る →</div></button>
+      </div>
+      <button type="button" class="primary" id="v72StartConversation">会話を解析する →</button><div class="v72-swipe-hint"><div class="v72-arrow">↑</div>上へスワイプ / スクロールでも次へ進めます</div>
+    </div>
+  </section>
+  <section class="v72-page" id="v72Page2"><div class="v72-page-inner"><div class="v72-kicker">STEP 2</div><h2 class="v72-title">会話を入れる</h2><p class="v72-lead" id="v72ContextLine">未設定のプロフィール同士で解析します。</p><div id="v72ConversationMount" class="v72-section-wrap"></div><div id="v72AnalyzeMount"></div><div id="v72BannerMount"></div><div class="v72-swipe-hint"><div class="v72-arrow">↑</div>上へスワイプ / スクロールで解析結果へ</div></div></section>
+  <section class="v72-page" id="v72Page3"><div class="v72-page-inner"><div class="v72-kicker">STEP 3</div><h2 class="v72-title">解析結果</h2><p class="v72-lead">今回の会話から見えた、すれ違いのポイントとヒントです。</p><div id="v72ResultMount"><div class="v72-result-empty">まだ解析結果はありません。<br>前のページから会話を解析してみてください。</div></div><div class="v72-mini-nav"><button type="button" id="v72BackToInput">← 会話を修正</button><button type="button" id="v72ToCompare" class="primary-mini">2人の違いを見る →</button></div></div></section>
+  <section class="v72-page" id="v72Page4"><div class="v72-page-inner"><div class="v72-kicker">STEP 4</div><h2 class="v72-title">2人の違い</h2><p class="v72-lead">プロフィールに保存した傾向を、今回の2人として横並びに確認できます。</p><div id="v72CompareMount"><div class="v72-result-empty">プロフィールを2人分設定すると、ここに比較が表示されます。</div></div><div class="v72-mini-nav"><button type="button" id="v72BackToResult">← 解析結果へ</button><button type="button" id="v72OpenProfileFromCompare" class="primary-mini">プロフィールを編集</button></div></div></section>
+</div>
+<div class="v72-page-dots" aria-hidden="true"><button class="v72-dot on" data-page="0"></button><button class="v72-dot" data-page="1"></button><button class="v72-dot" data-page="2"></button><button class="v72-dot" data-page="3"></button></div>
+<div id="v72PickerOverlay" class="v72-picker-overlay"><div class="v72-sheet"><div class="v72-sheet-head"><b id="v72PickerTitle">プロフィールを選ぶ</b><button type="button" class="v72-close" id="v72PickerClose">×</button></div><div id="v72PickerChoices"></div></div></div>
+<div id="v72ProfileOverlay" class="v72-profile-overlay"><div class="v72-sheet"><div class="v72-sheet-head"><b id="v72ProfileTitle">プロフィール</b><button type="button" class="v72-close" id="v72ProfileClose">×</button></div><div class="v72-editor-note">ここで保存したプロフィールが、今選んでいる「自分／相手」に使われます。特性チェックをした場合も、このプロフィールに反映できます。</div><div id="v72ProfileMount"></div><button type="button" id="v72OpenDiag" class="v72-more-link">🧩 特性チェックを開く（このプロフィールについて）</button></div></div>
+<div id="v72DiagOverlay" class="v72-diag-overlay"><div class="v72-sheet"><div class="v72-sheet-head"><b id="v72DiagTitle">特性チェック</b><button type="button" class="v72-close" id="v72DiagClose">×</button></div><div id="v72DiagMount"></div></div></div>
 
 <section id="talk">
 <div class="panel"><b>会話を入力</b><p style="font-size:12px;color:#717983">スクショは <b>右側＝自分</b>、<b>左側＝相手</b> として扱います。</p>
 <div class="actions"><button id="textMode" class="action on">⌨️ テキスト入力</button><button id="imageMode" class="action">🖼️ スクショ送信</button></div>
 <div id="textArea"><label class="small">この文章は誰の発言？</label><div class="actions"><button id="speakerMe" class="action on">👤 自分</button><button id="speakerPartner" class="action">👥 相手</button><button id="speakerUnknown" class="action">❓ 不明</button></div><textarea id="message" placeholder="気になったメッセージや会話を入力…" maxlength="60000"></textarea>
 <div id="analysisCharCount" class="analysis-char-count">0 / 60,000文字</div></div>
-<div id="imageArea" style="display:none"><label class="upload" for="images">🖼️ <b>スクショを追加</b><br><small>LINE・DM・SMSなど、最大5枚</small></label><input id="images" type="file" accept="image/*" multiple style="display:none"><div id="thumbs" class="thumbs"></div><div id="imageControls" style="display:none;margin-top:8px"><button id="clearImages" class="action">🗑️ 選択したスクショを全部削除</button></div><label class="small">このスクショについて聞きたいこと</label><textarea id="imageQuestion" placeholder="例：最後の「了解」はどういうニュアンスに見える？"></textarea><div class="ad-slot small" id="imageAd"><strong>📺 スクショ分析前の広告枠</strong>短い広告を表示する場所です。現在は広告未接続。<div class="ad-countdown" id="imageAdCountdown"></div></div></div></div>
+<div id="imageArea" style="display:none"><label class="upload" for="images">🖼️ <b>スクショを追加</b><br><small>LINE・DM・SMSなど、最大3枚</small></label><input id="images" type="file" accept="image/*" multiple style="display:none"><div id="thumbs" class="thumbs"></div><div id="imageControls" style="display:none;margin-top:8px"><button id="clearImages" class="action">🗑️ 選択したスクショを全部削除</button></div><label class="small">このスクショについて聞きたいこと</label><textarea id="imageQuestion" placeholder="例：最後の「了解」はどういうニュアンスに見える？"></textarea><div class="ad-slot small" id="imageAd"><strong>📺 スクショ分析前の広告枠</strong>短い広告を表示する場所です。現在は広告未接続。<div class="ad-countdown" id="imageAdCountdown"></div></div></div></div>
 <div class="panel"><b>👤 プロフィール</b><p style="font-size:12px;color:#717983">会話の中で見えやすい「傾向」を、自分と相手に分けて保存できます。診断名ではなく、コミュニケーションの特徴として扱います。</p>
 <div class="actions"><button id="profileMyTab" class="action on">👤 自分</button><button id="profilePartnerTab" class="action">👥 相手</button></div>
 <div id="profileMyPane" class="person"><h3>👤 自分のプロフィール</h3><label class="small">会話の傾向</label><div id="myTraits" class="chips"></div><label class="small">メモ</label><div class="friendly-note">特性チェックの結果を反映したり、自分で自由に書き換えたりできます。</div><textarea id="myFree" class="profile-memo" placeholder="自分について、会話で大切にしていることなど…"></textarea><div class="savebar"><input id="myName" type="text" placeholder="例：自分、仕事用"><button id="saveMy" class="save">保存</button></div><div id="myProfiles" class="profiles"></div><div class="profile-delete-hint">タップで使用中に切り替え。長押しで削除確認。</div></div>
@@ -352,7 +398,7 @@ async function compressImage(file){
   return blob;
 }
 images.onchange=async()=>{
-  const incoming=[...images.files].slice(0,5-selectedImages.length);
+  const incoming=[...images.files].slice(0,3-selectedImages.length);
   if(!incoming.length){images.value="";return}
   const oldText=imageMode.innerHTML;imageMode.disabled=true;imageMode.innerHTML="🖼️ 圧縮中…";
   try{
@@ -1769,6 +1815,129 @@ loadSharedFromUrl();
   };
   setTimeout(forceInviteView,200);
   setTimeout(forceInviteView,1000);
+})();
+</script>
+<script>
+(function(){
+  document.body.classList.add('v72-active');
+  const shell=document.getElementById('v72Shell');
+  if(!shell)return;
+  const page1=document.getElementById('v72Page1'),page2=document.getElementById('v72Page2'),page3=document.getElementById('v72Page3'),page4=document.getElementById('v72Page4');
+  const pages=[page1,page2,page3,page4];
+  const dots=[...document.querySelectorAll('.v72-dot')];
+  const talkOriginal=document.getElementById('talk');
+  const diagOriginal=document.getElementById('diag');
+  const profilePanels=[...document.querySelectorAll('#talk > .panel')];
+  // The original talk/diag sections were removed from the normal flow above; rebuild references from saved IDs if present.
+  const conversationPanel=document.querySelector('#v72ConversationMount') && document.querySelector('#v72ConversationMount').dataset.ready ? null : document.querySelector('#talk > .panel');
+  function setNames(){
+    const my=typeof activeProfile==='function'?activeProfile('my'):null;
+    const partner=typeof activeProfile==='function'?activeProfile('partner'):null;
+    document.getElementById('v72MyName').textContent=my||'未設定';
+    document.getElementById('v72PartnerName').textContent=partner||'未設定';
+    document.getElementById('v72ContextLine').textContent=(my||'自分')+' × '+(partner||'相手')+' の会話として解析します。プロフィールや特性チェックは後からでも設定できます。';
+  }
+  function go(i){pages[i].scrollIntoView({behavior:'smooth',block:'start'});dots.forEach((d,n)=>d.classList.toggle('on',n===i));}
+  dots.forEach(d=>d.addEventListener('click',()=>go(Number(d.dataset.page))));
+  document.getElementById('v72StartConversation').onclick=()=>go(1);
+  document.getElementById('v72BackToInput').onclick=()=>go(1);
+  document.getElementById('v72BackToResult').onclick=()=>go(2);
+  document.getElementById('v72ToCompare').onclick=()=>go(3);
+  document.getElementById('v72OpenProfileFromCompare').onclick=()=>openPicker('my');
+  // Move the original nodes into the new pages. IDs and existing event handlers remain intact.
+  const talk=document.getElementById('talk');
+  if(talk){
+    const panels=[...talk.querySelectorAll(':scope > .panel')];
+    const conv=panels[0];
+    const prof=panels[1];
+    if(conv){document.getElementById('v72ConversationMount').appendChild(conv);}
+    const analyzeEl=document.getElementById('analyze');
+    const banner=document.getElementById('bannerAd');
+    const result=document.getElementById('result');
+    if(analyzeEl)document.getElementById('v72AnalyzeMount').appendChild(analyzeEl);
+    if(banner)document.getElementById('v72BannerMount').appendChild(banner);
+    if(result)document.getElementById('v72ResultMount').appendChild(result);
+    if(prof)document.getElementById('v72ProfileMount').appendChild(prof);
+  }
+  const diag=document.getElementById('diag');
+  if(diag){
+    // Move the existing diagnostic UI into the diagnostic sheet so all original functions remain usable.
+    const inner=[...diag.children];
+    const mount=document.getElementById('v72DiagMount');
+    inner.forEach(x=>mount.appendChild(x));
+  }
+  function openProfile(which){
+    const overlay=document.getElementById('v72ProfileOverlay');
+    const title=document.getElementById('v72ProfileTitle');
+    const paneMy=document.getElementById('profileMyPane'),panePartner=document.getElementById('profilePartnerPane');
+    if(which==='my'){
+      profileMyTab.click(); title.textContent='👤 自分のプロフィール';
+      const n=activeProfile('my'); if(n){const x=list('my').find(z=>z.name===n);if(x)apply('my',x.state);}
+    }else{
+      profilePartnerTab.click(); title.textContent='👥 相手のプロフィール';
+      const n=activeProfile('partner'); if(n){const x=list('partner').find(z=>z.name===n);if(x)apply('partner',x.state);}
+    }
+    overlay.classList.add('show');
+  }
+  let pickerWhich='my';
+  function openPicker(which){
+    pickerWhich=which;
+    const title=document.getElementById('v72PickerTitle');
+    title.textContent=(which==='my'?'👤 自分':'👥 相手')+'のプロフィールを選ぶ';
+    const box=document.getElementById('v72PickerChoices');box.innerHTML='';
+    const arr=list(which), active=activeProfile(which);
+    const add=(label,sub,fn,cls='')=>{const b=document.createElement('button');b.type='button';b.className='v72-choice '+cls;b.innerHTML=label+(sub?'<small>'+sub+'</small>':'');b.onclick=()=>{document.getElementById('v72PickerOverlay').classList.remove('show');fn();};box.appendChild(b)};
+    add('＋ 新しく作る','名前をつけてプロフィールを作成',()=>openProfileNew(which),'v72-new');
+    arr.forEach(x=>add((active===x.name?'● ':'')+x.name,'このプロフィールを今回の'+(which==='my'?'自分':'相手')+'として使う',()=>{setActiveProfile(which,x.name);apply(which,x.state);draw(which);renderTwoPersonComparison();setNames();}));
+    if(arr.length) add('⚙️ 選択中のプロフィールを編集',active||'',()=>openProfile(which));
+    document.getElementById('v72PickerOverlay').classList.add('show');
+  }
+  function openProfileNew(which){
+    openProfile(which);
+    const name=document.getElementById(which+'Name');
+    const free=document.getElementById(which+'Free');
+    if(name)name.value='';
+    if(free)free.value='';
+    document.querySelectorAll('#'+which+'Traits .chip').forEach(x=>x.classList.remove('on'));
+    name?.focus();
+  }
+  document.getElementById('v72MyPicker').onclick=()=>openPicker('my');
+  document.getElementById('v72PartnerPicker').onclick=()=>openPicker('partner');
+  document.getElementById('v72PickerClose').onclick=()=>document.getElementById('v72PickerOverlay').classList.remove('show');
+  document.getElementById('v72ProfileClose').onclick=()=>{document.getElementById('v72ProfileOverlay').classList.remove('show');setNames();};
+  document.getElementById('v72OpenDiag').onclick=()=>{
+    document.getElementById('v72ProfileOverlay').classList.remove('show');
+    const which=pickerWhich;
+    if(which==='my')selfDiag.click();else otherDiag.click();
+    document.getElementById('v72DiagTitle').textContent=(which==='my'?'👤 自分':'👥 相手')+'の特性チェック';
+    document.getElementById('v72DiagOverlay').classList.add('show');
+  };
+  document.getElementById('v72DiagClose').onclick=()=>{document.getElementById('v72DiagOverlay').classList.remove('show');setNames();renderTwoPersonComparison();};
+  // Reflect saves/profile switches in the top page.
+  const oldSaveMy=saveMy.onclick,oldSavePartner=savePartner.onclick;
+  saveMy.addEventListener('click',()=>setTimeout(setNames,50));
+  savePartner.addEventListener('click',()=>setTimeout(setNames,50));
+  // Result auto-scroll after the existing analysis handler finishes.
+  const analyzeEl=document.getElementById('analyze');
+  const resultEl=document.getElementById('result');
+  if(analyzeEl && analyzeEl.onclick){
+    const old=analyzeEl.onclick;
+    analyzeEl.onclick=async function(e){
+      const r=await old.call(this,e);
+      setTimeout(()=>{if(resultEl && resultEl.innerHTML.trim())go(2);},80);
+      return r;
+    };
+  }
+  // Comparison is already rendered by the existing app; move its live node into page 4.
+  const compare=document.getElementById('v21CompareCard');
+  if(compare)document.getElementById('v72CompareMount').appendChild(compare);
+  // Since the original diagnostic and talk sections are now empty containers, keep them out of normal layout.
+  if(talk)talk.style.display='none';
+  if(diag)diag.style.display='none';
+  setNames();
+  // Page tracking.
+  const io=new IntersectionObserver(entries=>entries.forEach(en=>{if(en.isIntersecting){const i=pages.indexOf(en.target);dots.forEach((d,n)=>d.classList.toggle('on',n===i));}}),{root:shell,threshold:.6});
+  pages.forEach(p=>io.observe(p));
 })();
 </script>
 </body></html>
