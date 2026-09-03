@@ -56,7 +56,7 @@ body.invite-complete-mode #v23InviteCard > b,body.invite-complete-mode #v23Invit
 .v55-done .v36-status{margin-bottom:12px}
 .v55-done .v36-check{margin:10px 0 16px}
 .v55-done .primary{width:100%}
-body.shared-mode nav,body.shared-mode #talk > *:not(#result),body.shared-mode #diag{display:none!important}
+body.shared-mode nav,body.shared-mode #talk > *:not(#result),body.shared-mode #diag,body.shared-mode .v72-shell,body.shared-mode .v72-page-dots{display:none!important}
 body.shared-mode #result{display:block!important}
 .v36-shared-result{margin-top:14px}
 .v36-shared-title{padding:16px;background:#fff7fa;border:1px solid #f0dce3;border-radius:16px;color:#c74369}
@@ -258,7 +258,7 @@ body.v72-active nav{display:none!important}.v72-shell{height:calc(100vh - 92px);
 </div>
 <div class="v72-page-dots" aria-hidden="true"><button class="v72-dot on" data-page="0"></button><button class="v72-dot" data-page="1"></button><button class="v72-dot" data-page="2"></button><button class="v72-dot" data-page="3"></button></div>
 <div id="v72PickerOverlay" class="v72-picker-overlay"><div class="v72-sheet"><div class="v72-sheet-head"><b id="v72PickerTitle">プロフィールを選ぶ</b><button type="button" class="v72-close" id="v72PickerClose">×</button></div><div id="v72PickerChoices"></div></div></div>
-<div id="v72ProfileOverlay" class="v72-profile-overlay"><div class="v72-sheet"><div class="v72-sheet-head"><b id="v72ProfileTitle">プロフィール</b><button type="button" class="v72-close" id="v72ProfileClose">×</button></div><div class="v72-editor-note">ここで保存したプロフィールが、今選んでいる「自分／相手」に使われます。特性チェックをした場合も、このプロフィールに反映できます。</div><div id="v72ProfileMount"></div><button type="button" id="v72OpenDiag" class="v72-more-link">🧩 特性チェックを開く（このプロフィールについて）</button></div></div>
+<div id="v72ProfileOverlay" class="v72-profile-overlay"><div class="v72-sheet"><div class="v72-sheet-head"><b id="v72ProfileTitle">プロフィール</b><button type="button" class="v72-close" id="v72ProfileClose">×</button></div><div id="v72ProfileMount"></div><button type="button" id="v72OpenDiag" class="v72-more-link v74-diag-entry">🧩 特性チェックをする</button></div></div>
 <div id="v72DiagOverlay" class="v72-diag-overlay"><div class="v72-sheet"><div class="v72-sheet-head"><b id="v72DiagTitle">特性チェック</b><button type="button" class="v72-close" id="v72DiagClose">×</button></div><div id="v72DiagMount"></div></div></div>
 
 <section id="talk">
@@ -267,10 +267,10 @@ body.v72-active nav{display:none!important}.v72-shell{height:calc(100vh - 92px);
 <div id="textArea"><label class="small">この文章は誰の発言？</label><div class="actions"><button id="speakerMe" class="action on">👤 自分</button><button id="speakerPartner" class="action">👥 相手</button><button id="speakerUnknown" class="action">❓ 不明</button></div><textarea id="message" placeholder="気になったメッセージや会話を入力…" maxlength="60000"></textarea>
 <div id="analysisCharCount" class="analysis-char-count">0 / 60,000文字</div></div>
 <div id="imageArea" style="display:none"><label class="upload" for="images">🖼️ <b>スクショを追加</b><br><small>LINE・DM・SMSなど、最大3枚</small></label><input id="images" type="file" accept="image/*" multiple style="display:none"><div id="thumbs" class="thumbs"></div><div id="imageControls" style="display:none;margin-top:8px"><button id="clearImages" class="action">🗑️ 選択したスクショを全部削除</button></div><label class="small">このスクショについて聞きたいこと</label><textarea id="imageQuestion" placeholder="例：最後の「了解」はどういうニュアンスに見える？"></textarea><div class="ad-slot small" id="imageAd"><strong>📺 スクショ分析前の広告枠</strong>短い広告を表示する場所です。現在は広告未接続。<div class="ad-countdown" id="imageAdCountdown"></div></div></div></div>
-<div class="panel"><b>👤 プロフィール</b><p style="font-size:12px;color:#717983">会話の中で見えやすい「傾向」を、自分と相手に分けて保存できます。診断名ではなく、コミュニケーションの特徴として扱います。</p>
+<div class="panel v74-profile-panel">
 <div class="v73-hidden-compat" aria-hidden="true"><button type="button" id="profileMyTab">自分</button><button type="button" id="profilePartnerTab">相手</button></div>
-<div id="profileMyPane" class="person"><h3>👤 自分のプロフィール</h3><label class="small v73-name-label">名前をつける</label><div class="savebar"><input id="myName" type="text" placeholder="名前を入力" autocomplete="off"><button id="saveMy" class="save">保存</button></div><label class="small">会話の傾向</label><div id="myTraits" class="chips"></div><label class="small">メモ</label><div class="friendly-note">特性チェックの結果を反映したり、自分で自由に書き換えたりできます。</div><textarea id="myFree" class="profile-memo" placeholder="自分について、会話で大切にしていることなど…"></textarea><button type="button" id="deleteMyProfile" class="v73-delete-profile">このプロフィールを削除する</button></div>
-<div id="profilePartnerPane" class="person" style="display:none"><h3>👥 相手のプロフィール</h3><label class="small v73-name-label">名前をつける</label><div class="savebar"><input id="partnerName" type="text" placeholder="名前を入力" autocomplete="off"><button id="savePartner" class="save">保存</button></div><label class="small">会話の傾向</label><div id="partnerTraits" class="chips"></div><label class="small">メモ</label><div class="friendly-note">相手について分かる範囲で設定できます。推測だけで決めつけず、会話分析の補助として使います。</div><textarea id="partnerFree" class="profile-memo" placeholder="相手について、会話で気づいていることなど…"></textarea><button type="button" id="deletePartnerProfile" class="v73-delete-profile">このプロフィールを削除する</button></div></div>
+<div id="profileMyPane" class="person"><label class="small v73-name-label">名前をつける</label><div class="savebar"><input id="myName" type="text" placeholder="名前を入力" autocomplete="off"><button id="saveMy" class="save">保存</button></div><details class="v74-traits-fold"><summary>会話の傾向 <span>選択して補足できます</span></summary><div id="myTraits" class="chips"></div></details><label class="small">メモ</label><textarea id="myFree" class="profile-memo" placeholder="自分について、会話で大切にしていることなど…"></textarea><button type="button" id="deleteMyProfile" class="v73-delete-profile">このプロフィールを削除する</button></div>
+<div id="profilePartnerPane" class="person" style="display:none"><label class="small v73-name-label">名前をつける</label><div class="savebar"><input id="partnerName" type="text" placeholder="名前を入力" autocomplete="off"><button id="savePartner" class="save">保存</button></div><details class="v74-traits-fold"><summary>会話の傾向 <span>選択して補足できます</span></summary><div id="partnerTraits" class="chips"></div></details><label class="small">メモ</label><textarea id="partnerFree" class="profile-memo" placeholder="相手について、会話で気づいていることなど…"></textarea><button type="button" id="deletePartnerProfile" class="v73-delete-profile">このプロフィールを削除する</button></div></div>
 <button id="analyze" class="primary">✨ 分析・アドバイスを表示する</button><div class="ad-slot" id="bannerAd"><strong>📢 広告バナー予定エリア</strong>将来ここに常時バナー広告を表示します。現在は広告未接続。</div><div id="result"></div>
 </section>
 <section id="diag" style="display:none">
@@ -1599,7 +1599,8 @@ function normalizeSharedDeepScores(p){
 function renderShared(payload){
  const p=payload||{};
  document.body.classList.add('shared-mode');
- talk.style.display='block';diag.style.display='none';result.innerHTML='';
+ try{document.querySelectorAll('body > .shared-shell').forEach(x=>x.remove())}catch{}
+ diag.style.display='none';
  const shell=document.createElement('div');shell.className='shared-shell v36-shared-result';
  const title=document.createElement('div');title.className='v36-shared-title';
  title.innerHTML=`<h2>📎 特性チェックの共有結果</h2><p>${escapeHtml(p.title||'特性チェックの結果が共有されました。')}</p>`;
@@ -1636,8 +1637,8 @@ function renderShared(payload){
    cta.innerHTML='<b>🧩 自分も特性チェックしてみる</b><p>自分のコミュニケーション傾向もチェックしてみよう。</p><button type="button">特性チェックを始める</button>';
    cta.querySelector('button').addEventListener('click',()=>{const u=new URL(location.href);u.pathname='/';u.search='';u.hash='';location.href=u.toString();});
    shell.appendChild(cta);
- }else shell.innerHTML+='<div class="shared-error"><b>共有データを表示できませんでした</b><p>対応していない共有形式です。</p></div>';
- result.appendChild(shell);
+ }else shell.innerHTML+=`<div class="shared-error"><b>共有データを表示できませんでした</b><p>${escapeHtml(p.error||'対応していない共有形式です。')}</p></div>`;
+ document.body.appendChild(shell);
 }
 async function loadSharedFromUrl(){
  const pathMatch=location.pathname.match(/^\/share\/([A-Za-z0-9_-]{40,50})\/?$/);
@@ -1894,21 +1895,112 @@ loadSharedFromUrl();
     return {myName:myName||'あなた',paName:paName||'相手',my:myOpts.find(o=>o.id==='prof:my:'+myName)||myOpts.find(o=>o.id==='live:my'),partner:paOpts.find(o=>o.id==='prof:partner:'+paName)||paOpts.find(o=>o.id==='live:partner')};
   }
   function escSvg(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
-  function buildCompareSvg(data){
-    const axes=Array.isArray(window.CoreLingual_v36?.axes)?window.CoreLingual_v36.axes:[];
+  function cardSide(score){const n=Number(score);if(n<=35)return 'left';if(n>=65)return 'right';return 'middle';}
+  function cardDirection(key,score){
+    const a=AXES[key]||{};const side=cardSide(score);
+    if(side==='left')return a.left||'左寄り';
+    if(side==='right')return a.right||'右寄り';
+    return '場面に応じて使い分けやすい';
+  }
+  function buildCardCopy(data){
     const myScores=Object.fromEntries((data.my?.scores||[]).map(x=>[x.key,Number(x.score)||50]));
     const paScores=Object.fromEntries((data.partner?.scores||[]).map(x=>[x.key,Number(x.score)||50]));
-    const rows=axes.length?axes:[{id:'context',label:'情報の受け取り方'},{id:'thinking',label:'考え方'},{id:'emotion',label:'感情'},{id:'distance',label:'距離感'},{id:'change',label:'変化'},{id:'communication',label:'伝え方'}];
-    const meaning={context:['具体的な言葉を重視','文脈や場面を重視'],thinking:['理由や根拠を確認したい','直感や可能性を重視しやすい'],emotion:['気持ちを言葉にして整理','時間を置いて整理しやすい'],distance:['共有して整理したい','自分の時間を守りたい'],change:['見通しを持って進みたい','新しい方法を試しやすい'],communication:['共感を大切にする','具体策・結論を重視しやすい']};
-    let y=220;const rowH=122,width=1000,height=300+rows.length*rowH+150;let body='';
-    rows.forEach(a=>{const ms=myScores[a.id]??50,ps=paScores[a.id]??50,m=meaning[a.id]||['一方の傾向','もう一方の傾向'];const mt=ms>=65?m[1]:ms<=35?m[0]:'場面に応じて使い分けやすい',pt=ps>=65?m[1]:ps<=35?m[0]:'場面に応じて使い分けやすい';body+=`<rect x="50" y="${y}" width="900" height="104" rx="18" fill="#ffffff" stroke="#eadfe4"/><text x="75" y="${y+28}" font-size="22" font-weight="700" fill="#c74369">${escSvg(a.label)}</text><rect x="75" y="${y+42}" width="400" height="48" rx="12" fill="#fafbfc"/><rect x="525" y="${y+42}" width="400" height="48" rx="12" fill="#fafbfc"/><text x="92" y="${y+63}" font-size="14" font-weight="700" fill="#c74369">あなた</text><text x="92" y="${y+82}" font-size="14" fill="#343b44">${escSvg(mt)}</text><text x="542" y="${y+63}" font-size="14" font-weight="700" fill="#c74369">相手</text><text x="542" y="${y+82}" font-size="14" fill="#343b44">${escSvg(pt)}</text>`;y+=rowH;});
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#fafbfc"/><rect x="28" y="28" width="944" height="${height-56}" rx="28" fill="#fff" stroke="#e5e8ed"/><text x="75" y="82" font-size="34" font-weight="800" fill="#30343b">2人のコミュニケーション比較</text><text x="75" y="120" font-size="18" fill="#c74369" font-weight="700">${escSvg(data.myName)} × ${escSvg(data.paName)}</text>${body}<text x="75" y="${y+25}" font-size="14" fill="#717983">CoreLingual</text></svg>`;
+    const defs={
+      language:{left:'はっきり言葉にしたい',right:'全体の流れからつかみたい',same:'言葉の受け取り方が似ている2人',
+        mismatch:(a,b)=>`${a}さんは「何を言ったか」をはっきりさせると安心しやすく、${b}さんは前後の流れや空気も含めて意味をつかみやすい傾向があります。確認の仕方が違うと、同じ会話でも受け取り方にズレが出ることがあります。`,
+        tips:{left:'「つまりこういう意味？」と短く確認してみる',right:'大事な点は言葉でも一つだけ明確に伝えてみる'}},
+      thinking:{left:'整理してから進みたい',right:'ひらめきから広げたい',same:'考え方のテンポが似ている2人',
+        mismatch:(a,b)=>`${a}さんは理由や筋道を整理してから進みやすく、${b}さんは思いついた可能性を広げながら考えやすい傾向があります。片方には「慎重」、もう片方には「話が飛ぶ」と見えることがあります。`,
+        tips:{left:'結論だけでなく「理由はこれ」と一言添える',right:'思いついた案を出したあと、最後に要点を一つに絞る'}},
+      emotion:{left:'言葉にして整理したい',right:'少し時間を置いて整理したい',same:'気持ちの整理の仕方が似ている2人',
+        mismatch:(a,b)=>`${a}さんは話しながら気持ちを整理しやすく、${b}さんは少し時間を置くことで自分の気持ちをまとめやすい傾向があります。すぐ話したい側と、考える時間がほしい側でテンポがズレやすいところです。`,
+        tips:{left:'相手が考える時間も少し待ってみる',right:'「あとで話すね」と一言だけ先に伝える'}},
+      distance:{left:'一緒に話して整理したい',right:'ひとりで整えたい',same:'距離感の取り方が似ている2人',
+        mismatch:(a,b)=>`${a}さんは話すことで気持ちや状況を整理しやすく、${b}さんは自分の時間を取ることで整えやすい傾向があります。話し合いたいタイミングと、少し離れたいタイミングがズレることがあります。`,
+        tips:{left:'返事を急がず、相手のペースも残しておく',right:'離れたいときは「落ち着いたら話す」と伝える'}},
+      change:{left:'見通しを持って進みたい',right:'まず試してみたい',same:'変化への向き合い方が似ている2人',
+        mismatch:(a,b)=>`${a}さんは先の流れが見えると動きやすく、${b}さんはまず試してから調整するほうが進みやすい傾向があります。予定を固めたい側と、その場で変えたい側で小さな衝突が起きやすい組み合わせです。`,
+        tips:{left:'変更がありそうなら早めに共有する',right:'大きく変える前に「ここまではOK」を共有する'}},
+      communication:{left:'まず気持ちを受け取りたい',right:'具体的に解決したい',same:'会話の入口が似ている2人',
+        mismatch:(a,b)=>`${a}さんはまず気持ちを分かってもらえると話しやすく、${b}さんは何をすればいいか具体的になると話が進みやすい傾向があります。「分かってほしい」と「解決したい」が同時に出ると、少しすれ違うことがあります。`,
+        tips:{left:'「そう感じたんだね」を先に置いてみる',right:'解決策を出す前に「まず聞くよ」と伝えてみる'}}
+    };
+    const keys=Object.keys(defs);let best=keys[0],bestDiff=-1;
+    keys.forEach(k=>{const d=Math.abs((myScores[k]??50)-(paScores[k]??50));if(d>bestDiff){best=k;bestDiff=d;}});
+    const def=defs[best];const ms=myScores[best]??50,ps=paScores[best]??50;const mySide=cardSide(ms),paSide=cardSide(ps);
+    let title='';
+    if(mySide==='middle'&&paSide==='middle') title='似ているようで、入口が少し違う2人';
+    else if(mySide===paSide) title=def.same;
+    else title=`${mySide==='left'?def.left:def.right} × ${paSide==='left'?def.left:def.right}`;
+    if(bestDiff<22) title='似ているようで、入口が少し違う2人';
+    const myFeature=cardDirection(best,ms),paFeature=cardDirection(best,ps);
+    let mismatch=def.mismatch(data.myName||'あなた',data.paName||'相手');
+    let myTip=def.tips[mySide]||'相手と自分の違いを言葉にしてみる';
+    let paTip=def.tips[paSide]||'相手と自分の違いを言葉にしてみる';
+    if(mySide===paSide && mySide!=='middle'){
+      mismatch=`2人とも「${myFeature}」という感覚が出やすい組み合わせです。似ているぶん話が早い一方、同じ前提で分かったつもりになると、小さなズレを見落とすこともあります。`;
+      myTip='「自分はこう受け取った」を一言にして共有してみる';
+      paTip='「相手はどう受け取った？」を一度だけ確認してみる';
+    }
+    return {title,myName:data.myName||'あなた',paName:data.paName||'相手',myFeature,paFeature,mismatch,myTip,paTip,axisLabel:(AXES[best]?.label||'コミュニケーション'),bestDiff};
+  }
+  function svgTextLines(text,maxChars){
+    const out=[];let cur='';for(const ch of String(text||'')){if(ch==='\n'){if(cur)out.push(cur);cur='';continue;}if([...cur].length>=maxChars){out.push(cur);cur='';}cur+=ch;}if(cur)out.push(cur);return out;
+  }
+  function svgParagraph(text,x,y,maxChars,lineH,opts={}){
+    const lines=svgTextLines(text,maxChars);const fill=opts.fill||'#39424d',size=opts.size||25,weight=opts.weight||500,anchor=opts.anchor||'start';
+    return lines.map((line,i)=>`<text x="${x}" y="${y+i*lineH}" font-size="${size}" font-weight="${weight}" fill="${fill}" text-anchor="${anchor}">${escSvg(line)}</text>`).join('');
+  }
+  function buildCompareSvg(data){
+    const copy=buildCardCopy(data);const width=1080,height=1920;
+    const nameA=escSvg(copy.myName),nameB=escSvg(copy.paName);
+    const titleLines=svgTextLines(copy.title,18);
+    const mismatchLines=svgTextLines(copy.mismatch,31);
+    const myTipLines=svgTextLines(copy.myTip,24),paTipLines=svgTextLines(copy.paTip,24);
+    let y=92,body='';
+    body+=`<rect width="${width}" height="${height}" fill="#fbf7f8"/>`;
+    body+=`<rect x="42" y="42" width="996" height="1836" rx="44" fill="#fff" stroke="#eadfe4" stroke-width="2"/>`;
+    body+=`<text x="82" y="105" font-size="24" font-weight="800" fill="#c74369">CoreLingual</text><text x="998" y="105" font-size="18" fill="#8a919a" text-anchor="end">2人のコミュニケーションカード</text>`;
+    let ty=190;titleLines.forEach((line,i)=>{body+=`<text x="82" y="${ty+i*55}" font-size="42" font-weight="850" fill="#30343b">${escSvg(line)}</text>`});
+    y=ty+titleLines.length*55+34;
+    body+=`<text x="82" y="${y}" font-size="18" fill="#8a919a">今回いちばん差が出たところ：${escSvg(copy.axisLabel)}</text>`;
+    y+=48;
+    body+=`<rect x="70" y="${y}" width="940" height="270" rx="30" fill="#fff7fa" stroke="#f0dce3"/>`;
+    body+=`<circle cx="150" cy="${y+72}" r="36" fill="#ffe7ef"/><text x="150" y="${y+81}" font-size="30" text-anchor="middle">A</text>`;
+    body+=`<circle cx="930" cy="${y+72}" r="36" fill="#ffe7ef"/><text x="930" y="${y+81}" font-size="30" text-anchor="middle">B</text>`;
+    body+=`<text x="205" y="${y+67}" font-size="29" font-weight="800" fill="#30343b">${nameA}</text>`;
+    body+=`<text x="875" y="${y+67}" font-size="29" font-weight="800" fill="#30343b" text-anchor="end">${nameB}</text>`;
+    body+=svgParagraph(copy.myFeature,205,y+112,19,34,{size:23,weight:600,fill:'#c74369'});
+    body+=svgParagraph(copy.paFeature,875,y+112,19,34,{size:23,weight:600,fill:'#c74369',anchor:'end'});
+    body+=`<line x1="540" y1="${y+38}" x2="540" y2="${y+235}" stroke="#eadfe4" stroke-width="2"/>`;
+    body+=`<text x="540" y="${y+238}" font-size="16" fill="#8a919a" text-anchor="middle">ちがいは「良し悪し」ではありません</text>`;
+    y+=306;
+    body+=`<text x="82" y="${y}" font-size="22" font-weight="800" fill="#c74369">この2人で起きやすいこと</text>`;
+    y+=28;const mh=Math.max(230,44+mismatchLines.length*39);
+    body+=`<rect x="70" y="${y}" width="940" height="${mh}" rx="28" fill="#fafbfc" stroke="#e9edf1"/>`;
+    body+=svgParagraph(copy.mismatch,100,y+58,31,39,{size:24,weight:500,fill:'#39424d'});
+    y+=mh+48;
+    body+=`<text x="82" y="${y}" font-size="22" font-weight="800" fill="#c74369">2人への会話のヒント</text>`;
+    y+=28;
+    const tipH=Math.max(280,70+Math.max(myTipLines.length,paTipLines.length)*38);
+    body+=`<rect x="70" y="${y}" width="940" height="${tipH}" rx="28" fill="#fff" stroke="#eadfe4"/>`;
+    body+=`<rect x="92" y="${y+24}" width="424" height="${tipH-48}" rx="20" fill="#fff7fa"/><rect x="564" y="${y+24}" width="424" height="${tipH-48}" rx="20" fill="#fff7fa"/>`;
+    body+=`<text x="118" y="${y+64}" font-size="18" font-weight="800" fill="#c74369">${nameA}へ</text>`;
+    body+=`<text x="590" y="${y+64}" font-size="18" font-weight="800" fill="#c74369">${nameB}へ</text>`;
+    body+=svgParagraph(copy.myTip,118,y+108,24,38,{size:22,weight:600});
+    body+=svgParagraph(copy.paTip,590,y+108,24,38,{size:22,weight:600});
+    y+=tipH+52;
+    body+=`<rect x="70" y="${y}" width="940" height="190" rx="28" fill="#30343b"/>`;
+    body+=`<text x="100" y="${y+58}" font-size="22" font-weight="800" fill="#fff">CoreLingualから</text>`;
+    body+=svgParagraph('違いがあるから、会話が難しいとは限りません。相手の「入口」を知るだけで、伝え方は少し変えられます。',100,y+100,39,35,{size:21,weight:500,fill:'#fff'});
+    body+=`<text x="980" y="${y+162}" font-size="17" fill="#e8dfe3" text-anchor="end">会話のすれ違いを、やさしく読み解く</text>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${body}</svg>`;
   }
   async function downloadCompareCard(){
     const data=getActiveCompareData();if(!data.my||!data.partner){alert('2人分の比較データがまだありません。');return;}
     const overlay=document.getElementById('v73DownloadAdOverlay'),count=document.getElementById('v73DownloadAdCount');overlay?.classList.add('show');
     for(let n=5;n>=1;n--){if(count)count.textContent=String(n);await new Promise(r=>setTimeout(r,1000));}overlay?.classList.remove('show');
-    const svg=buildCompareSvg(data);const svgBlob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'});const svgUrl=URL.createObjectURL(svgBlob);try{const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=svgUrl;});const canvas=document.createElement('canvas');canvas.width=1000;canvas.height=300+6*122+150;const ctx=canvas.getContext('2d');ctx.fillStyle='#fafbfc';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0);const png=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('PNG生成に失敗しました')), 'image/png'));const url=URL.createObjectURL(png);const a=document.createElement('a');a.href=url;a.download='CoreLingual_2人のコミュニケーション比較.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){const a=document.createElement('a');a.href=svgUrl;a.download='CoreLingual_2人のコミュニケーション比較.svg';document.body.appendChild(a);a.click();a.remove();}finally{setTimeout(()=>URL.revokeObjectURL(svgUrl),1000);}
+    const svg=buildCompareSvg(data);const svgBlob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'});const svgUrl=URL.createObjectURL(svgBlob);try{const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=svgUrl;});const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1920;const ctx=canvas.getContext('2d');ctx.fillStyle='#fbf7f8';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);const png=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('PNG生成に失敗しました')), 'image/png'));const url=URL.createObjectURL(png);const a=document.createElement('a');a.href=url;a.download='CoreLingual_2人のコミュニケーション比較.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){const a=document.createElement('a');a.href=svgUrl;a.download='CoreLingual_2人のコミュニケーション比較.svg';document.body.appendChild(a);a.click();a.remove();}finally{setTimeout(()=>URL.revokeObjectURL(svgUrl),1000);}
     const toast=document.createElement('div');toast.className='v73-download-toast';toast.textContent='比較カードを保存しました';document.body.appendChild(toast);setTimeout(()=>toast.remove(),2200);
   }
   document.getElementById('v73DownloadCompare')?.addEventListener('click',downloadCompareCard);
@@ -1917,6 +2009,22 @@ loadSharedFromUrl();
   pages.forEach(p=>io.observe(p));
 })();
 </script>
+
+<style>
+/* v74: simplify profile sheet + polished downloadable comparison card */
+.v74-profile-panel{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.v74-profile-panel .person{padding:0}
+.v74-profile-panel .small{font-size:12px;margin-top:12px}
+.v74-traits-fold{margin:14px 0 2px;border:1px solid #e7e9ed;border-radius:14px;background:#fafbfc;overflow:hidden}
+.v74-traits-fold summary{list-style:none;cursor:pointer;padding:12px 13px;font-weight:800;font-size:13px;color:#39424d}
+.v74-traits-fold summary::-webkit-details-marker{display:none}
+.v74-traits-fold summary::after{content:'⌄';float:right;color:#8a919a;font-size:16px}
+.v74-traits-fold[open] summary::after{content:'⌃'}
+.v74-traits-fold summary span{font-size:10px;font-weight:500;color:#8a919a;margin-left:6px}
+.v74-traits-fold .chips{padding:0 12px 12px}
+.v74-diag-entry{width:100%;margin:10px 0 4px;padding:13px 14px!important;border-radius:13px!important;font-weight:800!important;background:linear-gradient(100deg,#fff0f5,#ffeaf0)!important;border:1px solid #df6684!important;color:#c74369!important}
+.v74-card-note{max-width:520px;margin:8px auto 0;font-size:11px;line-height:1.6;color:#8a919a;text-align:center}
+</style>
 </body></html>
 
 <script>
