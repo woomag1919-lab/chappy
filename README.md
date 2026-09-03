@@ -46,3 +46,10 @@ v73_fixed をベースにした改善版。
 - Kept the existing 5-second ad gate and SVG-to-PNG download flow.
 - Kept the in-app comparison UI unchanged.
 - Softened diagnosis-related explanatory copy in trait/profile helper text; user-facing labels remain communication-feature oriented.
+
+
+## v80
+- Downloadable comparison card redesigned as a poster-like communication card.
+- Removed report-style horizontal rules and stacked boxes.
+- Uses a warm ivory/rose background, large relationship title, two-person contrast, short story, and compact two-person prescription.
+- Keeps existing ad gate, SVG-to-PNG download flow, and in-app comparison UI unchanged.
