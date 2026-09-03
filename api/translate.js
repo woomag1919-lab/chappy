@@ -146,10 +146,27 @@ async function generate(body) {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      console.error("Gemini request failed", { status: res.status, model: MODEL });
+      const providerError = data?.error || {};
+      const providerStatus = typeof providerError.status === "string" ? providerError.status : "";
+      const providerMessage = typeof providerError.message === "string" ? providerError.message : "";
+      const retryAfter = res.headers.get("retry-after") || "";
+      console.error("Gemini request failed", {
+        status: res.status,
+        model: MODEL,
+        providerCode: providerError.code,
+        providerStatus,
+        providerMessage,
+        details: providerError.details,
+        retryAfter
+      });
       if (res.status === 400) throw new Error("gemini_bad_request");
       if (res.status === 413) throw new Error("gemini_payload_too_large");
-      if (res.status === 429) throw new Error("gemini_rate_limited");
+      if (res.status === 429) {
+        const err = new Error("gemini_rate_limited");
+        err.providerStatus = providerStatus;
+        err.providerMessage = providerMessage;
+        throw err;
+      }
       if (res.status === 401 || res.status === 403) throw new Error("gemini_auth");
       if (res.status >= 500) throw new Error("gemini_unavailable");
       throw new Error("gemini_request_failed");
@@ -175,7 +192,17 @@ export default async function handler(req, res) {
   } catch (e) {
     if (e?.name === "AbortError") return res.status(504).json({ error: "解析に時間がかかりすぎました。スクショが多い場合は枚数を減らして、しばらくしてからもう一度試してください。", code: "timeout" });
     if (e?.message === "image_too_large" || e?.message === "gemini_payload_too_large") return res.status(413).json({ error: "スクショの容量が大きすぎます。枚数を減らすか、画像を小さくしてもう一度試してください。", code: "image_size" });
-    if (e?.message === "gemini_rate_limited") return res.status(429).json({ error: "AIサービスへのアクセスが集中しています。少し時間をおいて、もう一度試してください。", code: "busy" });
+    if (e?.message === "gemini_rate_limited") {
+      const providerStatus = typeof e?.providerStatus === "string" ? e.providerStatus : "";
+      const reason = providerStatus === "RESOURCE_EXHAUSTED" ? "RESOURCE_EXHAUSTED" : providerStatus || "HTTP_429";
+      return res.status(429).json({
+        error: providerStatus === "RESOURCE_EXHAUSTED"
+          ? "AIの利用上限または一時的な混雑が原因の可能性があります。少し時間をおいて、もう一度試してください。"
+          : "AIサービスが429（利用制限）を返しました。少し時間をおいて、もう一度試してください。",
+        code: "busy",
+        reason
+      });
+    }
     if (e?.message === "gemini_auth") return res.status(502).json({ error: "AIサービスの接続設定を確認できませんでした。しばらくしてからもう一度試してください。", code: "service_config" });
     if (e?.message === "gemini_unavailable") return res.status(503).json({ error: "AIサービスが一時的に利用できません。しばらく時間をおいて、もう一度試してください。", code: "service_unavailable" });
     if (e?.message === "gemini_bad_request") return res.status(400).json({ error: "送信した内容をAIが受け取れませんでした。スクショを減らすか、画像を小さくしてもう一度試してください。", code: "bad_request" });
