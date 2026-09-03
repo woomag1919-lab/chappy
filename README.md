@@ -31,3 +31,9 @@ v73_fixed をベースにした改善版。
 - User-facing ASD/ADHD wording in trait explanations was softened to neutral "関連する特性" language; internal calculation keys remain unchanged.
 
 - V77: ユーザー向け表示からASD/ADHD/HSPの名称を外し、関連するコミュニケーション上の特徴・傾向として表現。Geminiの解析出力にも同名称が出ないよう指示し、万一出力された場合もAPI側で表示前に中立表現へ置換。愛着パターンは現状維持。
+
+## v78 changes
+- Redesigned the downloadable 2-person communication card as a dedicated “communication card,” not a screenshot-like report.
+- Added card-only sections: pair title, strengths, likely friction, how each person may be perceived, what each person may need for reassurance, and practical tips for both people.
+- Kept the existing 5-second ad gate and download flow; app comparison UI remains unchanged.
+- Softened the trait-check disclaimer: removed repeated per-card disclaimer text and added one gentle overall note.

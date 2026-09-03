@@ -785,7 +785,7 @@ function buildTraitOverlapCards(baseScores,deepScores){
     {key:'adhd',icon:'⚡',title:'切り替え・動きながら進めやすい傾向',score:adhd,note:'この傾向は、関連する特性の説明と重なることがあります。',why:'可能性を広げる、変化に合わせる、まず動いて調整する、といった回答が重なると、この傾向が出やすくなります。'},
     {key:'hsp',icon:'🌿',title:'刺激や情報量に敏感な傾向',score:hsp,note:'この傾向は、関連する特性の説明と重なることがあります。',why:'音・人の多さ・情報量などの刺激を強く受け取り、いったん減らして整理したいという回答が重なると、この傾向が出やすくなります.'}
   ];
-  return defs.map(d=>{const el=document.createElement('section');el.className='v36-attachment-card';el.innerHTML=`<div class="v36-asd-head">${d.icon} ${d.title}</div><div class="v36-asd-body"><p><b>${overlapLevel(d.score)}</b></p><p>${escapeHtml(d.why)}</p><div class="v36-cause">${escapeHtml(d.note)} これは診断・判定ではなく、今回の回答と説明上の特徴との重なりを見る参考情報です。</div></div>`;return el;});
+  return defs.map(d=>{const el=document.createElement('section');el.className='v36-attachment-card';el.innerHTML=`<div class="v36-asd-head">${d.icon} ${d.title}</div><div class="v36-asd-body"><p><b>${overlapLevel(d.score)}</b></p><p>${escapeHtml(d.why)}</p></div>`;return el;});
 }
 function buildAttachmentOverlapCard(scores){
   const by=Object.fromEntries((scores||[]).map(x=>[x.key,Number(x.score)]));
@@ -857,6 +857,7 @@ function renderDiagResult(scores){
   const label=target==='my'?'あなた':'相手';
   const profile=buildTraitSummary(scores,label);
   if(profile)diagResult.appendChild(profile);
+  const gentleNote=document.createElement('div');gentleNote.className='v77-gentle-note';gentleNote.textContent='「自分って、こういうところあるかも？」を見つけるための参考情報です。';diagResult.appendChild(gentleNote);
   const profileSection=document.createElement('section');profileSection.className='result-section analysis-section';
   profileSection.innerHTML='<div class="result-heading">📊 6つの傾向を確認</div><div style="padding:0 14px 4px"><p class="friendly-note">グラフは結果の位置関係を確認するための補助表示です。「右寄り・左寄り・中間」というラベルは表示しません。</p></div>';
   const box=document.createElement('div');box.className='result-card';
@@ -1913,42 +1914,68 @@ loadSharedFromUrl();
     const paScores=Object.fromEntries((data.partner?.scores||[]).map(x=>[x.key,Number(x.score)||50]));
     const defs={
       language:{left:'はっきり言葉にしたい',right:'全体の流れからつかみたい',same:'言葉の受け取り方が似ている2人',
-        mismatch:(a,b)=>`${a}さんは「何を言ったか」をはっきりさせると安心しやすく、${b}さんは前後の流れや空気も含めて意味をつかみやすい傾向があります。確認の仕方が違うと、同じ会話でも受け取り方にズレが出ることがあります。`,
-        tips:{left:'「つまりこういう意味？」と短く確認してみる',right:'大事な点は言葉でも一つだけ明確に伝えてみる'}},
+        strength:(a,b)=>`${a}さんは要点を言葉にする力、${b}さんは流れや背景をつかむ力が持ち味です。`,
+        mismatch:(a,b)=>`${a}さんは「何を言ったか」をはっきりさせると安心しやすく、${b}さんは前後の流れや空気も含めて意味をつかみやすい傾向があります。`,
+        seen:{left:'「そこをちゃんと確認したい人」に見えやすい',right:'「全体を見て受け取る人」に見えやすい'},
+        need:{left:'曖昧なまま進まない安心感',right:'言葉だけでは拾えない背景やニュアンス'},
+        tips:{left:'まず相手の受け取り方を聞いてから、要点を確認する',right:'大事なことは最後に一つだけ言葉で確認する'}},
       thinking:{left:'整理してから進みたい',right:'ひらめきから広げたい',same:'考え方のテンポが似ている2人',
-        mismatch:(a,b)=>`${a}さんは理由や筋道を整理してから進みやすく、${b}さんは思いついた可能性を広げながら考えやすい傾向があります。片方には「慎重」、もう片方には「話が飛ぶ」と見えることがあります。`,
-        tips:{left:'結論だけでなく「理由はこれ」と一言添える',right:'思いついた案を出したあと、最後に要点を一つに絞る'}},
+        strength:(a,b)=>`${a}さんは筋道を整える力、${b}さんは可能性を広げる力が持ち味です。`,
+        mismatch:(a,b)=>`${a}さんは理由や筋道を整理してから進みやすく、${b}さんは思いついた可能性を広げながら考えやすい傾向があります。`,
+        seen:{left:'「慎重に考えてから動く人」に見えやすい',right:'「まずアイデアを出してみる人」に見えやすい'},
+        need:{left:'筋道が見えている安心感',right:'考えを広げられる自由さ'},
+        tips:{left:'途中の案も「仮の案」として受け取ってみる',right:'アイデアを広げたあと、最後に要点を一つに絞る'}},
       emotion:{left:'言葉にして整理したい',right:'少し時間を置いて整理したい',same:'気持ちの整理の仕方が似ている2人',
-        mismatch:(a,b)=>`${a}さんは話しながら気持ちを整理しやすく、${b}さんは少し時間を置くことで自分の気持ちをまとめやすい傾向があります。すぐ話したい側と、考える時間がほしい側でテンポがズレやすいところです。`,
-        tips:{left:'相手が考える時間も少し待ってみる',right:'「あとで話すね」と一言だけ先に伝える'}},
+        strength:(a,b)=>`${a}さんは言葉にしながら気持ちを整理する力、${b}さんは時間を置いて落ち着いて考える力が持ち味です。`,
+        mismatch:(a,b)=>`${a}さんは話しながら気持ちを整理しやすく、${b}さんは少し時間を置くことで自分の気持ちをまとめやすい傾向があります。`,
+        seen:{left:'「話しながら答えを探す人」に見えやすい',right:'「いったん考えてから話す人」に見えやすい'},
+        need:{left:'言葉にすることで気持ちを整理できる時間',right:'自分の中で考えをまとめる時間'},
+        tips:{left:'相手が考える時間も「待っている」と伝えて残す',right:'時間が必要なときは「あとで話したい」と先に伝える'}},
       distance:{left:'一緒に話して整理したい',right:'ひとりで整えたい',same:'距離感の取り方が似ている2人',
-        mismatch:(a,b)=>`${a}さんは話すことで気持ちや状況を整理しやすく、${b}さんは自分の時間を取ることで整えやすい傾向があります。話し合いたいタイミングと、少し離れたいタイミングがズレることがあります。`,
+        strength:(a,b)=>`${a}さんは対話で前に進める力、${b}さんは一人で整えてから戻る力が持ち味です。`,
+        mismatch:(a,b)=>`${a}さんは話すことで気持ちや状況を整理しやすく、${b}さんは自分の時間を取ることで整えやすい傾向があります。`,
+        seen:{left:'「今話して整理したい人」に見えやすい',right:'「少し距離を置いて考えたい人」に見えやすい'},
+        need:{left:'つながっていると分かる安心感',right:'自分のペースで整える余白'},
         tips:{left:'返事を急がず、相手のペースも残しておく',right:'離れたいときは「落ち着いたら話す」と伝える'}},
       change:{left:'見通しを持って進みたい',right:'まず試してみたい',same:'変化への向き合い方が似ている2人',
-        mismatch:(a,b)=>`${a}さんは先の流れが見えると動きやすく、${b}さんはまず試してから調整するほうが進みやすい傾向があります。予定を固めたい側と、その場で変えたい側で小さな衝突が起きやすい組み合わせです。`,
-        tips:{left:'変更がありそうなら早めに共有する',right:'大きく変える前に「ここまではOK」を共有する'}},
+        strength:(a,b)=>`${a}さんは先の流れを組み立てる力、${b}さんは動きながら可能性を広げる力が持ち味です。`,
+        mismatch:(a,b)=>`${a}さんは先の流れが見えると動きやすく、${b}さんはまず試してから調整するほうが進みやすい傾向があります。`,
+        seen:{left:'「先に見通しを立てたい人」に見えやすい',right:'「やってみてから考えたい人」に見えやすい'},
+        need:{left:'変更があっても見通せる安心感',right:'途中で方向を変えられる余白'},
+        tips:{left:'予定は「今のところ」と少し余白を残して共有する',right:'変更するときは「ここまでは予定どおり」と一言添える'}},
       communication:{left:'まず気持ちを受け取りたい',right:'具体的に解決したい',same:'会話の入口が似ている2人',
-        mismatch:(a,b)=>`${a}さんはまず気持ちを分かってもらえると話しやすく、${b}さんは何をすればいいか具体的になると話が進みやすい傾向があります。「分かってほしい」と「解決したい」が同時に出ると、少しすれ違うことがあります。`,
+        strength:(a,b)=>`${a}さんは相手の気持ちを受け止める力、${b}さんは問題を具体化して前に進める力が持ち味です。`,
+        mismatch:(a,b)=>`${a}さんはまず気持ちを分かってもらえると話しやすく、${b}さんは何をすればいいか具体的になると話が進みやすい傾向があります。`,
+        seen:{left:'「まず分かってほしい人」に見えやすい',right:'「じゃあどうする？を考える人」に見えやすい'},
+        need:{left:'気持ちを受け止めてもらう安心感',right:'問題が少しずつ解決していく手応え'},
         tips:{left:'「そう感じたんだね」を先に置いてみる',right:'解決策を出す前に「まず聞くよ」と伝えてみる'}}
     };
     const keys=Object.keys(defs);let best=keys[0],bestDiff=-1;
     keys.forEach(k=>{const d=Math.abs((myScores[k]??50)-(paScores[k]??50));if(d>bestDiff){best=k;bestDiff=d;}});
     const def=defs[best];const ms=myScores[best]??50,ps=paScores[best]??50;const mySide=cardSide(ms),paSide=cardSide(ps);
+    const sideText=(obj,side)=>side==='left'?obj.left:side==='right'?obj.right:'場面に応じて使い分けやすい';
     let title='';
     if(mySide==='middle'&&paSide==='middle') title='似ているようで、入口が少し違う2人';
     else if(mySide===paSide) title=def.same;
-    else title=`${mySide==='left'?def.left:def.right} × ${paSide==='left'?def.left:def.right}`;
+    else title=`${sideText({left:def.left,right:def.right},mySide)} × ${sideText({left:def.left,right:def.right},paSide)}`;
     if(bestDiff<22) title='似ているようで、入口が少し違う2人';
     const myFeature=cardDirection(best,ms),paFeature=cardDirection(best,ps);
     let mismatch=def.mismatch(data.myName||'あなた',data.paName||'相手');
+    let strength=def.strength(data.myName||'あなた',data.paName||'相手');
+    let mySeen=sideText(def.seen,mySide),paSeen=sideText(def.seen,paSide);
+    let myNeed=sideText(def.need,mySide),paNeed=sideText(def.need,paSide);
     let myTip=def.tips[mySide]||'相手と自分の違いを言葉にしてみる';
     let paTip=def.tips[paSide]||'相手と自分の違いを言葉にしてみる';
     if(mySide===paSide && mySide!=='middle'){
-      mismatch=`2人とも「${myFeature}」という感覚が出やすい組み合わせです。似ているぶん話が早い一方、同じ前提で分かったつもりになると、小さなズレを見落とすこともあります。`;
-      myTip='「自分はこう受け取った」を一言にして共有してみる';
-      paTip='「相手はどう受け取った？」を一度だけ確認してみる';
+      mismatch=`2人とも「${myFeature}」という感覚が出やすい組み合わせです。似ているぶん話は早い一方、同じ前提で分かったつもりになると、小さなズレを見落とすこともあります。`;
+      strength=`2人とも「${myFeature}」を自然に使えるので、相手の考え方を想像しやすい組み合わせです。`;
+      mySeen='「自分と同じ感覚で分かってくれる人」に見えやすい';
+      paSeen='「自分と同じ感覚で分かってくれる人」に見えやすい';
+      myNeed='同じ前提で進める安心感';paNeed='同じ前提で進める安心感';
+      myTip='「自分はこう受け取った」を一言にして共有する';
+      paTip='「相手はどう受け取った？」を一度だけ確認する';
     }
-    return {title,myName:data.myName||'あなた',paName:data.paName||'相手',myFeature,paFeature,mismatch,myTip,paTip,axisLabel:(AXES[best]?.label||'コミュニケーション'),bestDiff};
+    return {title,myName:data.myName||'あなた',paName:data.paName||'相手',myFeature,paFeature,strength,mismatch,mySeen,paSeen,myNeed,paNeed,myTip,paTip,axisLabel:(AXES[best]?.label||'コミュニケーション'),bestDiff};
   }
   function svgTextLines(text,maxChars){
     const out=[];let cur='';for(const ch of String(text||'')){if(ch==='\n'){if(cur)out.push(cur);cur='';continue;}if([...cur].length>=maxChars){out.push(cur);cur='';}cur+=ch;}if(cur)out.push(cur);return out;
@@ -1960,46 +1987,28 @@ loadSharedFromUrl();
   function buildCompareSvg(data){
     const copy=buildCardCopy(data);const width=1080,height=1920;
     const nameA=escSvg(copy.myName),nameB=escSvg(copy.paName);
-    const titleLines=svgTextLines(copy.title,18);
-    const mismatchLines=svgTextLines(copy.mismatch,31);
-    const myTipLines=svgTextLines(copy.myTip,24),paTipLines=svgTextLines(copy.paTip,24);
+    const titleLines=svgTextLines(copy.title,17),strengthLines=svgTextLines(copy.strength,42),mismatchLines=svgTextLines(copy.mismatch,40);
+    const mySeenLines=svgTextLines(copy.mySeen,23),paSeenLines=svgTextLines(copy.paSeen,23);
+    const myNeedLines=svgTextLines(copy.myNeed,23),paNeedLines=svgTextLines(copy.paNeed,23);
+    const myTipLines=svgTextLines(copy.myTip,25),paTipLines=svgTextLines(copy.paTip,25);
     let y=92,body='';
     body+=`<rect width="${width}" height="${height}" fill="#fbf7f8"/>`;
     body+=`<rect x="42" y="42" width="996" height="1836" rx="44" fill="#fff" stroke="#eadfe4" stroke-width="2"/>`;
     body+=`<text x="82" y="105" font-size="24" font-weight="800" fill="#c74369">CoreLingual</text><text x="998" y="105" font-size="18" fill="#8a919a" text-anchor="end">2人のコミュニケーションカード</text>`;
-    let ty=190;titleLines.forEach((line,i)=>{body+=`<text x="82" y="${ty+i*55}" font-size="42" font-weight="850" fill="#30343b">${escSvg(line)}</text>`});
-    y=ty+titleLines.length*55+34;
-    body+=`<text x="82" y="${y}" font-size="18" fill="#8a919a">今回いちばん差が出たところ：${escSvg(copy.axisLabel)}</text>`;
-    y+=48;
-    body+=`<rect x="70" y="${y}" width="940" height="270" rx="30" fill="#fff7fa" stroke="#f0dce3"/>`;
-    body+=`<circle cx="150" cy="${y+72}" r="36" fill="#ffe7ef"/><text x="150" y="${y+81}" font-size="30" text-anchor="middle">A</text>`;
-    body+=`<circle cx="930" cy="${y+72}" r="36" fill="#ffe7ef"/><text x="930" y="${y+81}" font-size="30" text-anchor="middle">B</text>`;
-    body+=`<text x="205" y="${y+67}" font-size="29" font-weight="800" fill="#30343b">${nameA}</text>`;
-    body+=`<text x="875" y="${y+67}" font-size="29" font-weight="800" fill="#30343b" text-anchor="end">${nameB}</text>`;
-    body+=svgParagraph(copy.myFeature,205,y+112,19,34,{size:23,weight:600,fill:'#c74369'});
-    body+=svgParagraph(copy.paFeature,875,y+112,19,34,{size:23,weight:600,fill:'#c74369',anchor:'end'});
-    body+=`<line x1="540" y1="${y+38}" x2="540" y2="${y+235}" stroke="#eadfe4" stroke-width="2"/>`;
-    body+=`<text x="540" y="${y+238}" font-size="16" fill="#8a919a" text-anchor="middle">ちがいは「良し悪し」ではありません</text>`;
-    y+=306;
-    body+=`<text x="82" y="${y}" font-size="22" font-weight="800" fill="#c74369">この2人で起きやすいこと</text>`;
-    y+=28;const mh=Math.max(230,44+mismatchLines.length*39);
-    body+=`<rect x="70" y="${y}" width="940" height="${mh}" rx="28" fill="#fafbfc" stroke="#e9edf1"/>`;
-    body+=svgParagraph(copy.mismatch,100,y+58,31,39,{size:24,weight:500,fill:'#39424d'});
-    y+=mh+48;
-    body+=`<text x="82" y="${y}" font-size="22" font-weight="800" fill="#c74369">2人への会話のヒント</text>`;
-    y+=28;
-    const tipH=Math.max(280,70+Math.max(myTipLines.length,paTipLines.length)*38);
-    body+=`<rect x="70" y="${y}" width="940" height="${tipH}" rx="28" fill="#fff" stroke="#eadfe4"/>`;
-    body+=`<rect x="92" y="${y+24}" width="424" height="${tipH-48}" rx="20" fill="#fff7fa"/><rect x="564" y="${y+24}" width="424" height="${tipH-48}" rx="20" fill="#fff7fa"/>`;
-    body+=`<text x="118" y="${y+64}" font-size="18" font-weight="800" fill="#c74369">${nameA}へ</text>`;
-    body+=`<text x="590" y="${y+64}" font-size="18" font-weight="800" fill="#c74369">${nameB}へ</text>`;
-    body+=svgParagraph(copy.myTip,118,y+108,24,38,{size:22,weight:600});
-    body+=svgParagraph(copy.paTip,590,y+108,24,38,{size:22,weight:600});
-    y+=tipH+52;
-    body+=`<rect x="70" y="${y}" width="940" height="190" rx="28" fill="#30343b"/>`;
-    body+=`<text x="100" y="${y+58}" font-size="22" font-weight="800" fill="#fff">CoreLingualから</text>`;
-    body+=svgParagraph('違いがあるから、会話が難しいとは限りません。相手の「入口」を知るだけで、伝え方は少し変えられます。',100,y+100,39,35,{size:21,weight:500,fill:'#fff'});
-    body+=`<text x="980" y="${y+162}" font-size="17" fill="#e8dfe3" text-anchor="end">会話のすれ違いを、やさしく読み解く</text>`;
+    let ty=188;titleLines.forEach((line,i)=>{body+=`<text x="82" y="${ty+i*50}" font-size="40" font-weight="850" fill="#30343b">${escSvg(line)}</text>`});
+    y=ty+titleLines.length*50+24;
+    body+=`<text x="82" y="${y}" font-size="17" fill="#8a919a">今回いちばん差が出たところ：${escSvg(copy.axisLabel)}</text>`;y+=30;
+    body+=`<rect x="70" y="${y}" width="940" height="220" rx="30" fill="#fff7fa" stroke="#f0dce3"/>`;
+    body+=`<circle cx="150" cy="${y+62}" r="34" fill="#ffe7ef"/><text x="150" y="${y+71}" font-size="28" text-anchor="middle">A</text><circle cx="930" cy="${y+62}" r="34" fill="#ffe7ef"/><text x="930" y="${y+71}" font-size="28" text-anchor="middle">B</text>`;
+    body+=`<text x="205" y="${y+57}" font-size="27" font-weight="800" fill="#30343b">${nameA}</text><text x="875" y="${y+57}" font-size="27" font-weight="800" fill="#30343b" text-anchor="end">${nameB}</text>`;
+    body+=svgParagraph(copy.myFeature,205,y+100,19,31,{size:21,weight:600,fill:'#c74369'});body+=svgParagraph(copy.paFeature,875,y+100,19,31,{size:21,weight:600,fill:'#c74369',anchor:'end'});
+    body+=`<line x1="540" y1="${y+34}" x2="540" y2="${y+195}" stroke="#eadfe4" stroke-width="2"/><text x="540" y="${y+208}" font-size="15" fill="#8a919a" text-anchor="middle">違いは「良し悪し」ではありません</text>`;y+=250;
+    body+=`<text x="82" y="${y}" font-size="21" font-weight="800" fill="#c74369">🌱 この2人の強み</text>`;y+=22;let sh=Math.max(112,56+strengthLines.length*31);body+=`<rect x="70" y="${y}" width="940" height="${sh}" rx="24" fill="#fafbfc" stroke="#e9edf1"/>`;body+=svgParagraph(copy.strength,100,y+43,42,31,{size:21,weight:500,fill:'#39424d'});y+=sh+26;
+    body+=`<text x="82" y="${y}" font-size="21" font-weight="800" fill="#c74369">⚡ すれ違いやすい瞬間</text>`;y+=22;let mh=Math.max(142,56+mismatchLines.length*32);body+=`<rect x="70" y="${y}" width="940" height="${mh}" rx="24" fill="#fff" stroke="#eadfe4"/>`;body+=svgParagraph(copy.mismatch,100,y+43,40,32,{size:20,weight:500,fill:'#39424d'});y+=mh+26;
+    body+=`<text x="82" y="${y}" font-size="21" font-weight="800" fill="#c74369">👀 相手からは、こう見えやすい</text>`;y+=22;let seenH=Math.max(126,68+Math.max(mySeenLines.length,paSeenLines.length)*29);body+=`<rect x="70" y="${y}" width="940" height="${seenH}" rx="24" fill="#fff7fa" stroke="#f0dce3"/>`;body+=`<text x="105" y="${y+38}" font-size="16" font-weight="800" fill="#c74369">${nameA}</text><text x="575" y="${y+38}" font-size="16" font-weight="800" fill="#c74369">${nameB}</text>`;body+=svgParagraph(copy.mySeen,105,y+68,23,29,{size:17,weight:600});body+=svgParagraph(copy.paSeen,575,y+68,23,29,{size:17,weight:600});y+=seenH+26;
+    body+=`<text x="82" y="${y}" font-size="21" font-weight="800" fill="#c74369">💭 本当は、こんな安心がほしい</text>`;y+=22;let needH=Math.max(122,66+Math.max(myNeedLines.length,paNeedLines.length)*29);body+=`<rect x="70" y="${y}" width="940" height="${needH}" rx="24" fill="#fafbfc" stroke="#e9edf1"/>`;body+=`<text x="105" y="${y+38}" font-size="16" font-weight="800" fill="#c74369">${nameA}</text><text x="575" y="${y+38}" font-size="16" font-weight="800" fill="#c74369">${nameB}</text>`;body+=svgParagraph(copy.myNeed,105,y+68,23,29,{size:17,weight:600});body+=svgParagraph(copy.paNeed,575,y+68,23,29,{size:17,weight:600});y+=needH+26;
+    body+=`<text x="82" y="${y}" font-size="21" font-weight="800" fill="#c74369">💡 2人が噛み合うためのヒント</text>`;y+=22;let tipH=Math.max(176,72+Math.max(myTipLines.length,paTipLines.length)*30);body+=`<rect x="70" y="${y}" width="940" height="${tipH}" rx="24" fill="#fff" stroke="#eadfe4"/>`;body+=`<rect x="92" y="${y+18}" width="424" height="${tipH-36}" rx="20" fill="#fff7fa"/><rect x="564" y="${y+18}" width="424" height="${tipH-36}" rx="20" fill="#fff7fa"/>`;body+=`<text x="118" y="${y+53}" font-size="16" font-weight="800" fill="#c74369">${nameA}へ</text><text x="590" y="${y+53}" font-size="16" font-weight="800" fill="#c74369">${nameB}へ</text>`;body+=svgParagraph(copy.myTip,118,y+88,25,30,{size:18,weight:600});body+=svgParagraph(copy.paTip,590,y+88,25,30,{size:18,weight:600});y+=tipH+22;
+    const footerY=Math.min(Math.max(y,1640),1695);const footerH=150;body+=`<rect x="70" y="${footerY}" width="940" height="${footerH}" rx="24" fill="#30343b"/>`;body+=`<text x="100" y="${footerY+42}" font-size="19" font-weight="800" fill="#fff">CoreLingualから</text>`;body+=svgParagraph('違いがあるから、会話が難しいとは限りません。相手の「入口」を知るだけで、伝え方は少し変えられます。',100,footerY+77,46,29,{size:17,weight:500,fill:'#fff'});body+=`<text x="980" y="${footerY+132}" font-size="14" fill="#e8dfe3" text-anchor="end">会話のすれ違いを、やさしく読み解く</text>`;
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${body}</svg>`;
   }
   async function downloadCompareCard(){
@@ -2031,6 +2040,7 @@ loadSharedFromUrl();
 .v74-diag-entry{width:100%;margin:10px 0 4px;padding:13px 14px!important;border-radius:13px!important;font-weight:800!important;background:linear-gradient(100deg,#fff0f5,#ffeaf0)!important;border:1px solid #df6684!important;color:#c74369!important}
 .v76-save-profile{width:100%;margin-top:14px;padding:13px 12px;border:1px solid #df6684;border-radius:12px;background:linear-gradient(100deg,#fff0f5,#ffeaf0);color:#c74369;font-weight:800}.v76-save-profile:disabled{opacity:.6}.v76-profile-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#343b44;color:#fff;padding:10px 15px;border-radius:999px;font-size:12px;z-index:12000;box-shadow:0 5px 18px rgba(0,0,0,.2);white-space:nowrap}
 .v74-card-note{max-width:520px;margin:8px auto 0;font-size:11px;line-height:1.6;color:#8a919a;text-align:center}
+.v77-gentle-note{margin:10px 14px 16px;padding:11px 14px;border-radius:14px;background:#faf7f8;border:1px solid #eee3e7;color:#7f8790;font-size:12px;line-height:1.7;text-align:center}
 </style>
 </body></html>
 
