@@ -504,7 +504,19 @@ analyze.onclick=async()=>{analyze.disabled=true;const originalText=analyze.inner
     if(r.status===504)throw Error("解析に時間がかかりすぎました。スクショが多い場合は枚数を減らして、しばらくしてからもう一度試してください。");
     if(r.status===400)throw Error(d.error||"送信した内容をAIが受け取れませんでした。スクショを減らすか、画像を小さくしてもう一度試してください。");
     if(r.status===422)throw Error(d.error||"AIから解析結果を受け取れませんでした。文字が読み取りにくい可能性があります。");
-    if(r.status>=500)throw Error(d.error||"AIサービスが一時的に利用できません。しばらく時間をおいて、もう一度試してください。");
+    if(r.status>=500){
+      let msg=d.error||"AIサービスが一時的に利用できません。しばらく時間をおいて、もう一度試してください。";
+      const dg=d.diagnostic;
+      if(dg && (dg.providerStatus||dg.providerMessage||dg.providerCode)){
+        const parts=[];
+        if(dg.providerCode)parts.push("HTTP "+dg.providerCode);
+        if(dg.providerStatus)parts.push(dg.providerStatus);
+        if(dg.providerMessage)parts.push(dg.providerMessage);
+        msg += "\n\n【Gemini診断情報】\n"+parts.join(" / ");
+        if(dg.retryAfter)msg += "\nRetry-After: "+dg.retryAfter;
+      }
+      throw Error(msg);
+    }
     throw Error(d.error||"解析に失敗しました（HTTP "+r.status+"）。");
   }
   render(d);note.textContent="分析が完了しました。"}

@@ -27,3 +27,10 @@ v60を動作基準として、v61 Grok版から招待の先着1人ロックの�
 - Keeps the working v60-based analysis stack unchanged in normal successful requests.
 - Adds actionable error messages for image-size limits, AI rate limiting, timeouts, temporary service failures, unreadable/empty AI results, and invalid requests.
 - Frontend now maps HTTP errors to user-friendly guidance instead of a single generic analysis error.
+
+
+## v67
+- Geminiの5xxエラー時に、HTTP code / provider status / provider message / Retry-After を安全に診断情報として返します。
+- 画面にも「Gemini診断情報」として表示し、原因特定をしやすくしました。
+- APIキーや画像データなどの秘密情報は表示しません。
+- 解析プロンプト、画像圧縮、通常成功時の結果処理は変更していません。
