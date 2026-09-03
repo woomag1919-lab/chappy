@@ -140,12 +140,25 @@ async function callGemini(model, parts) {
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": API_KEY },
-      signal: controller.signal,
-      body: JSON.stringify(buildRequestPayload(parts))
-    });
+    let res;
+    try {
+      res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": API_KEY },
+        signal: controller.signal,
+        body: JSON.stringify(buildRequestPayload(parts))
+      });
+    } catch (fetchError) {
+      if (fetchError?.name === "AbortError") {
+        const err = new Error("gemini_timeout");
+        err.model = model;
+        err.httpStatus = 504;
+        err.providerStatus = "TIMEOUT";
+        err.providerMessage = `Geminiへの応答が${TIMEOUT_MS / 1000}秒以内に返りませんでした。`;
+        throw err;
+      }
+      throw fetchError;
+    }
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       const providerError = data?.error || {};
@@ -278,7 +291,24 @@ export default async function handler(req, res) {
     const result = await generate({ ...body, message, images });
     return res.status(200).json(result);
   } catch (e) {
-    if (e?.name === "AbortError") return res.status(504).json({ error: "解析に時間がかかりすぎました。スクショが多い場合は枚数を減らして、しばらくしてからもう一度試してください。", code: "timeout" });
+    if (e?.message === "gemini_timeout") {
+      const attempts = Array.isArray(e?.attempts) ? e.attempts : [];
+      return res.status(504).json({
+        error: "AIの応答に時間がかかったため、自動で別のモデルへの切り替えを試しましたが完了しませんでした。スクショが多い場合は枚数を少し減らして、もう一度試してください。",
+        code: "timeout",
+        diagnostic: {
+          providerCode: 504,
+          providerStatus: "TIMEOUT",
+          providerMessage: typeof e?.providerMessage === "string" ? e.providerMessage.slice(0, 300) : "",
+          attempts: attempts.slice(0, 6).map(a => ({
+            model: typeof a?.model === "string" ? a.model.slice(0, 80) : "",
+            reason: typeof a?.reason === "string" ? a.reason.slice(0, 20) : "",
+            status: a?.status || "",
+            providerStatus: typeof a?.providerStatus === "string" ? a.providerStatus.slice(0, 80) : ""
+          }))
+        }
+      });
+    }
     if (e?.message === "image_too_large" || e?.message === "gemini_payload_too_large") return res.status(413).json({ error: "スクショの容量が大きすぎます。枚数を減らすか、画像を小さくしてもう一度試してください。", code: "image_size" });
     if (e?.message === "gemini_rate_limited") {
       const providerStatus = typeof e?.providerStatus === "string" ? e.providerStatus : "";
