@@ -2080,6 +2080,8 @@ loadSharedFromUrl();
     for(let i=0;i<sc.length;i++)if(dc[i])copyComputedStyles(sc[i],dc[i]);
   }
   async function buildCompareTemplateCanvas(){
+    const data=getActiveCompareData();
+    if(!data?.my || !data?.partner) throw new Error('比較データが取得できませんでした');
     await Promise.all([
       document.fonts.load('700 34px "Zen Kaku Gothic New"'),
       document.fonts.load('500 24px "Zen Kaku Gothic New"'),
