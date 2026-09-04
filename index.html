@@ -303,7 +303,7 @@ body.v72-active nav{display:none!important}.v72-shell{height:calc(100vh - 92px);
 </div>
 
 <div id="cl55PanePartner" class="cl55-pane" style="display:none">
-  <div class="cl55-note cl55-partner-lead">相手は「こんな人だと思う」で大丈夫です。正解を当てるテストではありません。分かる範囲のメモや、診断で整理できます。</div>
+  <div class="cl55-note cl55-partner-lead">相手について分かる範囲で回答できます。本人にチェックをお願いすることもできます。</div>
   <div id="v23InviteCard" class="card cl55-block cl55-invite">
     <b>🔗 相手本人にチェックしてもらう</b>
     <p id="v23InviteIntro" class="cl55-desc">リンクを送ると、相手が本人として36問に答えられます。結果は相手が「共有する」を選んだときだけ、あなたの側に「相手の回答」として登録されます。この画面に共有ボタンはありません。</p>
@@ -1255,6 +1255,17 @@ function startExtra(){
   try{
     extraTarget=target;
     if(!ad30||!extraDiag||!ad30Countdown)throw new Error("追加チェックの広告ゲート要素が見つかりません。");
+    // 招待された相手には広告を表示しない。本人にお願いする導線なので、36問をそのまま続けてもらう。
+    const inviteState=v23GetInviteState();
+    const isInvitedPartner=!!(inviteState?.token && !inviteState?.ownerToken);
+    if(isInvitedPartner){
+      ad30.style.display="none";
+      extraDiag.style.display="none";
+      const btn=document.getElementById("startMore");
+      if(btn)btn.disabled=false;
+      setTimeout(()=>{try{showExtra()}catch(e){console.error(e);alert(e.message||"後半18問の表示に失敗しました。")}},50);
+      return;
+    }
     ad30.style.display="block";
     extraDiag.style.display="none";
     const btn=document.getElementById("startMore");
@@ -1460,8 +1471,8 @@ function v23EnsurePartnerKey(token){
   return key;
 }
 function v23InviteCreateControls(){
-  return `<div class="v36-share-explain"><b>流れ：</b>自分がチェック済み → リンクを送る → 相手が本人として36問 → 相手が共有ON → <b>「相手の回答」</b>プロフィールが自動作成され、2人比較に使えます。</div>
-<div class="v36-check"><input id="v23HostShare" type="checkbox" checked><label for="v23HostShare"><b>自分の結果も相手に見せる</b><br>オフにすると、相手にはあなたの結果は見えません。</label></div>
+  return `<p class="v84-invite-brief">リンクを送ると、相手本人が36問に回答できます。<br>相手が共有した結果だけ、こちらに反映されます。</p>
+<div class="v36-check"><input id="v23HostShare" type="checkbox" checked><label for="v23HostShare"><b>自分の結果も相手に見せる</b><br>オフなら、相手にはあなたの結果を見せません。</label></div>
 <button id="v23CreateInviteBtn" class="primary">🔗 相手に特性チェックをお願いする</button>`;
 }
 function v23BindCreateInvite(){
@@ -2134,6 +2145,7 @@ loadSharedFromUrl();
 .v74-traits-fold summary span{font-size:10px;font-weight:500;color:#8a919a;margin-left:6px}
 .v74-traits-fold .chips{padding:0 12px 12px}
 .v74-diag-entry{width:100%;margin:10px 0 4px;padding:13px 14px!important;border-radius:13px!important;font-weight:800!important;background:linear-gradient(100deg,#fff0f5,#ffeaf0)!important;border:1px solid #df6684!important;color:#c74369!important}
+.v84-invite-brief{margin:0 0 12px;font-size:12px;line-height:1.7;color:#717983}.v84-invite-brief br{display:none}
 .v84-name-error{min-height:17px;margin:5px 2px 0;color:#c74369;font-size:12px;font-weight:700}.v84-name-invalid{border-color:#df6684!important;box-shadow:0 0 0 2px rgba(223,102,132,.12)}.v76-save-profile{width:100%;margin-top:14px;padding:13px 12px;border:1px solid #df6684;border-radius:12px;background:linear-gradient(100deg,#fff0f5,#ffeaf0);color:#c74369;font-weight:800}.v76-save-profile:disabled{opacity:.6}.v76-profile-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#343b44;color:#fff;padding:10px 15px;border-radius:999px;font-size:12px;z-index:12000;box-shadow:0 5px 18px rgba(0,0,0,.2);white-space:nowrap}
 .v74-card-note{max-width:520px;margin:8px auto 0;font-size:11px;line-height:1.6;color:#8a919a;text-align:center}
 .v77-gentle-note{margin:10px 14px 16px;padding:11px 14px;border-radius:14px;background:#faf7f8;border:1px solid #eee3e7;color:#7f8790;font-size:12px;line-height:1.7;text-align:center}
