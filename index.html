@@ -2090,6 +2090,28 @@ loadSharedFromUrl();
     return _html2canvasPromise;
   }
 
+  function cl91AssetSvg(kind, color='#6f8790'){
+    const common='fill="none" stroke="'+color+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"';
+    const m={
+      language:`<svg viewBox="0 0 64 64"><path ${common} d="M10 12h44v30H28L17 53V42H10z"/><path ${common} d="M20 25h24M20 33h16"/></svg>`,
+      thinking:`<svg viewBox="0 0 64 64"><path ${common} d="M32 10c-11 0-20 8-20 18 0 7 4 12 10 15v9h20v-9c6-3 10-8 10-15 0-10-9-18-20-18z"/><path ${common} d="M25 43h14M26 49h12"/></svg>`,
+      emotion:`<svg viewBox="0 0 64 64"><path ${common} d="M9 15h46v31H28L17 54V46H9z"/><circle cx="23" cy="30" r="2" fill="${color}" stroke="none"/><circle cx="32" cy="30" r="2" fill="${color}" stroke="none"/><circle cx="41" cy="30" r="2" fill="${color}" stroke="none"/></svg>`,
+      distance:`<svg viewBox="0 0 64 64"><circle ${common} cx="22" cy="22" r="9"/><circle ${common} cx="42" cy="22" r="9"/><path ${common} d="M8 50c2-10 9-15 14-15s12 5 14 15M28 50c2-10 9-15 14-15s12 5 14 15"/></svg>`,
+      change:`<svg viewBox="0 0 64 64"><path ${common} d="M16 18h31l-7-7M48 18l-8 8M48 46H17l7 7M16 46l8-8"/></svg>`,
+      communication:`<svg viewBox="0 0 64 64"><path ${common} d="M10 13h44v31H28L17 54V44H10z"/><path ${common} d="M22 29h20"/></svg>`,
+      attach:`<svg viewBox="0 0 64 64"><path ${common} d="M19 31a13 13 0 0 1 22-9l4 4M45 33a13 13 0 0 1-22 9l-4-4"/><path ${common} d="M25 27l14 14M39 27L25 41"/></svg>`,
+      sensory:`<svg viewBox="0 0 64 64"><path ${common} d="M32 11c-8 9-15 16-15 27a15 15 0 0 0 30 0c0-11-7-18-15-27z"/><path ${common} d="M24 40c2 4 5 6 8 6"/></svg>`,
+      process:`<svg viewBox="0 0 64 64"><circle ${common} cx="32" cy="32" r="21"/><path ${common} d="M32 18v14l9 7"/></svg>`
+    };
+    return m[kind]||m.language;
+  }
+  function cl91AxisKey(label){
+    const s=String(label||'');
+    if(s.includes('情報'))return'language'; if(s.includes('考え'))return'thinking'; if(s.includes('感情'))return'emotion';
+    if(s.includes('距離感')||s.includes('距離の取り方'))return'distance'; if(s.includes('変化'))return'change';
+    if(s.includes('伝え方'))return'communication'; if(s.includes('近づき方'))return'attach'; if(s.includes('刺激'))return'sensory'; if(s.includes('進め方'))return'process';
+    return'language';
+  }
   async function downloadCompareCard(){
     const data=getActiveCompareData();
     if(!data.my||!data.partner){alert('2人分の比較データがまだありません。');return;}
@@ -2102,118 +2124,71 @@ loadSharedFromUrl();
     try{
       const source=document.getElementById('v21CompareCard');
       if(!source)throw new Error('比較結果が見つかりません');
-
-      // v89: 画面のスクショではなく、専用の「共有用テンプレート」を生成する。
-      // 固定レイアウト＋現在の比較結果だけを差し替えてPNG化するため、
-      // スマホ画面幅に左右されず、毎回同じ見た目の画像になる。
       const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
       const text=(el,sel)=>{const n=el?.querySelector(sel);return n?n.textContent.trim():''};
       const topItems=[...source.querySelectorAll('.v82-top-item')].slice(0,3).map((el,i)=>({
-        num:String(i+1).padStart(2,'0'),
-        axis:text(el,'.v82-top-axis'),
-        left:text(el,'.v82-top-contrast b:nth-of-type(1)'),
-        right:text(el,'.v82-top-contrast b:nth-of-type(2)')
+        num:String(i+1).padStart(2,'0'),axis:text(el,'.v82-top-axis').replace(/^[^\p{L}\p{N}]+/u,''),
+        left:text(el,'.v82-top-contrast b:nth-of-type(1)'),right:text(el,'.v82-top-contrast b:nth-of-type(2)')
       }));
       const rows=[...source.querySelectorAll('.v82-axis-row')].map(el=>({
-        axis:text(el,'.v82-axis-name'),
-        left:el.children[1]?.textContent.trim()||'',
-        right:el.children[2]?.textContent.trim()||''
+        axis:text(el,'.v82-axis-name').replace(/^[^\p{L}\p{N}]+/u,''),left:el.children[1]?.textContent.trim()||'',right:el.children[2]?.textContent.trim()||''
       }));
-      const advice=[...source.querySelectorAll('.v82-advice-item')].slice(0,2).map(el=>({
-        title:text(el,'b'),
-        lines:[...el.querySelectorAll('p')].map(x=>x.textContent.trim()).filter(Boolean)
-      }));
+      const advice=[...source.querySelectorAll('.v82-advice-item')].slice(0,2).map(el=>({title:text(el,'b').replace(/^[^\p{L}\p{N}]+/u,''),lines:[...el.querySelectorAll('p')].map(x=>x.textContent.trim()).filter(Boolean)}));
       const myName=source.querySelector('.v82-axis-head b:nth-of-type(1)')?.textContent.trim()||'Aさん';
       const paName=source.querySelector('.v82-axis-head b:nth-of-type(2)')?.textContent.trim()||'Bさん';
+      const icon=(key,color)=>`<span class="cl91-icon" style="color:${color}">${cl91AssetSvg(key,color)}</span>`;
+      const topIconKeys=['communication','process','change'];
 
       const exportRoot=document.createElement('div');
-      exportRoot.style.cssText='position:relative;width:1084px;box-sizing:border-box;padding:24px;background:#fff;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Yu Gothic",Meiryo,sans-serif;color:#26364d;';
+      exportRoot.className='cl91-share-root';
       exportRoot.innerHTML=`
-        <div style="border:1.5px solid #dfe8e9;border-radius:34px;background:#fff;box-shadow:0 14px 38px rgba(50,70,80,.14);overflow:hidden;">
-          <!-- header -->
-          <div style="padding:34px 40px 24px;position:relative;background:linear-gradient(180deg,#ffffff 0%,#fbfcfc 100%);">
-            <div style="position:absolute;right:36px;top:25px;color:#8fa0a9;font-size:16px;line-height:1.5;text-align:right;font-family:cursive;transform:rotate(-2deg);">ちがいを知ると、<br>もっと分かり合える</div>
-            <div style="display:flex;align-items:center;gap:18px;padding-right:250px;">
-              <div style="width:76px;height:76px;position:relative;flex:0 0 auto;">
-                <div style="position:absolute;left:0;top:17px;width:47px;height:39px;border-radius:50%;background:#a8b9ad;transform:rotate(-7deg);"></div>
-                <div style="position:absolute;right:0;top:8px;width:47px;height:42px;border-radius:50%;background:#e8c79b;transform:rotate(7deg);"></div>
-                <div style="position:absolute;left:10px;top:47px;border-width:11px 10px 0 0;border-style:solid;border-color:#a8b9ad transparent transparent transparent;transform:rotate(18deg);"></div>
-                <div style="position:absolute;right:8px;top:48px;border-width:11px 0 0 10px;border-style:solid;border-color:#e8c79b transparent transparent transparent;transform:rotate(-18deg);"></div>
-                <span style="position:absolute;left:0;top:0;font-size:20px;color:#6e7d83;">╲</span><span style="position:absolute;right:1px;top:0;font-size:20px;color:#6e7d83;">╱</span>
-              </div>
-              <div>
-                <div style="font-size:37px;font-weight:900;letter-spacing:.015em;line-height:1.2;color:#1e2e46;">2人のコミュニケーション比較</div>
-                <div style="font-size:18px;color:#66747d;line-height:1.55;margin-top:9px;">同じ会話でも、自然に選びやすい「入口」が違うと、すれ違いが起きることがあります。</div>
-              </div>
+        <div class="cl91-poster">
+          <header class="cl91-header">
+            <img class="cl91-asset cl91-bubbles" src="/assets/share/bubbles.png" crossorigin="anonymous">
+            <div class="cl91-header-copy"><h1>2人のコミュニケーション比較</h1><p>同じ会話でも、自然に選びやすい「入口」が違うと、すれ違いが起きることがあります。</p></div>
+            <img class="cl91-asset cl91-header-doodle" src="/assets/share/header-doodle.png" crossorigin="anonymous">
+          </header>
+
+          <section class="cl91-block cl91-top-block">
+            <div class="cl91-title pink">特に違いが出やすい3つ</div>
+            <div class="cl91-top-list">
+              ${topItems.length?topItems.map((r,i)=>`<div class="cl91-top-row"><div class="cl91-num">${r.num}</div><div class="cl91-top-axis">${icon(topIconKeys[i]||'communication','#6f8790')}<div>${esc(r.axis)}</div></div><div class="cl91-top-value">${esc(r.left)}</div><div class="cl91-x">×</div><div class="cl91-top-value">${esc(r.right)}</div></div>`).join(''):`<div class="cl91-similar">大きな差は少なめ。似た入口から会話を進めやすい2人です。</div>`}
             </div>
-          </div>
+            <img class="cl91-asset cl91-oval-doodle" src="/assets/share/oval-doodle.png" crossorigin="anonymous">
+          </section>
 
-          <!-- top 3 differences -->
-          <div style="margin:0 24px 22px;padding:26px 28px 25px;border:1.5px solid #f0d9e0;border-radius:28px;background:linear-gradient(135deg,#fff7fa 0%,#fffdfd 100%);position:relative;overflow:hidden;">
-            <div style="position:absolute;left:15px;top:17px;width:10px;height:24px;border-radius:9px;background:#f3b36d;transform:rotate(-28deg);opacity:.75"></div>
-            <div style="font-size:28px;font-weight:900;color:#bf4f6e;margin:0 0 16px 10px;">特に違いが出やすい3つ</div>
-            ${topItems.length?topItems.map((r,idx)=>{
-              const icons=['💬','🧭','↔️'];
-              return `<div style="display:grid;grid-template-columns:58px 265px 1fr;align-items:center;gap:14px;padding:13px 0;border-top:1px dashed #eadde2;">
-                <div style="width:48px;height:48px;border-radius:50%;background:#f7dce5;color:#c45070;font-size:20px;font-weight:900;display:flex;align-items:center;justify-content:center;">${r.num}</div>
-                <div style="font-size:18px;font-weight:800;color:#56636d;white-space:nowrap;">${icons[idx]}&nbsp; ${esc(r.axis)}</div>
-                <div style="display:grid;grid-template-columns:1fr 42px 1fr;align-items:center;gap:8px;font-size:22px;font-weight:900;color:#1e2e46;">
-                  <div>${esc(r.left)}</div><div style="text-align:center;color:#c94f70;font-size:27px;">×</div><div>${esc(r.right)}</div>
-                </div>
-              </div>`;
-            }).join(''):`<div style="padding:16px 0;color:#66737f;font-size:18px;">大きな差は少なめ。似た入口から会話を進めやすい2人です。</div>`}
-            <div style="position:absolute;right:24px;top:73px;width:150px;height:120px;border:1px solid #aeb7bc;border-radius:50%;transform:rotate(-6deg);opacity:.9;display:flex;align-items:center;justify-content:center;text-align:center;font-family:cursive;color:#59666e;font-size:15px;line-height:1.55;">ちがいは<br>どちらが正しい<br>ではなく<br>スタート地点の<br>違いです</div>
-          </div>
-
-          <!-- nine axes -->
-          <div style="margin:0 24px 22px;padding:25px 28px 24px;border:1.5px solid #d9e7ec;border-radius:28px;background:linear-gradient(135deg,#fafdfe 0%,#ffffff 100%);">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:13px;">
-              <div style="font-size:28px;font-weight:900;color:#3d6f94;position:relative;padding-left:13px;">9つのコミュニケーション傾向</div>
-              <div style="display:grid;grid-template-columns:190px 190px;gap:12px;font-size:18px;font-weight:900;text-align:center;flex:0 0 auto;">
-                <div style="padding:9px 12px;border-radius:999px;background:#d7e8e5;color:#3d6662;">${esc(myName)}</div>
-                <div style="padding:9px 12px;border-radius:999px;background:#f2dfbd;color:#866a47;">${esc(paName)}</div>
-              </div>
+          <section class="cl91-block cl91-nine-block">
+            <div class="cl91-nine-head"><div class="cl91-title blue">9つのコミュニケーション傾向</div><div class="cl91-names"><span>${esc(myName)}</span><span>${esc(paName)}</span></div></div>
+            <div class="cl91-nine-list">
+              ${rows.map((r,i)=>{const k=cl91AxisKey(r.axis);return `<div class="cl91-nine-row"><div class="cl91-axis-label">${icon(k,i%3===0?'#2c86d9':i%3===1?'#e89a8c':'#6f9d73')}<b>${esc(r.axis)}</b></div><div>${esc(r.left)}</div><div>${esc(r.right)}</div></div>`}).join('')}
             </div>
-            ${rows.map((r,i)=>{const icons=['🧠','🧠','💬','🤝','↔️','💬','👥','🌿','🧭']; return `<div style="display:grid;grid-template-columns:390px 1fr 1fr;align-items:center;min-height:57px;border-bottom:1px dashed #dfe7eb;font-size:17px;line-height:1.35;">
-              <div style="font-weight:800;color:#26394c;padding-right:14px;">${icons[i]||'•'}&nbsp; ${esc(r.axis)}</div><div style="padding:0 12px;color:#344454;">${esc(r.left)}</div><div style="padding:0 12px;color:#344454;">${esc(r.right)}</div>
-            </div>`}).join('')}
-          </div>
+          </section>
 
-          <!-- advice -->
-          <div style="margin:0 24px 22px;padding:25px 28px 27px;border:1.5px solid #f0dfbd;border-radius:28px;background:linear-gradient(135deg,#fffdf7 0%,#ffffff 100%);">
-            <div style="font-size:28px;font-weight:900;color:#bd5a6e;margin:0 0 17px;">💡 この2人がラクになるポイント</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-              ${advice.length?advice.map((a,i)=>`<div style="padding:20px 20px 18px;border:1.5px solid #ecdde2;border-radius:22px;background:linear-gradient(135deg,${i===0?'#f8fbf8':'#fff9ef'} 0%,#fff 100%);">
-                <div style="font-size:19px;font-weight:900;color:#304155;margin-bottom:9px;">${i===0?'💬':'🧭'}&nbsp; ${esc(a.title)}</div>
-                ${a.lines.map(line=>`<div style="font-size:17px;line-height:1.7;color:#465361;">${esc(line)}</div>`).join('')}
-              </div>`).join(''):`<div style="grid-column:1/-1;color:#66737f;font-size:17px;">お互いの入口を一つずつ確認すると、会話がラクになりやすくなります。</div>`}
+          <section class="cl91-block cl91-advice-block">
+            <div class="cl91-title warm">💡 この2人がラクになるポイント</div>
+            <div class="cl91-advice-grid">
+              ${advice.length?advice.map((a,i)=>`<div class="cl91-advice-card"><div class="cl91-advice-title">${icon(i===0?'communication':'process',i===0?'#6f8790':'#d99d38')}<b>${esc(a.title)}</b></div>${a.lines.map(line=>`<p>${esc(line)}</p>`).join('')}</div>`).join(''):`<div class="cl91-advice-card full"><p>お互いの入口を一つずつ確認すると、会話がラクになりやすくなります。</p></div>`}
             </div>
-          </div>
+          </section>
 
-          <!-- footer -->
-          <div style="margin:0 24px 24px;padding:24px 30px 26px;position:relative;border-radius:25px;background:linear-gradient(100deg,#edf6fb 0%,#f8eff7 100%);overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;">
-            <div style="position:absolute;left:-30px;bottom:-55px;width:440px;height:120px;border-radius:50%;background:rgba(255,255,255,.5);transform:rotate(-4deg);"></div>
-            <div style="font-size:21px;line-height:1.65;color:#45657e;font-family:cursive;position:relative;z-index:1;">ちがいは、<br>すれ違いじゃなく、可能性。</div>
-            <div style="text-align:center;min-width:270px;position:relative;z-index:1;"><div style="font-size:32px;font-weight:900;letter-spacing:.03em;color:#203f64;">CoreLingual</div><div style="font-size:15px;color:#71808c;margin-top:5px;">わかると、もっと、うまくいく。</div></div>
-            <div style="font-size:14px;line-height:1.65;color:#697681;text-align:right;max-width:320px;position:relative;z-index:1;">違いは、良し悪しではなく会話の入口の違い。<br>相手の入口が分かると、伝え方も少し変えられます。</div>
-          </div>
-        </div>`
+          <footer class="cl91-footer">
+            <img class="cl91-asset cl91-footer-doodle" src="/assets/share/footer-doodle.png" crossorigin="anonymous">
+            <div class="cl91-brand"><div>CoreLingual</div><small>わかると、もっと、うまくいく。</small></div>
+            <div class="cl91-footer-note">違いは、良し悪しではなく会話の入口の違い。<br>相手の入口が分かると、伝え方も少し変えられます。</div>
+            <img class="cl91-asset cl91-leaves" src="/assets/share/leaves.png" crossorigin="anonymous">
+          </footer>
+        </div>`;
 
       holder=document.createElement('div');
-      holder.style.cssText='position:fixed;left:-20000px;top:0;width:1084px;padding:0;margin:0;background:#fff;visibility:visible;z-index:-1;';
+      holder.className='cl91-export-holder';
       holder.appendChild(exportRoot);document.body.appendChild(holder);
       await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-
       const h2c=await ensureHtml2Canvas();
       const canvas=await h2c(exportRoot,{backgroundColor:'#ffffff',scale:1,useCORS:true,allowTaint:false,logging:false,imageTimeout:15000,scrollX:0,scrollY:0,width:1084,windowWidth:1084});
       const png=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('PNG生成に失敗しました')),'image/png'));
-      const url=URL.createObjectURL(png);
-      const a=document.createElement('a');a.href=url;a.download='CoreLingual_2人のコミュニケーション比較.png';document.body.appendChild(a);a.click();a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url),1500);
-    }catch(e){
-      console.error('comparison template PNG export failed',e);
-      alert('画像の作成に失敗しました。もう一度お試しください。');
-    }finally{if(holder)holder.remove();}
+      const url=URL.createObjectURL(png);const a=document.createElement('a');a.href=url;a.download='CoreLingual_2人のコミュニケーション比較.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+    }catch(e){console.error('comparison template PNG export failed',e);alert('画像の作成に失敗しました。もう一度お試しください。');}
+    finally{if(holder)holder.remove();}
   }
   document.getElementById('v73DownloadCompare')?.addEventListener('click',downloadCompareCard);
   // Page tracking.
@@ -2239,6 +2214,19 @@ loadSharedFromUrl();
 .v84-name-error{min-height:17px;margin:5px 2px 0;color:#c74369;font-size:12px;font-weight:700}.v84-name-invalid{border-color:#df6684!important;box-shadow:0 0 0 2px rgba(223,102,132,.12)}.v76-save-profile{width:100%;margin-top:14px;padding:13px 12px;border:1px solid #df6684;border-radius:12px;background:linear-gradient(100deg,#fff0f5,#ffeaf0);color:#c74369;font-weight:800}.v76-save-profile:disabled{opacity:.6}.v76-profile-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#343b44;color:#fff;padding:10px 15px;border-radius:999px;font-size:12px;z-index:12000;box-shadow:0 5px 18px rgba(0,0,0,.2);white-space:nowrap}
 .v74-card-note{max-width:520px;margin:8px auto 0;font-size:11px;line-height:1.6;color:#8a919a;text-align:center}
 .v77-gentle-note{margin:10px 14px 16px;padding:11px 14px;border-radius:14px;background:#faf7f8;border:1px solid #eee3e7;color:#7f8790;font-size:12px;line-height:1.7;text-align:center}
+</style>
+
+<style>
+/* v91: reusable share-poster template. Fixed decorative assets + dynamic comparison data. */
+.cl91-export-holder{position:fixed;left:-20000px;top:0;width:1084px;padding:0;margin:0;background:#fff;visibility:visible;z-index:-1}
+.cl91-share-root{width:1084px;background:#fff;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Yu Gothic",Meiryo,sans-serif;color:#26364d}
+.cl91-poster{margin:18px;padding:0 0 18px;border:1.5px solid #dfe8e9;border-radius:34px;background:#fff;box-shadow:0 16px 42px rgba(60,80,90,.14);overflow:hidden}
+.cl91-header{min-height:166px;padding:30px 42px 20px;position:relative;display:flex;align-items:center;gap:22px;background:linear-gradient(180deg,#fff 0%,#fbfcfc 100%)}
+.cl91-header-copy{padding:0 185px 0 86px}.cl91-header h1{margin:0;font-size:37px;line-height:1.18;letter-spacing:.01em;font-weight:900;color:#1e2e46}.cl91-header p{margin:12px 0 0;font-size:18px;line-height:1.55;color:#66747d;max-width:760px}.cl91-asset{display:block;object-fit:contain}.cl91-bubbles{position:absolute;left:32px;top:42px;width:72px;height:72px}.cl91-header-doodle{position:absolute;right:28px;top:25px;width:155px;height:105px}
+.cl91-block{margin:0 24px 22px;border-radius:28px;padding:26px 28px 25px;box-sizing:border-box}.cl91-top-block{position:relative;border:1.5px solid #f0d9e0;background:linear-gradient(135deg,#fff7fa 0%,#fffdfd 100%);overflow:hidden}.cl91-title{font-size:28px;font-weight:900;line-height:1.25;margin:0 0 17px}.cl91-title.pink{color:#bf4f6e}.cl91-title.blue{color:#3d6f94}.cl91-title.warm{color:#bd5a6e}.cl91-top-list{padding-right:120px}.cl91-top-row{display:grid;grid-template-columns:58px 250px 1fr 48px 1fr;align-items:center;gap:12px;min-height:67px;border-top:1px dashed #eadde2}.cl91-num{width:48px;height:48px;border-radius:50%;background:#f7dce5;color:#c45070;font-size:20px;font-weight:900;display:flex;align-items:center;justify-content:center}.cl91-top-axis{display:flex;align-items:center;gap:9px;font-size:18px;font-weight:800;color:#56636d}.cl91-icon{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}.cl91-icon svg{width:100%;height:100%;display:block}.cl91-top-value{font-size:22px;font-weight:900;line-height:1.3;color:#1e2e46}.cl91-x{text-align:center;color:#c94f70;font-size:28px;font-weight:900}.cl91-oval-doodle{position:absolute;right:16px;top:66px;width:150px;height:126px}.cl91-similar{padding:16px 0;font-size:18px;color:#66737f}
+.cl91-nine-block{border:1.5px solid #d9e7ec;background:linear-gradient(135deg,#fafdfe 0%,#fff 100%);padding-top:24px}.cl91-nine-head{display:grid;grid-template-columns:1fr 380px;gap:16px;align-items:center;margin-bottom:10px}.cl91-names{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:18px;font-weight:900;text-align:center}.cl91-names span:first-child{padding:9px 12px;border-radius:999px;background:#d7e8e5;color:#3d6662}.cl91-names span:last-child{padding:9px 12px;border-radius:999px;background:#f2dfbd;color:#866a47}.cl91-nine-list{border-top:1px solid #dfe7eb}.cl91-nine-row{display:grid;grid-template-columns:410px 1fr 1fr;align-items:center;min-height:56px;border-bottom:1px dashed #dfe7eb;font-size:17px;line-height:1.35}.cl91-axis-label{display:flex;align-items:center;gap:9px;padding-right:12px;color:#26394c}.cl91-nine-row>div:not(:first-child){padding:0 12px;color:#344454}
+.cl91-advice-block{border:1.5px solid #f0dfbd;background:linear-gradient(135deg,#fffdf7 0%,#fff 100%);padding-bottom:27px}.cl91-advice-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.cl91-advice-card{padding:19px 20px 17px;border:1.5px solid #ecdde2;border-radius:22px;background:linear-gradient(135deg,#f8fbf8 0%,#fff 100%);min-height:112px;box-sizing:border-box}.cl91-advice-card:nth-child(2){background:linear-gradient(135deg,#fff9ef 0%,#fff 100%)}.cl91-advice-title{display:flex;align-items:center;gap:8px;font-size:19px;color:#304155;margin-bottom:9px}.cl91-advice-card p{margin:3px 0;font-size:17px;line-height:1.65;color:#465361}.cl91-advice-card.full{grid-column:1/-1}
+.cl91-footer{margin:0 24px;min-height:122px;padding:22px 30px;position:relative;border-radius:25px;background:linear-gradient(100deg,#edf6fb 0%,#f8eff7 100%);overflow:hidden;display:grid;grid-template-columns:1fr 1fr 1.25fr;align-items:center;gap:18px}.cl91-footer:before{content:"";position:absolute;left:-35px;bottom:-60px;width:450px;height:120px;border-radius:50%;background:rgba(255,255,255,.52);transform:rotate(-4deg)}.cl91-footer-doodle{position:absolute;left:24px;bottom:10px;width:300px;height:105px}.cl91-brand{text-align:center;position:relative;z-index:2}.cl91-brand div{font-size:32px;font-weight:900;letter-spacing:.03em;color:#203f64}.cl91-brand small{font-size:15px;color:#71808c}.cl91-footer-note{font-size:14px;line-height:1.65;color:#697681;text-align:right;position:relative;z-index:2}.cl91-leaves{position:absolute;right:15px;bottom:6px;width:72px;height:95px}
 </style>
 </body></html>
 
