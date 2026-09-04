@@ -290,7 +290,7 @@ body.v72-active nav{display:none!important}.v72-shell{height:calc(100vh - 92px);
 <section id="diag" style="display:none">
 <div class="cl55-head">
   <h2>🧩 特性チェック</h2>
-  <p>会話の受け取り方のクセを整理します。まずは「自分」、必要なら「相手」へ。</p>
+  <p>会話の受け取り方の傾向を、36問で整理します。</p>
 </div>
 <div class="v73-hidden-compat" aria-hidden="true"><button type="button" id="selfDiag" class="cl55-tab on">自分</button><button type="button" id="otherDiag" class="cl55-tab">相手</button></div>
 
@@ -303,15 +303,14 @@ body.v72-active nav{display:none!important}.v72-shell{height:calc(100vh - 92px);
 </div>
 
 <div id="cl55PanePartner" class="cl55-pane" style="display:none">
-  <div class="cl55-note cl55-partner-lead">相手について分かる範囲で回答できます。本人にチェックをお願いすることもできます。</div>
   <div id="v23InviteCard" class="card cl55-block cl55-invite">
     <b>🔗 相手本人にチェックしてもらう</b>
-    <p id="v23InviteIntro" class="cl55-desc">リンクを送ると、相手が本人として36問に答えられます。結果は相手が「共有する」を選んだときだけ、あなたの側に「相手の回答」として登録されます。この画面に共有ボタンはありません。</p>
+    <p id="v23InviteIntro" class="cl55-desc">リンクを送ると、相手が36問に回答します。共有された結果だけ、この「相手」プロフィールに反映されます。</p>
     <div id="v23InviteControls"></div>
   </div>
   <div class="card cl55-block">
-    <b>🧩 分からないときは診断してみる</b>
-    <p class="cl55-desc">自分から見た相手を36問で整理します。本人の回答ではないので、参考程度に使ってください。</p>
+    <b>🧩 自分から見た相手を整理する</b>
+    <p class="cl55-desc">相手について分かる範囲で36問に答えます。本人の回答ではないため、参考としてご利用ください。</p>
   </div>
 </div>
 
@@ -430,16 +429,16 @@ function showSaveNameRequired(p){
   }
 }
 
-function save(p){
+function save(p,opts={}){
   const input=document.getElementById(p+"Name");
   const name=input.value.trim();
   if(!name){
     showSaveNameRequired(p);
-    return;
+    return false;
   }
   clearNameRequired(p);
   const btn=document.getElementById(p==="my"?"saveMy":"savePartner");
-  if(btn?.dataset.saving==="1")return;
+  if(btn?.dataset.saving==="1")return false;
   if(btn)btn.dataset.saving="1";
   let a=list(p);
   const existing=a.findIndex(x=>x.name===name);
@@ -450,15 +449,19 @@ function save(p){
   setActiveProfile(p,name);
   draw(p);
   renderTwoPersonComparison();
-  // 保存成功後は入力欄をリセットせず、そのまま閉じて完了を小さく知らせる。
-  document.getElementById('v72ProfileOverlay')?.classList.remove('show');
-  setNames();
-  const toast=document.createElement('div');
-  toast.className='v76-profile-toast';
-  toast.textContent='✓ プロフィールを保存しました';
-  document.body.appendChild(toast);
-  setTimeout(()=>toast.remove(),1800);
+  if(opts.close!==false){
+    document.getElementById('v72ProfileOverlay')?.classList.remove('show');
+    setNames();
+  }
+  if(opts.toast!==false){
+    const toast=document.createElement('div');
+    toast.className='v76-profile-toast';
+    toast.textContent='✓ プロフィールを保存しました';
+    document.body.appendChild(toast);
+    setTimeout(()=>toast.remove(),1800);
+  }
   if(btn)setTimeout(()=>{btn.dataset.saving="0"},300);
+  return true;
 }
 
 saveMy.onclick=()=>save("my");savePartner.onclick=()=>save("partner");
@@ -1471,8 +1474,7 @@ function v23EnsurePartnerKey(token){
   return key;
 }
 function v23InviteCreateControls(){
-  return `<p class="v84-invite-brief">リンクを送ると、相手本人が36問に回答できます。<br>相手が共有した結果だけ、こちらに反映されます。</p>
-<div class="v36-check"><input id="v23HostShare" type="checkbox" checked><label for="v23HostShare"><b>自分の結果も相手に見せる</b><br>オフなら、相手にはあなたの結果を見せません。</label></div>
+  return `<div class="v36-check"><input id="v23HostShare" type="checkbox" checked><label for="v23HostShare"><b>自分の結果も相手に見せる</b><br>オフなら、相手にはあなたの結果を見せません。</label></div>
 <button id="v23CreateInviteBtn" class="primary">🔗 相手に特性チェックをお願いする</button>`;
 }
 function v23BindCreateInvite(){
@@ -1509,12 +1511,13 @@ function v23CurrentProfilePayload(p){
   const extra=(()=>{try{return JSON.parse(localStorage.getItem("cl_extra_result_"+p)||"null")}catch{return null}})();
   const deepScores=Array.isArray(extra?.scores)?extra.scores.slice(0,18):[];
   const scores=Array.isArray(base?.scores)?base.scores:[];
-  return {name:p==="my"?"あなた":"相手",radar:radar||null,extraRadar:ex||null,traits:state(p).traits,summary:document.getElementById(p+"Free")?.value||"",scores:scores.map(x=>({key:x.key,score:Number(x.score)||50})),answers:Array.isArray(base?.answers)?base.answers.slice(0,18):[],extraAnswers:Array.isArray(extra?.answers)?extra.answers.slice(0,18):[],deepScores:deepScores.map(x=>({key:x.key,score:x.score,count:x.count})),deepAnswers:Array.isArray(extra?.answers)?extra.answers.slice(0,18):[]};
+  return {name:activeProfile(p)||(p==="my"?"あなた":"相手"),radar:radar||null,extraRadar:ex||null,traits:state(p).traits,summary:document.getElementById(p+"Free")?.value||"",scores:scores.map(x=>({key:x.key,score:Number(x.score)||50})),answers:Array.isArray(base?.answers)?base.answers.slice(0,18):[],extraAnswers:Array.isArray(extra?.answers)?extra.answers.slice(0,18):[],deepScores:deepScores.map(x=>({key:x.key,score:x.score,count:x.count})),deepAnswers:Array.isArray(extra?.answers)?extra.answers.slice(0,18):[]};
 }
 async function v23CreateInvite(){
+  const partnerProfileName=activeProfile('partner');
+  if(!partnerProfileName){alert("先に相手プロフィールを作って、名前をつけてください。");return}
   if(!loadDiagRadar("my")){alert("先に自分の前半18問の特性チェックを終えてね。");return}
   const shareMy=!!document.getElementById("v23HostShare")?.checked;
-  const partnerProfileName='相手の回答';
   const owner=v23OwnerToken();
   const payload={ownerToken:owner,host:v23CurrentProfilePayload("my"),hostShare:shareMy};
   const r=await fetch("/api/invite",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
@@ -1533,11 +1536,8 @@ function v23RenderHostStatus(d){
   if(!v29HostInviteActive())return;
   const box=document.getElementById('v23InviteControls');if(!box)return;
   const s=d?.status||{};
-  box.innerHTML=`<div class="v36-status"><b>🔗 2人用チェックを作成しました</b><br>${s.joined?'相手が回答を完了しています。':'まだ相手の回答待ちです。'}<br>${s.partnerShared?'相手の結果を共有しています。':'相手は結果を共有していないため、比較結果はまだ表示できません。'}</div><div class="invite-partner-name" style="margin:10px 0;">
-  <label for="invitePartnerName" style="display:block;margin-bottom:6px;">相手の名前</label>
-  <input id="invitePartnerName" type="text" maxlength="50" placeholder="例：友達A" autocomplete="off">
-  <div style="font-size:12px;color:#7b838c;margin-top:4px;">この名前は招待相手には表示されません。</div>
-</div>
+  const partnerName=v23GetInviteState()?.partnerProfileName||activeProfile('partner')||'相手';
+  box.innerHTML=`<div class="v36-status"><b>🔗 2人用チェックを作成しました</b><br>「${escapeHtml(partnerName)}」プロフィールへの回答を待っています。<br>${s.joined?'相手が回答を完了しています。':'まだ相手の回答待ちです。'}<br>${s.partnerShared?'相手の結果を共有しています。':'相手は結果を共有していないため、比較結果はまだ表示できません。'}</div>
 <button id="v23ResetInviteBtn" type="button" style="margin-top:8px;width:100%;padding:10px;border:1px solid #ddd;border-radius:11px;background:#fff;color:#59616b">↩️ 招待を終了して戻る</button>`;
   if(s.joined&&s.partnerShared&&d.partnerProfile){
     savePartnerSharedProfile(d.partnerProfile,v23GetInviteState()?.partnerProfileName||'');
@@ -1883,6 +1883,7 @@ loadSharedFromUrl();
   }
   function openProfile(which){
     const overlay=document.getElementById('v72ProfileOverlay');
+    overlay?.setAttribute('data-profile-mode','existing');
     const title=document.getElementById('v72ProfileTitle');
     const paneMy=document.getElementById('profileMyPane'),panePartner=document.getElementById('profilePartnerPane');
     const diagBtn=document.getElementById('v72OpenDiag');
@@ -1912,6 +1913,7 @@ loadSharedFromUrl();
   }
   function openProfileNew(which){
     openProfile(which);
+    document.getElementById('v72ProfileOverlay')?.setAttribute('data-profile-mode','new');
     const name=document.getElementById(which+'Name');
     const free=document.getElementById(which+'Free');
     if(name)name.value='';
@@ -1924,8 +1926,16 @@ loadSharedFromUrl();
   document.getElementById('v72PickerClose').onclick=()=>document.getElementById('v72PickerOverlay').classList.remove('show');
   document.getElementById('v72ProfileClose').onclick=()=>{document.getElementById('v72ProfileOverlay').classList.remove('show');setNames();};
   document.getElementById('v72OpenDiag').onclick=()=>{
-    document.getElementById('v72ProfileOverlay').classList.remove('show');
     const which=pickerWhich;
+    const nameInput=document.getElementById(which+'Name');
+    if(!nameInput?.value.trim()){
+      showSaveNameRequired(which);
+      return;
+    }
+    // 特性チェックへ進むときは、名前を確定したプロフィールを先に作成・保存する。
+    // 特性チェック自体は任意なので、ここでプロフィールを保存してもメモだけ保存する利用方法はそのまま。
+    if(!save(which,{close:false,toast:false}))return;
+    document.getElementById('v72ProfileOverlay').classList.remove('show');
     if(which==='my')selfDiag.click();else otherDiag.click();
     document.getElementById('v72DiagTitle').textContent=(which==='my'?'👤 自分':'👥 相手')+'の特性チェック';
     document.getElementById('v72DiagOverlay').classList.add('show');
