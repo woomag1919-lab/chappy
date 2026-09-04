@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CoreLingual v60</title>
+<title>CoreLingual v92</title>
 <style>
 body{margin:0;background:#fafbfc;color:#30343b;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:760px;margin:auto;padding-bottom:40px}header{padding:18px 20px;color:#fff;background:linear-gradient(110deg,#ef6585,#d94788)}h1{margin:0}.sub{font-size:12px}nav{display:flex;gap:4px;margin:12px 14px}nav button{flex:1;padding:12px;border:0;border-radius:24px;font-weight:bold}nav .on{background:#ffeaf0;color:#c74369}main{padding:0 14px}.panel,.person,.card{background:#fff;border:1px solid #e5e8ed;border-radius:16px;padding:14px;margin-bottom:12px}.person{margin-top:10px}button,select,input,textarea{font:inherit}button{cursor:pointer}.actions{display:flex;gap:8px;margin:10px 0}
 .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-4px;margin-right:7px}
@@ -1012,16 +1012,16 @@ function buildPairComparisonCard(myScores,partnerScores,partnerDeep,myDeepScores
       <div class="v82-kicker">👥 2人のコミュニケーション比較</div>
       <p class="v82-lead">同じ会話でも、自然に選びやすい「入口」が違うと、すれ違いが起きることがあります。</p>
     </div>
-    <div class="v82-section-title">特に違いが出やすい3つ</div>
+    <div class="v82-section-title">特に差が出やすい<span class="v82-top-count">3</span>つ</div>
     <div class="v82-top3"></div>
-    <div class="v82-section-title v82-list-title">9つのコミュニケーション傾向</div>
+    <div class="v82-section-title v82-list-title"><span class="v82-nine-count">9</span>つのコミュニケーション傾向</div>
     <div class="v82-axis-head"><span></span><b>${escapeHtml(myName||'自分')}</b><b>${escapeHtml(partnerName||'相手')}</b></div>
     <div class="v82-axis-list"></div>
     <div class="v82-advice">
       <div class="v82-section-title">💡 この2人がラクになるポイント</div>
       <div class="v82-advice-grid"></div>
     </div>
-    <div class="v82-footer-note">違いは、良し悪しではなく会話の入口の違い。相手の入口が分かると、伝え方も少し変えられます。</div>`;
+    <div class="v82-footer-note">それぞれの入口に良し悪しはありません。相手の入口が分かると、伝え方も少し変えられます。</div>`;
 
   const topEl=sec.querySelector('.v82-top3');
   if(topRows.length){
@@ -1034,6 +1034,8 @@ function buildPairComparisonCard(myScores,partnerScores,partnerDeep,myDeepScores
   }else{
     topEl.innerHTML='<div class="v82-similar">大きな差は少なめ。似た入口から会話を進めやすい2人です。</div>';
   }
+  const topCountEl=sec.querySelector(".v82-top-count");
+  if(topCountEl) topCountEl.textContent=String(topRows.length);
 
   const list=sec.querySelector('.v82-axis-list');
   allRows.forEach(row=>{
@@ -1042,6 +1044,8 @@ function buildPairComparisonCard(myScores,partnerScores,partnerDeep,myDeepScores
     el.innerHTML=`<div class="v82-axis-name">${axis.icon||''} ${escapeHtml(axis.label)}</div><div>${escapeHtml(ml)}</div><div>${escapeHtml(pl)}</div>`;
     list.appendChild(el);
   });
+  const nineCountEl=sec.querySelector(".v82-nine-count");
+  if(nineCountEl) nineCountEl.textContent=String(allRows.length);
 
   const adviceEl=sec.querySelector('.v82-advice-grid');
   const adviceMap={
@@ -2112,6 +2116,10 @@ loadSharedFromUrl();
     if(s.includes('伝え方'))return'communication'; if(s.includes('近づき方'))return'attach'; if(s.includes('刺激'))return'sensory'; if(s.includes('進め方'))return'process';
     return'language';
   }
+  function cl92CleanAxisLabel(value){
+    return String(value||'').replace(/^[\s\p{Extended_Pictographic}\u200d\ufe0f\u20e3\u2600-\u27bf\u2190-\u21ff]+/u,'').replace(/^[-•・]+\s*/,'').trim();
+  }
+
   async function downloadCompareCard(){
     const data=getActiveCompareData();
     if(!data.my||!data.partner){alert('2人分の比較データがまだありません。');return;}
@@ -2127,13 +2135,13 @@ loadSharedFromUrl();
       const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
       const text=(el,sel)=>{const n=el?.querySelector(sel);return n?n.textContent.trim():''};
       const topItems=[...source.querySelectorAll('.v82-top-item')].slice(0,3).map((el,i)=>({
-        num:String(i+1).padStart(2,'0'),axis:text(el,'.v82-top-axis').replace(/^[^\p{L}\p{N}]+/u,''),
+        num:String(i+1).padStart(2,'0'),axis:cl92CleanAxisLabel(text(el,'.v82-top-axis')),
         left:text(el,'.v82-top-contrast b:nth-of-type(1)'),right:text(el,'.v82-top-contrast b:nth-of-type(2)')
       }));
       const rows=[...source.querySelectorAll('.v82-axis-row')].map(el=>({
-        axis:text(el,'.v82-axis-name').replace(/^[^\p{L}\p{N}]+/u,''),left:el.children[1]?.textContent.trim()||'',right:el.children[2]?.textContent.trim()||''
+        axis:cl92CleanAxisLabel(text(el,'.v82-axis-name')),left:el.children[1]?.textContent.trim()||'',right:el.children[2]?.textContent.trim()||''
       }));
-      const advice=[...source.querySelectorAll('.v82-advice-item')].slice(0,2).map(el=>({title:text(el,'b').replace(/^[^\p{L}\p{N}]+/u,''),lines:[...el.querySelectorAll('p')].map(x=>x.textContent.trim()).filter(Boolean)}));
+      const advice=[...source.querySelectorAll('.v82-advice-item')].slice(0,2).map(el=>({title:text(el,'b').replace(/^[^\p{L}\p{N}]+/u,''),lines:[...new Set([...el.querySelectorAll('p')].map(x=>x.textContent.trim()).filter(Boolean))].slice(0,2)}));
       const myName=source.querySelector('.v82-axis-head b:nth-of-type(1)')?.textContent.trim()||'Aさん';
       const paName=source.querySelector('.v82-axis-head b:nth-of-type(2)')?.textContent.trim()||'Bさん';
       const icon=(key,color)=>`<span class="cl91-icon" style="color:${color}">${cl91AssetSvg(key,color)}</span>`;
@@ -2150,7 +2158,7 @@ loadSharedFromUrl();
           </header>
 
           <section class="cl91-block cl91-top-block">
-            <div class="cl91-title pink">特に違いが出やすい3つ</div>
+            <div class="cl91-title pink">特に差が出やすい${topItems.length}つ</div>
             <div class="cl91-top-list">
               ${topItems.length?topItems.map((r,i)=>`<div class="cl91-top-row"><div class="cl91-num">${r.num}</div><div class="cl91-top-axis">${icon(topIconKeys[i]||'communication','#6f8790')}<div>${esc(r.axis)}</div></div><div class="cl91-top-value">${esc(r.left)}</div><div class="cl91-x">×</div><div class="cl91-top-value">${esc(r.right)}</div></div>`).join(''):`<div class="cl91-similar">大きな差は少なめ。似た入口から会話を進めやすい2人です。</div>`}
             </div>
@@ -2158,7 +2166,7 @@ loadSharedFromUrl();
           </section>
 
           <section class="cl91-block cl91-nine-block">
-            <div class="cl91-nine-head"><div class="cl91-title blue">9つのコミュニケーション傾向</div><div class="cl91-names"><span>${esc(myName)}</span><span>${esc(paName)}</span></div></div>
+            <div class="cl91-nine-head"><div class="cl91-title blue">${rows.length}つのコミュニケーション傾向</div><div class="cl91-names"><span>${esc(myName)}</span><span>${esc(paName)}</span></div></div>
             <div class="cl91-nine-list">
               ${rows.map((r,i)=>{const k=cl91AxisKey(r.axis);return `<div class="cl91-nine-row"><div class="cl91-axis-label">${icon(k,i%3===0?'#2c86d9':i%3===1?'#e89a8c':'#6f9d73')}<b>${esc(r.axis)}</b></div><div>${esc(r.left)}</div><div>${esc(r.right)}</div></div>`}).join('')}
             </div>
@@ -2174,7 +2182,7 @@ loadSharedFromUrl();
           <footer class="cl91-footer">
             <img class="cl91-asset cl91-footer-doodle" src="/assets/share/footer-doodle.png" crossorigin="anonymous">
             <div class="cl91-brand"><div>CoreLingual</div><small>わかると、もっと、うまくいく。</small></div>
-            <div class="cl91-footer-note">違いは、良し悪しではなく会話の入口の違い。<br>相手の入口が分かると、伝え方も少し変えられます。</div>
+            <div class="cl91-footer-note">それぞれの入口に、良し悪しはありません。<br>相手の入口が分かると、伝え方も少し変えられます。</div>
             <img class="cl91-asset cl91-leaves" src="/assets/share/leaves.png" crossorigin="anonymous">
           </footer>
         </div>`;
@@ -2216,6 +2224,11 @@ loadSharedFromUrl();
 .v77-gentle-note{margin:10px 14px 16px;padding:11px 14px;border-radius:14px;background:#faf7f8;border:1px solid #eee3e7;color:#7f8790;font-size:12px;line-height:1.7;text-align:center}
 </style>
 
+
+<style>
+/* v92: display the actual number of comparison items instead of fixed labels. */
+.v82-top-count,.v82-nine-count{display:inline;}
+</style>
 <style>
 /* v91: reusable share-poster template. Fixed decorative assets + dynamic comparison data. */
 .cl91-export-holder{position:fixed;left:-20000px;top:0;width:1084px;padding:0;margin:0;background:#fff;visibility:visible;z-index:-1}
@@ -2227,6 +2240,48 @@ loadSharedFromUrl();
 .cl91-nine-block{border:1.5px solid #d9e7ec;background:linear-gradient(135deg,#fafdfe 0%,#fff 100%);padding-top:24px}.cl91-nine-head{display:grid;grid-template-columns:1fr 380px;gap:16px;align-items:center;margin-bottom:10px}.cl91-names{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:18px;font-weight:900;text-align:center}.cl91-names span:first-child{padding:9px 12px;border-radius:999px;background:#d7e8e5;color:#3d6662}.cl91-names span:last-child{padding:9px 12px;border-radius:999px;background:#f2dfbd;color:#866a47}.cl91-nine-list{border-top:1px solid #dfe7eb}.cl91-nine-row{display:grid;grid-template-columns:410px 1fr 1fr;align-items:center;min-height:56px;border-bottom:1px dashed #dfe7eb;font-size:17px;line-height:1.35}.cl91-axis-label{display:flex;align-items:center;gap:9px;padding-right:12px;color:#26394c}.cl91-nine-row>div:not(:first-child){padding:0 12px;color:#344454}
 .cl91-advice-block{border:1.5px solid #f0dfbd;background:linear-gradient(135deg,#fffdf7 0%,#fff 100%);padding-bottom:27px}.cl91-advice-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.cl91-advice-card{padding:19px 20px 17px;border:1.5px solid #ecdde2;border-radius:22px;background:linear-gradient(135deg,#f8fbf8 0%,#fff 100%);min-height:112px;box-sizing:border-box}.cl91-advice-card:nth-child(2){background:linear-gradient(135deg,#fff9ef 0%,#fff 100%)}.cl91-advice-title{display:flex;align-items:center;gap:8px;font-size:19px;color:#304155;margin-bottom:9px}.cl91-advice-card p{margin:3px 0;font-size:17px;line-height:1.65;color:#465361}.cl91-advice-card.full{grid-column:1/-1}
 .cl91-footer{margin:0 24px;min-height:122px;padding:22px 30px;position:relative;border-radius:25px;background:linear-gradient(100deg,#edf6fb 0%,#f8eff7 100%);overflow:hidden;display:grid;grid-template-columns:1fr 1fr 1.25fr;align-items:center;gap:18px}.cl91-footer:before{content:"";position:absolute;left:-35px;bottom:-60px;width:450px;height:120px;border-radius:50%;background:rgba(255,255,255,.52);transform:rotate(-4deg)}.cl91-footer-doodle{position:absolute;left:24px;bottom:10px;width:300px;height:105px}.cl91-brand{text-align:center;position:relative;z-index:2}.cl91-brand div{font-size:32px;font-weight:900;letter-spacing:.03em;color:#203f64}.cl91-brand small{font-size:15px;color:#71808c}.cl91-footer-note{font-size:14px;line-height:1.65;color:#697681;text-align:right;position:relative;z-index:2}.cl91-leaves{position:absolute;right:15px;bottom:6px;width:72px;height:95px}
+
+/* v93: visual refinement toward the approved reference poster */
+.cl91-export-holder{left:-30000px;top:0;width:1084px;background:transparent;}
+.cl91-share-root{width:1084px;background:#fff;}
+.cl91-poster{margin:16px;padding:0 0 14px;border:1px solid #dfe6e7;border-radius:34px;background:#fff;box-shadow:0 12px 34px rgba(60,80,90,.12);}
+.cl91-header{min-height:174px;padding:26px 44px 18px;align-items:flex-start;gap:0;background:#fff;}
+.cl91-header-copy{padding:10px 165px 0 98px;}
+.cl91-header h1{font-size:38px;line-height:1.2;letter-spacing:.015em;}
+.cl91-header p{margin-top:12px;font-size:18px;line-height:1.55;max-width:730px;}
+.cl91-bubbles{left:38px;top:48px;width:76px;height:70px;}
+.cl91-header-doodle{right:30px;top:20px;width:142px;height:100px;}
+.cl91-block{margin:0 24px 18px;border-radius:28px;padding:25px 28px 22px;}
+.cl91-top-block{background:linear-gradient(135deg,#fff7fa 0%,#fffdfd 100%);}
+.cl91-title{font-size:28px;margin-bottom:14px;}
+.cl91-top-list{padding-right:96px;}
+.cl91-top-row{grid-template-columns:54px 248px 1fr 42px 1fr;gap:10px;min-height:64px;}
+.cl91-num{width:46px;height:46px;font-size:19px;}
+.cl91-top-axis{font-size:17px;gap:8px;}
+.cl91-top-value{font-size:22px;}
+.cl91-x{font-size:27px;}
+.cl91-oval-doodle{right:8px;top:70px;width:132px;height:112px;opacity:.92;}
+.cl91-nine-block{padding:23px 28px 20px;background:linear-gradient(135deg,#fbfdfe 0%,#fff 100%);}
+.cl91-nine-head{grid-template-columns:1fr 390px;gap:14px;margin-bottom:9px;}
+.cl91-nine-head .cl91-title{margin-bottom:0;}
+.cl91-names{gap:12px;font-size:18px;}
+.cl91-names span{padding:8px 12px!important;}
+.cl91-nine-row{grid-template-columns:410px 1fr 1fr;min-height:55px;font-size:16px;}
+.cl91-axis-label{gap:8px;}
+.cl91-icon{width:30px;height:30px;}
+.cl91-nine-row>div:not(:first-child){padding:0 12px;}
+.cl91-advice-block{padding:24px 28px 24px;margin-bottom:18px;}
+.cl91-advice-grid{gap:14px;}
+.cl91-advice-card{padding:17px 18px 15px;min-height:108px;border-radius:20px;}
+.cl91-advice-title{font-size:18px;margin-bottom:7px;}
+.cl91-advice-card p{font-size:16px;line-height:1.6;margin:2px 0;}
+.cl91-footer{margin:0 24px;min-height:128px;padding:18px 28px;border-radius:24px;grid-template-columns:1.05fr .9fr 1.15fr;gap:10px;background:linear-gradient(100deg,#edf6fb 0%,#f7eff7 100%);}
+.cl91-footer-doodle{left:18px;bottom:2px;width:300px;height:105px;}
+.cl91-brand div{font-size:31px;}
+.cl91-brand small{font-size:14px;}
+.cl91-footer-note{font-size:13px;line-height:1.55;padding-right:10px;}
+.cl91-leaves{right:10px;bottom:3px;width:62px;height:92px;}
+
 </style>
 </body></html>
 
