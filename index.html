@@ -2236,10 +2236,24 @@ async function downloadCompareCard(){
   for(let n=5;n>=1;n--){if(count)count.textContent=String(n);await new Promise(r=>setTimeout(r,1000));}overlay?.classList.remove('show');
   try{
     const canvas=await buildCompareTemplateCanvas();
-    const png=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('PNG生成に失敗しました')),'image/png'));
-    const url=URL.createObjectURL(png),a=document.createElement('a');a.href=url;a.download='CoreLingual_2人のコミュニケーション比較.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+    // Android ChromeでtoBlobが無反応になるケースを避け、まずdataURLでPNG化する。
+    let dataUrl;
+    try{
+      dataUrl=canvas.toDataURL('image/png');
+      if(!dataUrl || dataUrl==='data:,') throw new Error('PNG dataURLが空です');
+    }catch(blobErr){
+      console.warn('toDataURL failed, falling back to JPEG',blobErr);
+      dataUrl=canvas.toDataURL('image/jpeg',0.92);
+    }
+    const a=document.createElement('a');
+    a.href=dataUrl;
+    a.download='CoreLingual_2人のコミュニケーション比較.png';
+    a.style.display='none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>a.remove(),1000);
     const toast=document.createElement('div');toast.className='v73-download-toast';toast.textContent='比較結果を保存しました';document.body.appendChild(toast);setTimeout(()=>toast.remove(),2200);
-  }catch(e){console.error('comparison image export failed',e);alert('画像の作成に失敗しました。もう一度お試しください。');}
+  }catch(e){console.error('comparison image export failed',e);alert('画像の作成に失敗しました。\n'+(e?.message||e));}
 }
   document.getElementById('v73DownloadCompare')?.addEventListener('click',downloadCompareCard);
   // Page tracking.
