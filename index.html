@@ -2079,40 +2079,64 @@ loadSharedFromUrl();
   function buildCompareImageSvg(){
     const source=document.getElementById('v21CompareCard');
     if(!source)throw new Error('比較結果が見つかりません');
+
+    // AndroidのWebViewでは画面のCSS幅と端末の実ピクセル幅が違うため、
+    // 元の比較カードをそのまま1084pxのSVGへ入れると「中身だけ小さい画像」になる。
+    // いったん元カードと同じCSS幅で描画し、その全体を1084pxへ等倍拡大する。
+    const sourceWidth=Math.max(320,Math.ceil(source.getBoundingClientRect().width||source.offsetWidth||350));
+    const targetWidth=1084;
+    const scale=targetWidth/sourceWidth;
+
     const clone=source.cloneNode(true);
     clone.removeAttribute('id');
     clone.style.display='block';
     clone.style.visibility='visible';
-    clone.style.width='1000px';
-    clone.style.maxWidth='1000px';
+    clone.style.width=sourceWidth+'px';
+    clone.style.maxWidth='none';
     clone.style.margin='0';
     clone.style.padding='42px';
     clone.style.background='#ffffff';
     clone.style.border='0';
     clone.style.borderRadius='0';
+
+    // foreignObject内でも現在の見た目を再現するためcomputed styleを持ち込む。
     copyComputedStyles(source,clone);
+
+    // copyComputedStylesで子要素に元の固定CSS幅が入るため、ルート幅に合わせて
+    // 全体をまとめて拡大する。レイアウト比率は変えない。
     clone.style.display='block';
-    clone.style.width='1000px';
-    clone.style.maxWidth='1000px';
+    clone.style.width=sourceWidth+'px';
+    clone.style.maxWidth='none';
     clone.style.padding='42px';
     clone.style.background='#ffffff';
     clone.style.border='0';
     clone.style.borderRadius='0';
+    clone.style.transform='scale('+scale+')';
+    clone.style.transformOrigin='top left';
+
     clone.querySelectorAll('button,select,input,[aria-hidden="true"]').forEach(el=>el.remove());
+
     const holder=document.createElement('div');
-    holder.style.position='fixed';holder.style.left='-100000px';holder.style.top='0';holder.style.width='1084px';holder.style.background='#fff';holder.style.padding='0';holder.style.visibility='hidden';holder.appendChild(clone);document.body.appendChild(holder);
-    const w=1084,h=Math.max(900,Math.ceil(clone.scrollHeight||clone.getBoundingClientRect().height)+8);
+    holder.style.position='fixed';
+    holder.style.left='-100000px';
+    holder.style.top='0';
+    holder.style.width=sourceWidth+'px';
+    holder.style.background='#fff';
+    holder.style.padding='0';
+    holder.style.visibility='hidden';
+    holder.appendChild(clone);
+    document.body.appendChild(holder);
+
+    // transform前の高さを取得してから、出力SVG側では拡大後の高さを使う。
+    const rawHeight=Math.max(1,Math.ceil(clone.scrollHeight||clone.getBoundingClientRect().height||900));
+    const h=Math.max(900,Math.ceil(rawHeight*scale)+8);
     holder.remove();
-    // SVGのforeignObjectはXMLとして解析されるため、HTMLのvoid要素（br/img/input等）を
-    // XML互換の自己終了タグへ正規化してから埋め込む。これをしないとAndroidの画像ビューア等で
-    // 「Opening and ending tag mismatch: br ... p」のようなXMLエラーになる。
-    // XMLSerializerでXHTMLとして直列化する。outerHTMLのHTML表記（<br>など）を
-    // 正規表現だけで直す方式はAndroidのXMLパーサーで取りこぼしが起きるため使わない。
+
     const serializer=new XMLSerializer();
     let html=serializer.serializeToString(clone).replace(/&nbsp;/g,' ');
-    // HTML→XHTML変換で残る可能性のあるvoid要素を念のため自己終了化。
     html=html.replace(/<(br|hr|img|input|meta|link|source|area|base|col|embed|param|track|wbr)(\s[^<>]*?)?\s*>/gi,(_,tag,attrs='')=>`<${tag}${attrs || ''} />`);
-    return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="100%" height="100%" fill="#ffffff"/><foreignObject x="0" y="0" width="${w}" height="${h}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:${w}px;box-sizing:border-box;background:#fff;">${html}</div></foreignObject></svg>`;
+
+    return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${targetWidth}" height="${h}" viewBox="0 0 ${targetWidth} ${h}"><rect width="100%" height="100%" fill="#ffffff"/><foreignObject x="0" y="0" width="${targetWidth}" height="${h}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:${sourceWidth}px;transform:scale(${scale});transform-origin:top left;background:#fff;">${html}</div></foreignObject></svg>`;
   }
   async function downloadCompareCard(){
     const data=getActiveCompareData();if(!data.my||!data.partner){alert('2人分の比較データがまだありません。');return;}
@@ -2130,8 +2154,7 @@ loadSharedFromUrl();
       const url=URL.createObjectURL(png),a=document.createElement('a');a.href=url;a.download='CoreLingual_2人のコミュニケーション比較.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
     }catch(e){
       console.error('comparison image export failed',e);
-      if(svgUrl){const a=document.createElement('a');a.href=svgUrl;a.download='CoreLingual_2人のコミュニケーション比較.svg';document.body.appendChild(a);a.click();a.remove();}
-      else alert('画像の作成に失敗しました。もう一度お試しください。');
+      alert('画像の作成に失敗しました。もう一度お試しください。');
     }finally{if(svgUrl)setTimeout(()=>URL.revokeObjectURL(svgUrl),1500);}
     const toast=document.createElement('div');toast.className='v73-download-toast';toast.textContent='比較結果を保存しました';document.body.appendChild(toast);setTimeout(()=>toast.remove(),2200);
   }
@@ -2143,7 +2166,7 @@ loadSharedFromUrl();
 </script>
 
 <style>
-/* v74: simplify profile sheet + polished downloadable comparison card */
+/* v87: fix comparison PNG export size; PNG-only download */
 .v74-profile-panel{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
 .v74-profile-panel .person{padding:0}
 .v74-profile-panel .small{font-size:12px;margin-top:12px}
