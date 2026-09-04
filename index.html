@@ -2111,7 +2111,7 @@ loadSharedFromUrl();
     b:el.querySelector('.v82-top-contrast b:nth-of-type(2)')?.textContent||''
   }));
   fill(80,195,430,55,pink);
-  text(`特に差が出やすい${topItems.length}つ`,92,220,28,'700',rose);
+  text(`特に差が出やすい${topItems.length}つ`,92,220,29,'700',rose);
   fill(70,250,735,250,pink);
   [333,414].forEach(y=>{ctx.strokeStyle='#eedfe6';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(220,y);ctx.lineTo(805,y);ctx.stroke();});
   const iconSrcY={
@@ -2122,10 +2122,10 @@ loadSharedFromUrl();
   topItems.forEach((it,i)=>{
     const cy=[286,366,446][i];
     text(it.num,102,cy,17,'700','#c55374','center');drawIcon(it.axis,166,cy-18);
-    const ax=wrap(it.axis,170,17,'700',1);drawLines(ax.lines,230,cy-17,ax.size,'700','#39424d',18);
-    const as=fit(it.a,150,24,'700');text(it.a,380,cy+16,as,'700',navy);
+    const ax=wrap(it.axis,170,18,'700',1);drawLines(ax.lines,230,cy-17,ax.size,'700','#39424d',18);
+    const as=fit(it.a,150,25,'700');text(it.a,380,cy+16,as,'700',navy);
     text('×',520,cy+6,30,'700',rose,'center');
-    const bs=fit(it.b,190,24,'700');text(it.b,595,cy+16,bs,'700',navy);
+    const bs=fit(it.b,190,25,'700');text(it.b,595,cy+16,bs,'700',navy);
   });
   if(!topItems.length)text('大きな差は少なめ。似た入口から会話を進めやすい2人です。',225,375,20,'500',gray);
 
@@ -2133,9 +2133,9 @@ loadSharedFromUrl();
     const ds=el.querySelectorAll(':scope > div');return {name:ds[0]?.textContent||'',a:ds[1]?.textContent||'',b:ds[2]?.textContent||''};
   });
   fill(70,530,900,55,white);
-  text(`${rows.length}つのコミュニケーション傾向`,88,565,27,'700','#2f6488');
+  text(`${rows.length}つのコミュニケーション傾向`,88,565,28,'700','#2f6488');
   rr(520,545,195,40,20,teal);rr(760,545,195,40,20,gold);
-  text(data.myName||'あなた',617,566,20,'700','#fff','center');text(data.paName||'相手',857,566,20,'700','#fff','center');
+  text(data.myName||'あなた',617,566,21,'700','#fff','center');text(data.paName||'相手',857,566,21,'700','#fff','center');
   ctx.strokeStyle='#dce2e6';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(735,590);ctx.lineTo(735,1040);ctx.stroke();
   fill(70,590,900,460,white);
   const rowH=Math.max(45,Math.min(54,Math.floor(450/Math.max(rows.length,1))));
@@ -2143,7 +2143,7 @@ loadSharedFromUrl();
     const cy=610+i*rowH+Math.floor(rowH/2);
     ctx.strokeStyle='#e1e5e8';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(70,cy+rowH/2);ctx.lineTo(970,cy+rowH/2);ctx.stroke();
     const name=r.name.replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim();drawIcon(name,82,cy-17);
-    const ns=fit(name,330,17,'700');text(name,145,cy,ns,'700','#263b50');
+    const ns=fit(name,330,18,'700');text(name,145,cy,ns,'700','#263b50');
     const as=fit(r.a,205,18,'500');text(r.a,505,cy,as,'500',gray);
     const bs=fit(r.b,205,18,'500');text(r.b,755,cy,bs,'500',gray);
   });
@@ -2156,8 +2156,8 @@ loadSharedFromUrl();
     const x=i===0?125:575,max=350,head=a.head.replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim();
     const iconKey=head.includes('進め方')?'進め方・柔軟性':head.includes('伝え方')?'伝え方・受け止め方':'';
     if(iconKey)drawIcon(iconKey,i===0?88:538,1175);
-    const hs=fit(head,max,17,'700');text(head,x,1185,hs,'700','#263b50');
-    const w=wrap(a.ps.join('\n'),max,16,'500',3);drawLines(w.lines,x,1225,w.size,'500',gray,26);
+    const hs=fit(head,max,18,'700');text(head,x,1185,hs,'700','#263b50');
+    const w=wrap(a.ps.join('\n'),max,15,'500',3);drawLines(w.lines,x,1225,w.size,'500',gray,26);
   });
   return canvas;
 }
@@ -2180,7 +2180,7 @@ async function downloadCompareCard(){
 </script>
 
 <style>
-/* v74: simplify profile sheet + polished downloadable comparison card */
+/* v95: fixed-image comparison template + closer font sizing/weight match */
 .v74-profile-panel{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
 .v74-profile-panel .person{padding:0}
 .v74-profile-panel .small{font-size:12px;margin-top:12px}
