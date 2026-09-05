@@ -55,3 +55,12 @@
   function refreshAdvice(){try{const card=document.getElementById('v21CompareCard');if(!card)return false;card.querySelectorAll('.v82-advice-item').forEach(item=>{const axis=(item.querySelector('b')?.textContent||'').replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim(),key=axisKey[axis];if(!key)return;const axisRow=[...card.querySelectorAll('.v82-axis-row')].find(r=>r.querySelector('.v82-axis-name')?.textContent?.includes(axis));if(!axisRow)return;const cells=axisRow.querySelectorAll(':scope > div'),ps=item.querySelectorAll('p'),a=sideFromText(cells[1]?.textContent,key),b=sideFromText(cells[2]?.textContent,key);if(ps[0])ps[0].textContent=a==='middle'?middle[key]:adviceMap[key][a];if(ps[1])ps[1].textContent=b==='middle'?middle[key]:adviceMap[key][b]}) ;return true}catch(e){console.warn('v119 advice refresh failed',e);return false}}
   let tries=0;const timer=setInterval(()=>{if(refreshAdvice()||++tries>=80)clearInterval(timer)},100);window.addEventListener('load',refreshAdvice);
 })();
+
+/* CoreLingual v120 — load comparison difference visibility fix */
+(function(){
+  try{
+    if(!document.querySelector('script[data-corelingual-v120]')){
+      const s=document.createElement('script');s.src='/js/v120-fixes.js';s.dataset.corelingualV120='1';document.body.appendChild(s);
+    }
+  }catch(e){console.warn('v120 loader failed',e)}
+})();
