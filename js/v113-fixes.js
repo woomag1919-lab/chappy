@@ -66,4 +66,37 @@
       if(wrapRestoreDiagAnswers() || ++tries>=40) clearInterval(timer);
     },50);
   }
+
+  /* v116 — 同名プロフィールを削除→再作成した場合も、深掘り18問の下書きを引き継がない */
+  function wrapProfileSave(){
+    try{
+      const orig=window.save;
+      if(typeof orig!=='function' || orig.__v116Wrapped)return !!orig;
+      const wrapped=function(p,opts){
+        try{
+          const input=document.getElementById(p+'Name');
+          const name=input?.value?.trim()||'';
+          if(name && typeof list==='function'){
+            const exists=list(p).some(x=>x?.name===name);
+            if(!exists){
+              const key='cl_extra_draft_'+p+'_'+encodeURIComponent(name);
+              localStorage.removeItem(key);
+              localStorage.removeItem('cl_extra_draft_'+p);
+            }
+          }
+        }catch(e){console.warn('v116 draft reset failed',e)}
+        return orig.apply(this,arguments);
+      };
+      wrapped.__v116Wrapped=true;
+      window.save=wrapped;
+      return true;
+    }catch(e){console.warn('v116 save wrapper failed',e);return false}
+  }
+
+  if(!wrapProfileSave()){
+    let tries=0;
+    const timer=setInterval(()=>{
+      if(wrapProfileSave() || ++tries>=40) clearInterval(timer);
+    },50);
+  }
 })();
