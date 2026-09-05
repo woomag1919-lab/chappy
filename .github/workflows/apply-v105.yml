@@ -24,7 +24,6 @@ jobs:
           from pathlib import Path
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
-
           old_table = """      text(r.a,510,cy,fit(r.a,210,17,'500',10),'500',gray,'left');
           text(r.b,750,cy,fit(r.b,210,17,'500',10),'500',gray,'left');"""
           new_table = """      text(r.a,510,cy,fit(r.a,210,18,'500',12),'500',gray,'left');
@@ -32,7 +31,6 @@ jobs:
           if old_table not in s:
               raise SystemExit('v105 table target not found; refusing to modify index.html')
           s = s.replace(old_table, new_table, 1)
-
           old_adv = """    adv.forEach((a,i)=>{
           const x=i===0?125:575;
           const iconX=i===0?85:535;
@@ -59,7 +57,6 @@ jobs:
           if old_adv not in s:
               raise SystemExit('v105 advice target not found; refusing to modify index.html')
           s = s.replace(old_adv, new_adv, 1)
-
           p.write_text(s, encoding='utf-8')
           PY
 
@@ -71,3 +68,5 @@ jobs:
           git add index.html .github/workflows/apply-v105.yml
           git commit -m 'Apply v105 comparison font update'
           git push
+
+# trigger
