@@ -141,6 +141,8 @@ function save(p,opts={}){
   a=a.slice(-5);
   localStorage.setItem("cl_"+p,JSON.stringify(a));
   setActiveProfile(p,name);
+  /* v115: 新規プロフィール作成時も診断DOMを新プロフィールの保存状態に同期する */
+  syncDiagnosisForProfile(p,item);
   draw(p);
   renderTwoPersonComparison();
   if(opts.close!==false){
