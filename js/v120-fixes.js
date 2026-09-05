@@ -2,8 +2,13 @@
 (function(){
   'use strict';
 
+  const BASE_AXES=['情報の受け取り方','考え方','感情の扱い方','人との距離感','変化への対応','伝え方・受け止め方'];
+  const DEEP_KEY={
+    '近づき方・距離の取り方':'attach','刺激への反応':'sensory','進め方・柔軟性':'process'
+  };
   const AXIS_KEY={
-    '情報の受け取り方':'language','考え方':'thinking','感情の扱い方':'emotion','人との距離感':'distance','変化への対応':'change','伝え方・受け止め方':'communication','近づき方・距離の取り方':'attach','刺激への反応':'sensory','進め方・柔軟性':'process'
+    '情報の受け取り方':'language','考え方':'thinking','感情の扱い方':'emotion','人との距離感':'distance','変化への対応':'change','伝え方・受け止め方':'communication',
+    '近づき方・距離の取り方':'attach','刺激への反応':'sensory','進め方・柔軟性':'process'
   };
   const LABELS={
     language:{left:'言葉ではっきり',right:'流れから受け取る',middle:'言葉と流れを使い分け'},
@@ -42,11 +47,11 @@
   function getRows(data){
     const my=data?.my?.scores||[],pa=data?.partner?.scores||[];
     const bm=Object.fromEntries(my.map(x=>[x.key,Number(x.score)])),bp=Object.fromEntries(pa.map(x=>[x.key,Number(x.score)]));
-    const rows=Object.keys(AXIS_KEY).map(k=>({key:AXIS_KEY[k],axis:k,type:'base',my:bm[AXIS_KEY[k]]??50,partner:bp[AXIS_KEY[k]]??50}));
+    const rows=BASE_AXES.map(axis=>{const key=AXIS_KEY[axis];return {key,axis,type:'base',my:bm[key]??50,partner:bp[key]??50}});
     const md=data?.my?.deep||[],pd=data?.partner?.deep||[];
     if(md.length&&pd.length){
       const dm=Object.fromEntries(md.map(x=>[x.key,Number(x.score)])),dp=Object.fromEntries(pd.map(x=>[x.key,Number(x.score)]));
-      Object.keys(dm).forEach(key=>{if(dp[key]!=null)rows.push({key,axis:(typeof DEEP_AXES!=='undefined'&&DEEP_AXES[key]?.label)||key,type:'deep',my:dm[key],partner:dp[key]})});
+      Object.keys(DEEP_KEY).forEach(axis=>{const key=DEEP_KEY[axis];if(dm[key]!=null&&dp[key]!=null)rows.push({key,axis,type:'deep',my:dm[key],partner:dp[key]})});
     }
     return rows.map(r=>({...r,diff:Math.abs(r.my-r.partner),myLabel:label(r.key,r.my),partnerLabel:label(r.key,r.partner)}));
   }
@@ -57,13 +62,14 @@
       const data=window.getActiveCompareData?.();if(!data?.my||!data?.partner)return false;
       const box=card.querySelector('.v82-top3');if(!box)return false;
       const rows=getRows(data).sort((a,b)=>b.diff-a.diff);
-      // 「違いが出やすい」欄には、表示上もちゃんと違いが見える項目だけを採用する。
-      const candidates=rows.filter(r=>r.diff>=8&&(r.myLabel!==r.partnerLabel||r.diff>=15)).slice(0,3);
+      // TOP欄は「差がある」だけでなく、画面上でも左右の違いが見える項目だけを選ぶ。
+      const candidates=rows.filter(r=>r.diff>=8&&r.myLabel!==r.partnerLabel).slice(0,3);
       box.innerHTML='';
       if(!candidates.length){box.innerHTML='<div class="v82-similar">大きな差は少なめ。似た入口から会話を進めやすい2人です。</div>';return true}
       candidates.forEach((r,i)=>{
         const el=document.createElement('div');el.className='v82-top-item';
-        el.innerHTML='<div class="v82-top-num">0'+(i+1)+'</div><div class="v82-top-main"><div class="v82-top-axis">'+((typeof AXES!=='undefined'&&AXES[r.key]?.icon)||'')+' '+(typeof escapeHtml==='function'?escapeHtml(r.axis):r.axis)+'</div><div class="v82-top-contrast"><b>'+ (typeof escapeHtml==='function'?escapeHtml(r.myLabel):r.myLabel) +'</b><span>×</span><b>'+ (typeof escapeHtml==='function'?escapeHtml(r.partnerLabel):r.partnerLabel) +'</b></div></div>';
+        const icon=(r.type==='base'&&typeof AXES!=='undefined'&&AXES[r.key]?.icon)||(r.type==='deep'&&typeof DEEP_AXES!=='undefined'&&DEEP_AXES[r.key]?.icon)||'';
+        el.innerHTML='<div class="v82-top-num">0'+(i+1)+'</div><div class="v82-top-main"><div class="v82-top-axis">'+icon+' '+(typeof escapeHtml==='function'?escapeHtml(r.axis):r.axis)+'</div><div class="v82-top-contrast"><b>'+ (typeof escapeHtml==='function'?escapeHtml(r.myLabel):r.myLabel) +'</b><span>×</span><b>'+ (typeof escapeHtml==='function'?escapeHtml(r.partnerLabel):r.partnerLabel) +'</b></div></div>';
         box.appendChild(el);
       });
       return true;
@@ -77,25 +83,19 @@
       const rows=getRows(data),byKey=Object.fromEntries(rows.map(r=>[r.key,r]));
       card.querySelectorAll('.v82-advice-item').forEach(item=>{
         const axis=(item.querySelector('b')?.textContent||'').replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim(),key=AXIS_KEY[axis],r=byKey[key];if(!r)return;
-        const dict=ADVICE[key]||{},a=side(r.my),b=side(r.partner),ps=item.querySelectorAll('p');
-        if(!ps.length)return;
-        if(a===b){
-          ps[0].textContent=dict.same||dict[a]||'';
-          if(ps[1])ps[1].textContent='';
-        }else{
-          ps[0].textContent=dict[a]||dict.middle||'';
-          if(ps[1])ps[1].textContent=dict[b]||dict.middle||'';
-        }
+        const dict=ADVICE[key]||{},a=side(r.my),b=side(r.partner),ps=item.querySelectorAll('p');if(!ps.length)return;
+        if(a===b){ps[0].textContent=dict.same||dict[a]||'';if(ps[1])ps[1].textContent='';}
+        else{ps[0].textContent=dict[a]||dict.middle||'';if(ps[1])ps[1].textContent=dict[b]||dict.middle||'';}
         item.style.display='';
       });
       return true;
     }catch(e){console.warn('v120 advice refresh failed',e);return false}
   }
 
-  function refresh(){return refreshTop()&&refreshAdvice()}
+  function refresh(){const a=refreshTop();refreshAdvice();return a}
   let tries=0;
   const timer=setInterval(()=>{if(refresh()||++tries>=120)clearInterval(timer)},100);
-  window.addEventListener('load',()=>{refresh();setTimeout(refresh,300);setTimeout(refresh,1000)});
+  window.addEventListener('load',()=>{refresh();setTimeout(refresh,300);setTimeout(refresh,1000);setTimeout(refresh,2000)});
   const card=document.getElementById('v21CompareCard');
-  if(card){new MutationObserver(()=>refresh()).observe(card,{subtree:true,childList:true});}
+  if(card)new MutationObserver(()=>refresh()).observe(card,{subtree:true,childList:true});
 })();
