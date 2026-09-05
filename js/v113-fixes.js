@@ -99,4 +99,39 @@
       if(wrapProfileSave() || ++tries>=40) clearInterval(timer);
     },50);
   }
+
+  /* v117 — 特性チェックを開くたび、前回閉じた位置を引き継がず先頭から開始 */
+  function resetDiagSheetScroll(){
+    try{
+      const overlay=document.getElementById('v72DiagOverlay');
+      const sheet=overlay?.querySelector('.v72-sheet');
+      if(sheet) sheet.scrollTop=0;
+    }catch(e){console.warn('v117 diagnosis scroll reset failed',e)}
+  }
+
+  function installDiagScrollReset(){
+    try{
+      const overlay=document.getElementById('v72DiagOverlay');
+      if(!overlay || overlay.__v117ScrollReset)return !!overlay;
+      overlay.__v117ScrollReset=true;
+      const reset=()=>{
+        resetDiagSheetScroll();
+        requestAnimationFrame(resetDiagSheetScroll);
+        setTimeout(resetDiagSheetScroll,50);
+      };
+      const openBtn=document.getElementById('v72OpenDiag');
+      if(openBtn)openBtn.addEventListener('click',reset,true);
+      new MutationObserver(()=>{
+        if(overlay.classList.contains('show'))reset();
+      }).observe(overlay,{attributes:true,attributeFilter:['class']});
+      return true;
+    }catch(e){console.warn('v117 diagnosis scroll hook failed',e);return false}
+  }
+
+  if(!installDiagScrollReset()){
+    let tries=0;
+    const timer=setInterval(()=>{
+      if(installDiagScrollReset() || ++tries>=40) clearInterval(timer);
+    },50);
+  }
 })();
