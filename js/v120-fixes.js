@@ -1,20 +1,10 @@
-/* CoreLingual v120.2 — comparison difference/advice fix */
+/* CoreLingual v120.3 — comparison difference/advice fix */
 (function(){
   'use strict';
   const BASE_AXES=['情報の受け取り方','考え方','感情の扱い方','人との距離感','変化への対応','伝え方・受け止め方'];
   const DEEP_AXES=['近づき方・距離の取り方','刺激への反応','進め方・柔軟性'];
   const KEY={'情報の受け取り方':'language','考え方':'thinking','感情の扱い方':'emotion','人との距離感':'distance','変化への対応':'change','伝え方・受け止め方':'communication','近づき方・距離の取り方':'attach','刺激への反応':'sensory','進め方・柔軟性':'process'};
-  const LABELS={
-    language:{left:'言葉ではっきり',right:'流れから受け取る',middle:'言葉と流れを使い分け',low:'やや言葉寄り',high:'やや流れ寄り'},
-    thinking:{left:'筋道を整理',right:'ひらめきを広げる',middle:'整理と発想を行き来',low:'やや整理寄り',high:'やや発想寄り'},
-    emotion:{left:'話して整理',right:'時間を置いて整理',middle:'話す・考えるを使い分け',low:'やや話す寄り',high:'やや時間を置く寄り'},
-    distance:{left:'一緒に整理',right:'ひとりで整理',middle:'状況に合わせて距離調整',low:'やや共有寄り',high:'やや一人の時間寄り'},
-    change:{left:'見通してから',right:'動きながら',middle:'見通しと柔軟さを両立',low:'やや見通し寄り',high:'やや柔軟寄り'},
-    communication:{left:'まず気持ち',right:'まず具体策',middle:'気持ちと具体策を両方見る',low:'やや気持ち寄り',high:'やや具体策寄り'},
-    attach:{left:'つながりを確認',right:'自分で整理してから',middle:'近さと距離を調整',low:'ややつながり寄り',high:'やや距離寄り'},
-    sensory:{left:'刺激を減らして整理',right:'その場で切り替える',middle:'刺激量で切り替える',low:'やや刺激を減らす寄り',high:'やや切り替える寄り'},
-    process:{left:'順番を整えてから',right:'まず動いて調整',middle:'計画と柔軟さを使い分け',low:'やや順番寄り',high:'やや柔軟寄り'}
-  };
+  const LABELS={language:{left:'言葉ではっきり',right:'流れから受け取る',middle:'言葉と流れを使い分け',low:'やや言葉寄り',high:'やや流れ寄り'},thinking:{left:'筋道を整理',right:'ひらめきを広げる',middle:'整理と発想を行き来',low:'やや整理寄り',high:'やや発想寄り'},emotion:{left:'話して整理',right:'時間を置いて整理',middle:'話す・考えるを使い分け',low:'やや話す寄り',high:'やや時間を置く寄り'},distance:{left:'一緒に整理',right:'ひとりで整理',middle:'状況に合わせて距離調整',low:'やや共有寄り',high:'やや一人の時間寄り'},change:{left:'見通してから',right:'動きながら',middle:'見通しと柔軟さを両立',low:'やや見通し寄り',high:'やや柔軟寄り'},communication:{left:'まず気持ち',right:'まず具体策',middle:'気持ちと具体策を両方見る',low:'やや気持ち寄り',high:'やや具体策寄り'},attach:{left:'つながりを確認',right:'自分で整理してから',middle:'近さと距離を調整',low:'ややつながり寄り',high:'やや距離寄り'},sensory:{left:'刺激を減らして整理',right:'その場で切り替える',middle:'刺激量で切り替える',low:'やや刺激を減らす寄り',high:'やや切り替える寄り'},process:{left:'順番を整えてから',right:'まず動いて調整',middle:'計画と柔軟さを使い分け',low:'やや順番寄り',high:'やや柔軟寄り'}};
   const ADVICE={
     language:{left:'要点を短く区切って伝えると、行き違いを減らしやすい。',right:'話の最後に、認識が合っているか一度確かめる。',middle:'大事な点だけ、短く確認しておくと行き違いを防ぎやすい。',same:'2人とも言葉と流れの両方を使えるので、場面に合わせて確認の仕方を選ぶと進めやすい。'},
     thinking:{left:'まず目的をそろえてから、具体的な案を出していく。',right:'いくつかの案を広げたあと、最後に選択肢を絞り込む。',middle:'目的を共有したうえで、考えを広げたり整理したりすると進めやすい。',same:'2人とも整理と発想を行き来しやすいので、ゴールだけ共有して自由に考える時間を残すとよい。'},
@@ -40,9 +30,9 @@
   function refreshTop(card,d){
     const box=card.querySelector('.v82-top3');if(!box)return false;
     const candidates=rows(d).sort((a,b)=>b.diff-a.diff).filter(r=>r.diff>=8&&r.myLabel!==r.partnerLabel).slice(0,3);
-    const signature=candidates.map(r=>r.key+'|'+r.my+'|'+r.partner+'|'+r.myLabel+'|'+r.partnerLabel).join(';;')||'__none__';
-    if(box.dataset.v120Signature===signature)return true;
-    box.dataset.v120Signature=signature;box.innerHTML='';
+    const sig=candidates.map(r=>r.key+'|'+r.my+'|'+r.partner+'|'+r.myLabel+'|'+r.partnerLabel).join(';;')||'__none__';
+    if(box.dataset.v120Signature===sig)return true;
+    box.dataset.v120Signature=sig;box.innerHTML='';
     if(!candidates.length){box.innerHTML='<div class="v82-similar">大きな差は少なめ。似た入口から会話を進めやすい2人です。</div>';return true}
     candidates.forEach((r,i)=>{const el=document.createElement('div');el.className='v82-top-item';el.innerHTML='<div class="v82-top-num">0'+(i+1)+'</div><div class="v82-top-main"><div class="v82-top-axis">'+icon(r)+' '+r.axis+'</div><div class="v82-top-contrast"><b>'+r.myLabel+'</b><span>×</span><b>'+r.partnerLabel+'</b></div></div>';box.appendChild(el)});
     return true;
@@ -50,7 +40,7 @@
   function refreshAdvice(card,d){
     const items=[...card.querySelectorAll('.v82-advice-item')];if(!items.length)return false;
     const ranked=rows(d).sort((a,b)=>b.diff-a.diff).slice(0,2);
-    items.forEach((item,i)=>{const r=ranked[i];if(!r)return;const dict=ADVICE[r.key]||{},a=side(r.my),b=side(r.partner),texts=a===b?[dict.same||dict[a]||'']:[dict[a]||dict.middle||'',dict[b]||dict.middle||''];const ps=item.querySelectorAll('p');if(ps[0])ps[0].textContent=texts[0];if(ps[1]){ps[1].textContent=texts[1]||'';ps[1].style.display=texts[1]?'':'none'}});
+    items.forEach((item,i)=>{const r=ranked[i];if(!r)return;const dict=ADVICE[r.key]||{},a=side(r.my),b=side(r.partner),texts=a===b?[dict.same||dict[a]||'']:[dict[a]||dict.middle||'',dict[b]||dict.middle||''];const ps=item.querySelectorAll('p');if(ps[0]&&ps[0].textContent!==texts[0])ps[0].textContent=texts[0];if(ps[1]){if(ps[1].textContent!==texts[1])ps[1].textContent=texts[1]||'';ps[1].style.display=texts[1]?'':'none'}});
     return true;
   }
   function refresh(){const card=document.getElementById('v21CompareCard'),d=getData();if(!card||!d?.my||!d?.partner)return false;refreshTop(card,d);refreshAdvice(card,d);return true}
