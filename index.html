@@ -2148,7 +2148,25 @@ loadSharedFromUrl();
     };
     const drawAxisIcon=(name,dx,dy,size=48)=>{
       const s=axisIconSource[name];
-      if(s)ctx.drawImage(src,s.x,s.y,50,50,dx,dy,size,size);
+      if(!s)return;
+      // テンプレ内のアイコンをそのまま使いつつ、周囲の白だけ透明化する。
+      // これでトップ3・アドバイスカードに白い四角が出ない。
+      const off=document.createElement('canvas'); off.width=50; off.height=50;
+      const oc=off.getContext('2d'); oc.drawImage(src,s.x,s.y,50,50,0,0,50,50);
+      const im=oc.getImageData(0,0,50,50);
+      for(let k=0;k<im.data.length;k+=4){
+        const r=im.data[k],g=im.data[k+1],b=im.data[k+2];
+        if(r>238&&g>238&&b>238) im.data[k+3]=0;
+      }
+      oc.putImageData(im,0,0);
+      ctx.drawImage(off,dx,dy,size,size);
+    };
+    const clearTopX=(cy)=>{
+      // 固定テンプレのXは位置が決まっているため、動的Xを中央へ置く前に
+      // 元のXだけを周囲の背景色で覆う。テンプレ自体のファイルは変更しない。
+      const sample=ctx.getImageData(790,cy,1,1).data;
+      ctx.fillStyle=`rgb(${sample[0]},${sample[1]},${sample[2]})`;
+      ctx.fillRect(674,cy-34,60,68);
     };
 
     // ---- Top 3 differences: fixed template artwork + dynamic text/icons only ----
@@ -2160,13 +2178,16 @@ loadSharedFromUrl();
     }));
 
     const topY=[286,370,454];
+    topY.forEach(clearTopX);
     topItems.forEach((it,i)=>{
       const cy=topY[i];
       drawAxisIcon(it.axis,176,cy-27,48);
       const axis=wrap(it.axis,205,18,'700',2,11);
       drawLines(axis.lines,248,cy-15,axis.size,'700',navy,19);
-      text(it.a,410,cy+18,fit(it.a,190,24,'700',13),'700',navy,'center');
-      text(it.b,675,cy+18,fit(it.b,190,24,'700',13),'700',navy,'center');
+      // 見本と同じく、左右の結果をそれぞれ固定位置に左寄せで配置。
+      text(it.a,360,cy+18,fit(it.a,210,24,'700',13),'700',navy,'center');
+      text('×',520,cy+18,30,'500','#b83f58','center');
+      text(it.b,650,cy+18,fit(it.b,210,24,'700',13),'700',navy,'center');
     });
 
     // ---- Table: fixed labels, grid, icons and pills stay untouched ----
@@ -2191,9 +2212,9 @@ loadSharedFromUrl();
       const iconX=i===0?85:535;
       const head=a.head.replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim();
       drawAxisIcon(head,iconX,1168,48);
-      text(head,x+55,1186,fit(head,280,18,'700',12),'700',navy,'left');
-      const w=wrap(a.ps.join(' '),315,14,'500',3,10);
-      drawLines(w.lines,x+5,1225,w.size,'500',gray,25);
+      text(head,x+55,1186,fit(head,280,22,'700',14),'700',navy,'left');
+      const w=wrap(a.ps.join(' '),345,17,'500',3,12);
+      drawLines(w.lines,x+5,1228,w.size,'500',gray,31);
     });
 
     return canvas;
