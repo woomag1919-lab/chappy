@@ -3,7 +3,94 @@ function apply(p,s){document.getElementById(p+"Free").value=s.free||"";document.
 function list(p){try{return JSON.parse(localStorage.getItem("cl_"+p)||"[]")}catch{return[]}}
 function activeProfile(p){try{return JSON.parse(localStorage.getItem("cl_"+p+"_active")||"null")}catch{return null}}
 function setActiveProfile(p,name){localStorage.setItem("cl_"+p+"_active",JSON.stringify(name))}
-function draw(p){const e=document.getElementById(p+"Profiles");if(!e)return;e.innerHTML="";const active=activeProfile(p);list(p).forEach((x,idx)=>{let b=document.createElement("button");b.className="profile"+(active===x.name?" active":"");b.type="button";b.textContent=(active===x.name?"● ":"")+x.name;let timer=null,longPressed=false;const cancel=()=>{if(timer){clearTimeout(timer);timer=null}};b.addEventListener("pointerdown",()=>{longPressed=false;timer=setTimeout(()=>{longPressed=true;if(confirm("「"+x.name+"」を削除しますか？")){let a=list(p);a.splice(idx,1);localStorage.setItem("cl_"+p,JSON.stringify(a));if(active===x.name)localStorage.removeItem("cl_"+p+"_active");draw(p)}},650)});b.addEventListener("pointerup",cancel);b.addEventListener("pointercancel",cancel);b.addEventListener("pointerleave",cancel);b.addEventListener("click",()=>{if(longPressed)return;setActiveProfile(p,x.name);apply(p,x.state);draw(p)});e.appendChild(b)})}
+
+/* v109: プロフィール切替時に、そのプロフィール固有の特性チェック結果を復元する */
+function syncDiagnosisForProfile(p,profile){
+  const baseKey="cl_diag_result_"+p;
+  const radarKey="cl_diag_radar_"+p;
+  const extraKey="cl_extra_result_"+p;
+  const extraRadarKey="cl_extra_radar_"+p;
+  const scores=Array.isArray(profile?.scores)?profile.scores:[];
+  const answers=Array.isArray(profile?.answers)?profile.answers:[];
+  const deepScores=Array.isArray(profile?.deepScores)?profile.deepScores:[];
+  const deepAnswers=Array.isArray(profile?.deepAnswers)?profile.deepAnswers:[];
+
+  if(scores.length){
+    localStorage.setItem(baseKey,JSON.stringify({
+      scores:scores.map(x=>({key:x.key,score:Number(x.score)||50})),
+      answers:answers.slice(0,18),
+      updatedAt:Number(profile.updatedAt)||Date.now()
+    }));
+    try{
+      const radar=Array.isArray(profile.radar)&&profile.radar.length
+        ?profile.radar
+        :(typeof axisValuesFromScores==="function"?axisValuesFromScores(scores):null);
+      if(radar)localStorage.setItem(radarKey,JSON.stringify(radar));
+    }catch{}
+  }else{
+    localStorage.removeItem(baseKey);
+    localStorage.removeItem(radarKey);
+  }
+
+  if(deepScores.length){
+    localStorage.setItem(extraKey,JSON.stringify({
+      kind:"deep",
+      scores:deepScores.map(x=>({key:x.key,score:Number(x.score)||50})),
+      answers:deepAnswers.slice(0,18),
+      free:profile?.state?.free||"",
+      updatedAt:Number(profile.updatedAt)||Date.now()
+    }));
+    localStorage.setItem(extraRadarKey,JSON.stringify({deep:deepScores}));
+  }else{
+    localStorage.removeItem(extraKey);
+    localStorage.removeItem(extraRadarKey);
+  }
+
+  try{
+    if(typeof restoreDiagAnswers==="function")restoreDiagAnswers(p);
+  }catch(e){console.warn("diagnosis restore failed",e)}
+}
+
+function draw(p){
+  const e=document.getElementById(p+"Profiles");if(!e)return;
+  e.innerHTML="";
+  const active=activeProfile(p);
+  list(p).forEach((x,idx)=>{
+    let b=document.createElement("button");
+    b.className="profile"+(active===x.name?" active":"");
+    b.type="button";
+    b.textContent=(active===x.name?"● ":"")+x.name;
+    let timer=null,longPressed=false;
+    const cancel=()=>{if(timer){clearTimeout(timer);timer=null}};
+    b.addEventListener("pointerdown",()=>{
+      longPressed=false;
+      timer=setTimeout(()=>{
+        longPressed=true;
+        if(confirm("「"+x.name+"」を削除しますか？")){
+          let a=list(p);
+          a.splice(idx,1);
+          localStorage.setItem("cl_"+p,JSON.stringify(a));
+          if(active===x.name){
+            localStorage.removeItem("cl_"+p+"_active");
+            syncDiagnosisForProfile(p,{});
+          }
+          draw(p)
+        }
+      },650)
+    });
+    b.addEventListener("pointerup",cancel);
+    b.addEventListener("pointercancel",cancel);
+    b.addEventListener("pointerleave",cancel);
+    b.addEventListener("click",()=>{
+      if(longPressed)return;
+      setActiveProfile(p,x.name);
+      apply(p,x.state);
+      syncDiagnosisForProfile(p,x);
+      draw(p);
+    });
+    e.appendChild(b)
+  })
+}
 function clearNameRequired(p){
   const input=document.getElementById(p+"Name");
   const error=document.getElementById(p+"NameError");
@@ -36,7 +123,16 @@ function save(p,opts={}){
   if(btn)btn.dataset.saving="1";
   let a=list(p);
   const existing=a.findIndex(x=>x.name===name);
-  const item={name,state:state(p)};
+  const old=existing>=0?a[existing]:null;
+  const item={
+    name,
+    state:state(p),
+    ...(old?.scores?{scores:old.scores}:{}),
+    ...(old?.answers?{answers:old.answers}:{}),
+    ...(old?.deepScores?{deepScores:old.deepScores}:{}),
+    ...(old?.deepAnswers?{deepAnswers:old.deepAnswers}:{}),
+    ...(old?.updatedAt?{updatedAt:old.updatedAt}:{})
+  };
   if(existing>=0)a[existing]=item;else a.push(item);
   a=a.slice(-5);
   localStorage.setItem("cl_"+p,JSON.stringify(a));
