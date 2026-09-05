@@ -4,7 +4,7 @@ function list(p){try{return JSON.parse(localStorage.getItem("cl_"+p)||"[]")}catc
 function activeProfile(p){try{return JSON.parse(localStorage.getItem("cl_"+p+"_active")||"null")}catch{return null}}
 function setActiveProfile(p,name){localStorage.setItem("cl_"+p+"_active",JSON.stringify(name))}
 
-/* v109: プロフィール切替時に、そのプロフィール固有の特性チェック結果を復元する */
+/* v110: プロフィール切替後、比較ページのDOMも即時再描画する */
 function syncDiagnosisForProfile(p,profile){
   const baseKey="cl_diag_result_"+p;
   const radarKey="cl_diag_radar_"+p;
@@ -74,7 +74,9 @@ function draw(p){
             localStorage.removeItem("cl_"+p+"_active");
             syncDiagnosisForProfile(p,{});
           }
-          draw(p)
+          draw(p);
+          renderTwoPersonComparison();
+          setNames();
         }
       },650)
     });
@@ -87,6 +89,8 @@ function draw(p){
       apply(p,x.state);
       syncDiagnosisForProfile(p,x);
       draw(p);
+      renderTwoPersonComparison();
+      setNames();
     });
     e.appendChild(b)
   })
