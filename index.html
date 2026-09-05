@@ -9,6 +9,9 @@
 <script src="/js/data.js"></script>
 
 <div id="v73DownloadAdOverlay" class="v73-ad-overlay" aria-hidden="true"><div class="v73-ad-box"><b>📺 広告表示中…</b><p>広告表示後、現在の比較結果を1枚の画像として保存できます。</p><div id="v73DownloadAdCount" class="v73-ad-count">5</div></div></div>
+<script src="/js/profiles.js"></script>
+<script src="/js/diagnosis.js"></script>
+<script src="/js/compare.js"></script>
 <script>
 /* CoreLingual_v36 — result-linked radar chart */
 (function(){
@@ -118,7 +121,7 @@ window.CoreLingual_v36 = {
 <div class="v72-page-dots" aria-hidden="true"><button class="v72-dot on" data-page="0"></button><button class="v72-dot" data-page="1"></button><button class="v72-dot" data-page="2"></button><button class="v72-dot" data-page="3"></button></div>
 <div id="v72PickerOverlay" class="v72-picker-overlay"><div class="v72-sheet"><div class="v72-sheet-head"><b id="v72PickerTitle">プロフィールを選ぶ</b><button type="button" class="v72-close" id="v72PickerClose">×</button></div><div id="v72PickerChoices"></div></div></div>
 <div id="v72ProfileOverlay" class="v72-profile-overlay"><div class="v72-sheet"><div class="v72-sheet-head"><b id="v72ProfileTitle">プロフィール</b><button type="button" class="v72-close" id="v72ProfileClose">×</button></div><div id="v72ProfileMount"></div></div></div>
-<div id="v72DiagOverlay" class="v72-diag-overlay"><div class="v72-sheet"><div class="v72-sheet-head"><b id="v72DiagTitle">特性チェック</b><button type="button" class="v72-close" id="v72DiagClose">×</button></div><div id="v72DiagMount"></div></div></div>
+<div id="v72DiagOverlay" class="v72-diag-overlay"><div class="v72-sheet"><div class="v72-sheet-head"><b id="v72DiagTitle">特性チェック</b><button type="button" class="v72-close" id="v72DiagClose">×</button></div><div id="v72DiagMount"></div><div id="v72DiagBottomActions" class="v72-diag-bottom-actions"><button type="button" id="v72DiagSaveClose" class="primary">💾 保存して閉じる</button></div></div></div>
 
 <section id="talk">
 <div class="panel">
@@ -249,67 +252,6 @@ clearImages.onclick=()=>{selectedImages=[];drawImages()};
 let currentSpeaker="me";
 function setSpeaker(x){currentSpeaker=x;speakerMe.classList.toggle("on",x==="me");speakerPartner.classList.toggle("on",x==="partner");speakerUnknown.classList.toggle("on",x==="unknown")}
 speakerMe.onclick=()=>setSpeaker("me");speakerPartner.onclick=()=>setSpeaker("partner");speakerUnknown.onclick=()=>setSpeaker("unknown");
-function state(p){return{traits:[...document.querySelectorAll("#"+p+"Traits .on")].map(x=>x.textContent),free:document.getElementById(p+"Free").value}}
-function apply(p,s){document.getElementById(p+"Free").value=s.free||"";document.querySelectorAll("#"+p+"Traits .chip").forEach(x=>x.classList.toggle("on",(s.traits||[]).includes(x.textContent)))}
-function list(p){try{return JSON.parse(localStorage.getItem("cl_"+p)||"[]")}catch{return[]}}
-function activeProfile(p){try{return JSON.parse(localStorage.getItem("cl_"+p+"_active")||"null")}catch{return null}}
-function setActiveProfile(p,name){localStorage.setItem("cl_"+p+"_active",JSON.stringify(name))}
-function draw(p){const e=document.getElementById(p+"Profiles");if(!e)return;e.innerHTML="";const active=activeProfile(p);list(p).forEach((x,idx)=>{let b=document.createElement("button");b.className="profile"+(active===x.name?" active":"");b.type="button";b.textContent=(active===x.name?"● ":"")+x.name;let timer=null,longPressed=false;const cancel=()=>{if(timer){clearTimeout(timer);timer=null}};b.addEventListener("pointerdown",()=>{longPressed=false;timer=setTimeout(()=>{longPressed=true;if(confirm("「"+x.name+"」を削除しますか？")){let a=list(p);a.splice(idx,1);localStorage.setItem("cl_"+p,JSON.stringify(a));if(active===x.name)localStorage.removeItem("cl_"+p+"_active");draw(p)}},650)});b.addEventListener("pointerup",cancel);b.addEventListener("pointercancel",cancel);b.addEventListener("pointerleave",cancel);b.addEventListener("click",()=>{if(longPressed)return;setActiveProfile(p,x.name);apply(p,x.state);draw(p)});e.appendChild(b)})}
-function clearNameRequired(p){
-  const input=document.getElementById(p+"Name");
-  const error=document.getElementById(p+"NameError");
-  if(input)input.classList.remove("v84-name-invalid");
-  if(input)input.removeAttribute("aria-invalid");
-  if(error)error.textContent="";
-}
-function showSaveNameRequired(p){
-  const input=document.getElementById(p+"Name");
-  const error=document.getElementById(p+"NameError");
-  if(error)error.textContent="プロフィール名を入力してください";
-  if(input){
-    input.classList.add("v84-name-invalid");
-    input.setAttribute("aria-invalid","true");
-    input.focus();
-    input.scrollIntoView({block:"center",behavior:"smooth"});
-  }
-}
-
-function save(p,opts={}){
-  const input=document.getElementById(p+"Name");
-  const name=input.value.trim();
-  if(!name){
-    showSaveNameRequired(p);
-    return false;
-  }
-  clearNameRequired(p);
-  const btn=document.getElementById(p==="my"?"saveMy":"savePartner");
-  if(btn?.dataset.saving==="1")return false;
-  if(btn)btn.dataset.saving="1";
-  let a=list(p);
-  const existing=a.findIndex(x=>x.name===name);
-  const item={name,state:state(p)};
-  if(existing>=0)a[existing]=item;else a.push(item);
-  a=a.slice(-5);
-  localStorage.setItem("cl_"+p,JSON.stringify(a));
-  setActiveProfile(p,name);
-  draw(p);
-  renderTwoPersonComparison();
-  if(opts.close!==false){
-    document.getElementById('v72ProfileOverlay')?.classList.remove('show');
-    setNames();
-  }
-  if(opts.toast!==false){
-    const toast=document.createElement('div');
-    toast.className='v76-profile-toast';
-    toast.textContent='✓ プロフィールを保存しました';
-    document.body.appendChild(toast);
-    setTimeout(()=>toast.remove(),1800);
-  }
-  if(btn)setTimeout(()=>{btn.dataset.saving="0"},300);
-  return true;
-}
-
-saveMy.onclick=()=>save("my");savePartner.onclick=()=>save("partner");
 document.getElementById("myName")?.addEventListener("input",()=>clearNameRequired("my"));
 document.getElementById("partnerName")?.addEventListener("input",()=>clearNameRequired("partner"));
 draw("my");draw("partner");
@@ -439,592 +381,6 @@ analyze.onclick=async()=>{analyze.disabled=true;const originalText=analyze.inner
 
 
 
-let diagScores=[];let diagAnswers=[];let target="my";
-function axisScore(qset,answers){
- const out={};
- Object.keys(AXES).forEach(k=>{
-   let total=0,count=0;
-   qset.forEach((q,i)=>{if(q.axis!==k)return;const v=Number(answers[i]);total+=(v-3)*q.dir;count++});
-   out[k]=count?Math.max(0,Math.min(100,50+(total/count)*25)):50;
- });
- return Object.entries(out).map(([key,score])=>({key,score}));
-}
-function deepScore(answers){
- const out={};
- Object.keys(DEEP_AXES).forEach(k=>{
-   let total=0,count=0;
-   Q_DEEP.forEach((q,i)=>{if(q.axis!==k)return;const v=Number(answers[i]);total+=(v-3)*q.dir;count++});
-   out[k]=count?Math.max(0,Math.min(100,50+(total/count)*25)):50;
- });
- return Object.entries(out).map(([key,score])=>({key,score}));
-}
-function deepNarrative(key,score){
- const a=DEEP_AXES[key];
- const uses={
-  attach:{left:"相手の反応が読みにくいときは、確認したくなる気持ちを否定せず、『今は返事が必要なのか、少し待てるのか』を切り分けると落ち着きやすくなります。",right:"近い関係でも一人で整理する時間が必要になることがあります。『少し考えてから話したい』と先に伝えると、距離を拒絶と受け取られにくくなります。",middle:"相手との関係やその時の気持ちによって、確認したい時と一人で整理したい時を切り替えやすい傾向があります。"},
-  sensory:{left:"情報や刺激が重なった場面では、話す量や通知などを少し減らしてから会話を続けると整理しやすくなることがあります。",right:"刺激が重なっても、その場で切り替えながら会話を続けやすい傾向があります。ただし疲れが出ているときは、無理に合わせなくても大丈夫です。",middle:"刺激の量やその場の余裕によって、受け止め方を変えやすい傾向があります。"},
-  process:{left:"予定や順番が見えないときは、まず『次に何をするか』を一つ決めると動きやすくなります。",right:"最初から全部決めるより、まず小さく始めて途中で調整するほうが進みやすいことがあります。",middle:"見通しを立ててから動く時と、まず試して途中で変える時を状況に応じて使い分けやすい傾向があります。"}
- };
- if(score<=35)return {main:a.left,use:uses[key].left};
- if(score>=65)return {main:a.right,use:uses[key].right};
- return {main:`${a.left}と${a.right}の両方が、場面によって出やすい`,use:uses[key].middle};
-}
-function axisValuesFromScores(scores){const by={};(scores||[]).forEach(x=>by[x.key]=Number(x.score));return CoreLingual_v36.axes.map(a=>Math.round(by[a.id]??50))}
-function extraAxisValues(extraScores){
- const by={};
- (extraScores||[]).forEach(x=>{
-   if(AXES[x.key]) by[x.key]=Number(x.score)||0;
- });
- return CoreLingual_v36.axes.map(a=>by[a.id]!=null?Math.round(CoreLingual_v36.normalize(by[a.id])):50);
-}
-function combinedAxisValues(baseScores,extraScores){const b=axisValuesFromScores(baseScores),e=extraAxisValues(extraScores);return b.map((v,i)=>Math.round(v*.5+e[i]*.5))}
-function profileDisplayName(p){return p==="my"?"あなた":"相手"}
-function loadDiagRadar(p){try{return JSON.parse(localStorage.getItem("cl_diag_radar_"+p)||"null")}catch{return null}}
-function escapeHtml(v){const d=document.createElement("div");d.textContent=String(v??"");return d.innerHTML}
-function profileTraitMap(){return{
- language:["具体的な言葉を好む","文脈や行間を重視する"],
- thinking:["理由や根拠を確認したい","直感を重視することがある","複数の可能性を考える","一度気になると考え続けやすい"],
- emotion:["自分の気持ちを言葉にして整理する","一人で整理してから話したい","相手の感情の変化に気づきやすい"],
- distance:["関係の変化が気になりやすい","自分のペースを保ちたい","まず話し合って解決したい"],
- change:["変化は前もって知りたい","新しいことを試すのが好き","興味のあることに集中しやすい"],
- communication:["具体的な言葉を好む","文脈や行間を重視する","まず話し合って解決したい","会話では共感を大切にする"]
-}}
-function diagSummary(scores,targetLabel){return `【特性チェックの自動まとめ】\n${targetLabel}の回答では、次のような方向が見えました。\n${scores.map(x=>`・${AXES[x.key].label}：${directionText(x.key,x.score)}`).join("\n")}\n\nこれは性格・病気・障害・愛着スタイルなどを判定するものではありません。会話の中で「どちらのやり方が自然に感じやすいか」を見るための参考メモです。`}
-function extractManualMemo(existing){
-  const text=String(existing||'').trim();
-  if(!text)return '';
-  const markers=['【本人が追加したメモ】','【自分で追加したメモ】'];
-  for(const marker of markers){
-    const i=text.indexOf(marker);
-    if(i>=0)return text.slice(i+marker.length).trim();
-  }
-  if(text.includes('【特性チェック v'))return '';
-  return text;
-}
-function mergeDiagFree(existing,auto){
-  const manual=extractManualMemo(existing);
-  return auto+(manual?`\n\n【本人が追加したメモ】\n${manual}`:'');
-}
-function applyDiagToProfile(p,scores,extraScoresOverride){
-  const id=p==='my'?'myTraits':'partnerTraits';const selected=new Set();const map=profileTraitMap();
-  (scores||[]).forEach(x=>{if(x.score<=35)(map[x.key]||[]).slice(0,1).forEach(t=>selected.add(t));if(x.score>=65)(map[x.key]||[]).slice(-1).forEach(t=>selected.add(t))});
-  document.querySelectorAll('#'+id+' .chip').forEach(c=>c.classList.toggle('on',selected.has(c.textContent)));
-  const freeId=p==='my'?'myFree':'partnerFree';const label=p==='my'?'あなた':'相手';
-  let extra=Array.isArray(extraScoresOverride)?extraScoresOverride:[];
-  if(!extra.length){try{extra=JSON.parse(localStorage.getItem('cl_extra_result_'+p)||'null')?.scores||[]}catch{}}
-  const current=document.getElementById(freeId)?.value||'';
-  const manual=extractManualMemo(current);
-  const auto=buildAiProfileText(scores||[],label,extra,manual);
-  const free=document.getElementById(freeId);if(free)free.value=auto;
-  localStorage.setItem('cl_diag_summary_'+p,auto);
-  const active=activeProfile(p);
-  if(active){
-    const arr=list(p);const idx=arr.findIndex(x=>x.name===active);
-    if(idx>=0){
-      arr[idx]={
-        ...arr[idx],
-        state:state(p),
-        scores:Array.isArray(scores)?scores.map(x=>({key:x.key,score:Number(x.score)||50})):[],
-        deepScores:Array.isArray(extra)?extra.map(x=>({key:x.key,score:Number(x.score)||50})):[],
-        updatedAt:Date.now()
-      };
-      localStorage.setItem('cl_'+p,JSON.stringify(arr));
-      draw(p);
-    }
-  }
-}
-
-function axisDirection(key,score){
- const a=AXES[key];
- if(score<=35)return {short:"左寄り",label:a.left};
- if(score>=65)return {short:"右寄り",label:a.right};
- return {short:"中間",label:"場面・相手に応じて使い分け"};
-}
-const AXIS_MEANINGS={
- language:{left:"言葉の細かい条件まで確認したいところがあるため、情報が曖昧なままだと引っかかりやすいことがあります",right:"会話全体の流れから意味をつかみやすいところがあるため、言葉だけを切り取られると意図と違って受け取ることがあります",middle:"言葉の具体性と会話全体の流れの両方を手がかりにしやすく、相手や場面によって理解の仕方が変わることがあります",use:"相手に『具体的な条件があると助かる』『前後の流れもあると分かりやすい』など、自分に必要な情報の量を伝えるとズレを減らせます。"},
- thinking:{left:"理由や順序を整理してから納得したいところがあるため、結論だけを急に渡されると置いていかれたように感じることがあります",right:"いくつかの可能性を広げて考えやすいところがあるため、早く一つに決めるより選択肢を残したくなることがあります",middle:"筋道と直感の両方を使いやすく、状況によって判断材料を切り替えることがあります",use:"相手には『理由を聞いてから決めたい』『候補をいくつか出したい』など、考えるために必要な材料を伝えると会話が進みやすくなります。"},
- emotion:{left:"気持ちを言葉にして整理したいところがあるため、話せないまま抱えると考えがまとまりにくくなることがあります",right:"感情が動いた直後より時間を置いて整理したいところがあるため、すぐ答えを求められると負担になることがあります",middle:"話しながら整理する時と、時間を置く時を状況に応じて選びやすい傾向があります",use:"感情的な場面では、『今話したい』『少し整理してから話したい』のどちらが楽かを相手に伝えておくと誤解を減らせます。"},
- distance:{left:"気になることを共有して整理したいところがあるため、相手の反応が分からない状態が続くと確認したくなることがあります",right:"自分の時間やペースを守って整理したいところがあるため、すぐに話し合うよう求められると少し離れて考えたくなることがあります",middle:"相手と話す時間と一人で整える時間を、状況に応じて切り替えやすい傾向があります",use:"近い関係ほど、『話さない＝拒絶』ではなく、必要な距離の取り方が人によって違うことを前提にできます。"},
- change:{left:"先の流れや慣れた手順を確認したいところがあるため、急な変更ではまず状況を整理したくなることがあります",right:"新しい方法を試しながら進めやすいところがあるため、細かく決めすぎるより自由に試せるほうが動きやすいことがあります",middle:"見通しを持つことと試しながら変えることを、状況に応じて使い分けやすい傾向があります",use:"予定変更では、変更そのものより『理由・次の流れ』を共有するだけで受け入れやすくなる場合があります。"},
- communication:{left:"相手の気持ちや背景を受け止めてから進めたいところがあるため、解決策だけを急に出されると気持ちが追いつかないことがあります",right:"具体的な方法や次の一歩を決めて進めたいところがあるため、共感だけが続くと『で、どうすればいい？』となることがあります",middle:"共感と具体策のどちらを先に置くか、相手や状況に応じて調整しやすい傾向があります",use:"相談では『まず気持ちを聞いてほしい』『一緒に解決策を考えてほしい』など、最初に欲しいものを確認すると善意のズレを減らせます。"}
-};
-function directionText(key,score){return axisDirection(key,score).label}
-function directionShort(key,score){return axisDirection(key,score).short}
-function scoreTraitOverlap(scores, weights){
-  const by=Object.fromEntries((scores||[]).map(x=>[x.key,Number(x.score)]));
-  let total=0, used=0;
-  Object.entries(weights).forEach(([key,w])=>{const v=by[key]; if(!Number.isFinite(v))return; total += (50-v)*w; used += 50*Math.abs(w);});
-  if(!used)return 50;
-  // weights are signed: negative means the lower end of an axis contributes more.
-  return Math.max(0,Math.min(100,50 + (total/used)*50));
-}
-function overlapLevel(score){
-  if(score>=70)return '比較的強く重なる';
-  if(score>=58)return 'やや重なる';
-  return '目立った重なりは少なめ';
-}
-function buildTraitOverlapCards(baseScores,deepScores){
-  const base=baseScores||[]; const deep=deepScores||[];
-  const allBy=Object.fromEntries([...base,...deep].map(x=>[x.key,Number(x.score)]));
-  const get=k=>allBy[k];
-  const asd=Math.max(0,Math.min(100,50 + (50-(get('language')??50))*.28 + (50-(get('thinking')??50))*.22 + (50-(get('change')??50))*.18 + ((get('communication')??50)-50)*.16 - ((get('process')??50)-50)*.16));
-  const adhd=Math.max(0,Math.min(100,50 + ((get('thinking')??50)-50)*.24 + ((get('change')??50)-50)*.20 + ((get('process')??50)-50)*.28 + ((get('sensory')??50)-50)*.14));
-  const hsp=Math.max(0,Math.min(100,50 + (50-(get('emotion')??50))*.22 + (50-(get('sensory')??50))*.38 + (50-(get('language')??50))*.12 + (50-(get('distance')??50))*.10));
-  const defs=[
-    {key:'asd',icon:'🧩',title:'具体性・見通しを好む傾向',score:asd,why:'曖昧さより具体性、理由や順序、予定変更後の見通しを重視する回答が重なると、この傾向が出やすくなります。'},
-    {key:'adhd',icon:'⚡',title:'切り替え・動きながら進めやすい傾向',score:adhd,why:'可能性を広げる、変化に合わせる、まず動いて調整する、といった回答が重なると、この傾向が出やすくなります。'},
-    {key:'hsp',icon:'🌿',title:'刺激や情報量に敏感な傾向',score:hsp,why:'音・人の多さ・情報量などの刺激を強く受け取り、いったん減らして整理したいという回答が重なると、この傾向が出やすくなります.'}
-  ];
-  return defs.map(d=>{const el=document.createElement('section');el.className='v36-attachment-card';el.innerHTML=`<div class="v36-asd-head">${d.icon} ${d.title}</div><div class="v36-asd-body"><p><b>${overlapLevel(d.score)}</b></p><p>${escapeHtml(d.why)}</p></div>`;return el;});
-}
-function buildAttachmentOverlapCard(scores){
-  const by=Object.fromEntries((scores||[]).map(x=>[x.key,Number(x.score)]));
-  const score=by.attach;
-  if(!Number.isFinite(score))return null;
-  let title,main;
-  if(score<=35){
-    title="🤝 つながりを確認したくなる傾向";
-    main="相手の反応や関係の変化が気になると、つながりを確かめたくなりやすい傾向があります。";
-  }else if(score>=65){
-    title="🤝 一人で整理して距離を調整したくなる傾向";
-    main="近い関係でも、自分の中で整理してから距離を調整したくなりやすい傾向があります。";
-  }else{
-    title="🤝 関係によって距離の取り方が変わりやすい傾向";
-    main="つながりを確かめたい時と、一人で整理したい時の両方が、相手や状況によって出やすい傾向があります。";
-  }
-  const type=score<=35?'不安型':score>=65?'回避型':'安定型';
-  const el=document.createElement('section');el.className='v36-attachment-card';
-  el.innerHTML=`<div class="v36-asd-head">${title}</div><div class="v36-asd-body"><p><b>愛着パターン：${type}の特徴と重なる傾向</b></p><p>${escapeHtml(main)}</p><div class="v36-cause">愛着パターンの考え方では似た特徴が説明されることがありますが、これは愛着スタイルの診断ではありません。人や状況によって反応は変わります。</div></div>`;
-  return el;
-}
-function traitNarrative(key,score){
-  const m=AXIS_MEANINGS[key];
-  if(score<=35)return {main:m.leftResult||m.left,use:m.use};
-  if(score>=65)return {main:m.rightResult||m.right,use:m.use};
-  return {main:m.middleResult||"状況や相手に応じて、複数の受け取り方・進め方を切り替えやすい",use:m.use};
-}
-function buildTraitSummary(scores,label){
-  const sorted=[...scores].sort((a,b)=>Math.abs(b.score-50)-Math.abs(a.score-50));
-  const focus=sorted.slice(0,3);
-  if(!focus.length)return null;
-  const sec=document.createElement('section');sec.className='v36-profile-card';
-  sec.innerHTML=`<div class="v36-profile-head">🧩 ${escapeHtml(label)}はこういう傾向</div><div class="v36-profile-intro">このチェックは診断名をつけるものではなく、会話の中でどんな受け取り方・考え方・伝え方が自然になりやすいかを整理するためのものです。</div>`;
-  focus.forEach(x=>{const a=AXES[x.key],n=traitNarrative(x.key,x.score),c=document.createElement('div');c.className='v36-trait';c.innerHTML=`<div class="v36-trait-title">${a.icon} ${a.label}</div><p class="v36-trait-main"><b>傾向：</b>${escapeHtml(n.main)}。</p><div class="v36-trait-use"><b>会話では：</b>${escapeHtml(n.use)}</div>`;sec.appendChild(c)});
-  return sec;
-}
-function buildTraitOverlapData(baseScores,deepScores){
- const b=Object.fromEntries((baseScores||[]).map(x=>[x.key,Number(x.score)]));
- const d=Object.fromEntries((deepScores||[]).map(x=>[x.key,Number(x.score)]));
- const asd=Math.max(0,Math.min(100,50 + (50-(b.language??50))*.28 + (50-(b.thinking??50))*.22 + (50-(b.change??50))*.18 + ((b.communication??50)-50)*.16 - ((d.process??50)-50)*.16));
- const adhd=Math.max(0,Math.min(100,50 + ((b.thinking??50)-50)*.24 + ((b.change??50)-50)*.20 + ((d.process??50)-50)*.28 + ((d.sensory??50)-50)*.14));
- const hsp=Math.max(0,Math.min(100,50 + (50-(b.emotion??50))*.22 + (50-(d.sensory??50))*.38 + (50-(b.language??50))*.12 + (50-(b.distance??50))*.10));
- const a=Object.fromEntries((deepScores||[]).map(x=>[x.key,Number(x.score)]));
- const att=a.attach??50; const type=att<=35?'不安型':att>=65?'回避型':'安定型';
- return `・具体性・見通しを好む傾向：${overlapLevel(asd)}\n・切り替え・動きながら進めやすい傾向：${overlapLevel(adhd)}\n・刺激や情報量に敏感な傾向：${overlapLevel(hsp)}\n・愛着パターン：${type}の特徴と重なる傾向`;
-}
-function buildAiProfileText(scores,label,extraScores,free){
-  const sorted=[...(scores||[])].sort((a,b)=>Math.abs(b.score-50)-Math.abs(a.score-50));
-  const top=sorted.slice(0,4).map(x=>{const a=AXES[x.key],n=traitNarrative(x.key,x.score);return `・${a.label}: ${n.main}`}).join('\n');
-  const deep=(extraScores||[]).filter(x=>DEEP_AXES[x.key]).sort((a,b)=>Math.abs(b.score-50)-Math.abs(a.score-50)).slice(0,3).map(x=>`・${DEEP_AXES[x.key].label}: ${deepNarrative(x.key,x.score).main}`).join('\n');
-  const overlap=extraScores&&extraScores.length?buildTraitOverlapData(scores,extraScores):null;
-  return `【特性チェック v46：${label}の会話プロフィール】
-【基本18問】
-${top}${deep?`
-
-【深掘り18問】
-${deep}`:''}${overlap?`
-
-【補助的な特徴の整理】
-${overlap}`:''}
-
-この情報は会話解析の補助情報です。実際の発言内容やその時々の状況も含めて、ひとつの参考としてご覧ください。${free?`
-
-【本人が追加したメモ】
-${free.trim()}`:''}`;
-}
-function renderDiagResult(scores){
-  diagResult.innerHTML='';
-  const label=target==='my'?'あなた':'相手';
-  const profile=buildTraitSummary(scores,label);
-  if(profile)diagResult.appendChild(profile);
-  const gentleNote=document.createElement('div');gentleNote.className='v77-gentle-note';gentleNote.textContent='「自分って、こういうところあるかも？」を見つけるための参考情報です。';diagResult.appendChild(gentleNote);
-  const profileSection=document.createElement('section');profileSection.className='result-section analysis-section';
-  profileSection.innerHTML='<div class="result-heading">📊 6つの傾向を確認</div><div style="padding:0 14px 4px"><p class="friendly-note">グラフは結果の位置関係を確認するための補助表示です。「右寄り・左寄り・中間」というラベルは表示しません。</p></div>';
-  const box=document.createElement('div');box.className='result-card';
-  scores.forEach(x=>{const a=AXES[x.key];const row=document.createElement('div');row.className='axis-result';row.innerHTML=`<div class="axis-head2"><span>${a.icon} ${a.label}</span></div><div class="axis-bar2"><span class="axis-dot2" style="left:${x.score}%"></span></div><div class="axis-labels2"><span>${a.left}</span><span>${a.right}</span></div>`;box.appendChild(row)});
-  profileSection.appendChild(box);diagResult.appendChild(profileSection);
-  const shareBox=document.createElement('div');addShareButton(shareBox,'CoreLingualの特性チェック結果',{kind:'diagnosis',version:7,target:target,targetLabel:label,scores:scores.map(x=>({key:x.key,score:x.score}))});diagResult.appendChild(shareBox);
-  const applyBox=document.createElement('div');applyBox.className='v36-profile-apply';const applyBtn=document.createElement('button');applyBtn.type='button';applyBtn.textContent='🧩 この結果をプロフィールに反映する';applyBtn.onclick=()=>{applyDiagToProfile(target,scores);alert('特性チェックの結果をプロフィールに反映したよ！')};applyBox.appendChild(applyBtn);diagResult.appendChild(applyBox);
-}
-
-function renderSharedAnswers(container,profile,label){
-  const baseScores=Array.isArray(profile?.scores)?profile.scores:[];
-  const deepScores=Array.isArray(profile?.deepScores)?profile.deepScores:[];
-  if(!baseScores.length && !deepScores.length)return;
-  const sec=document.createElement('section');sec.className='v46-partner-result';
-  sec.innerHTML=`<div class="v46-result-head">🧩 ${escapeHtml(label)}の特性チェック結果</div><div class="v46-result-note">回答そのものを並べるのではなく、36問から整理した「会話で出やすい傾向」を表示しています。</div>`;
-  const overview=buildTraitSummary(baseScores,label);
-  if(overview){
-    overview.querySelectorAll('.v36-trait').forEach(t=>{
-      const c=document.createElement('div');c.className='v46-result-trait';
-      c.innerHTML=`<h4>${escapeHtml(t.querySelector('.v36-trait-title')?.textContent||'')}</h4><p>${escapeHtml((t.querySelector('.v36-trait-main')?.textContent||'').replace(/^傾向：/,''))}</p><div class="use">${escapeHtml(t.querySelector('.v36-trait-use')?.textContent||'')}</div>`;
-      sec.appendChild(c);
-    });
-  }
-  if(deepScores.length){
-    const h=document.createElement('h4');h.className='v46-subhead';h.textContent='🔎 後半18問で見えた3つの方向';sec.appendChild(h);
-    deepScores.forEach(x=>{const a=DEEP_AXES[x.key];if(!a)return;const n=deepNarrative(x.key,x.score);const c=document.createElement('div');c.className='v46-result-trait';c.innerHTML=`<h4>${escapeHtml(a.icon+' '+a.label)}</h4><p>${escapeHtml(n.main)}。</p><div class="use"><b>会話では：</b>${escapeHtml(n.use)}</div>`;sec.appendChild(c)});
-    buildTraitOverlapCards(baseScores,deepScores).forEach(c=>sec.appendChild(c.cloneNode(true)));
-    const attachment=buildAttachmentOverlapCard(deepScores);if(attachment)sec.appendChild(attachment.cloneNode(true));
-  }
-  container.appendChild(sec);
-}
-function sharedTraitsFromScores(scores){
-  const id='partnerTraits';const selected=new Set();const map=profileTraitMap();
-  (scores||[]).forEach(x=>{if(Number(x.score)<=35)(map[x.key]||[]).slice(0,1).forEach(t=>selected.add(t));if(Number(x.score)>=65)(map[x.key]||[]).slice(-1).forEach(t=>selected.add(t))});
-  return [...selected];
-}
-function scoresFromInviteProfile(profile){
-  if(!profile||typeof profile!=='object')return [];
-  if(Array.isArray(profile.scores)&&profile.scores.length)return profile.scores;
-  if(Array.isArray(profile.answers)&&profile.answers.length===Q.length){
-    try{return axisScore(Q,profile.answers)}catch(e){console.warn(e)}
-  }
-  if(Array.isArray(profile.radar)&&profile.radar.length){
-    const ids=(typeof CoreLingual_v36!=='undefined'&&CoreLingual_v36.axes)?CoreLingual_v36.axes.map(a=>a.id):Object.keys(AXES);
-    return ids.map((id,i)=>({key:id,score:Math.max(0,Math.min(100,Number(profile.radar[i])||50))}));
-  }
-  return [];
-}
-function savePartnerSharedProfile(profile,targetName){
-  if(!profile)return;
-  const scores=scoresFromInviteProfile(profile);
-  const deep=Array.isArray(profile.deepScores)?profile.deepScores:[];
-  const answers=Array.isArray(profile.answers)?profile.answers:[];
-  if(scores.length){
-    localStorage.setItem('cl_diag_result_partner',JSON.stringify({scores,answers,updatedAt:Date.now()}));
-    const radar=Array.isArray(profile.radar)&&profile.radar.length?profile.radar.map(v=>Math.max(0,Math.min(100,Number(v)||50))):axisValuesFromScores(scores);
-    localStorage.setItem('cl_diag_radar_partner',JSON.stringify(radar));
-  }
-  if(deep.length){
-    localStorage.setItem('cl_extra_result_partner',JSON.stringify({kind:'deep',scores:deep,answers:Array.isArray(profile.deepAnswers)?profile.deepAnswers:[],free:profile.free||profile.summary||'',updatedAt:Date.now()}));
-    localStorage.setItem('cl_extra_radar_partner',JSON.stringify({deep}));
-  }
-  const summary=buildAiProfileText(scores,'相手',deep,profile.free||profile.summary||'');
-  if(summary)localStorage.setItem('cl_diag_summary_partner',summary);
-
-  const desired=String(targetName||'').trim()||'相手の回答';
-  const active=activeProfile('partner');
-  let target=desired || active || '相手の回答';
-  if(target){
-    let arr=list('partner');
-    let idx=arr.findIndex(x=>x.name===target);
-    if(idx<0){
-      const traits=typeof sharedTraitsFromScores==='function'?sharedTraitsFromScores(scores):(Array.isArray(profile.traits)?profile.traits:[]);
-      const st={traits,free:summary||profile.free||profile.summary||''};
-      arr.push({name:target,state:st,scores:scores.map(x=>({key:x.key,score:Number(x.score)||50})),deepScores:deep.map(x=>({key:x.key,score:Number(x.score)||50})),updatedAt:Date.now()});
-      localStorage.setItem('cl_partner',JSON.stringify(arr));
-      setActiveProfile('partner',target);
-      apply('partner',st);
-      try{draw('partner')}catch(e){}
-      renderTwoPersonComparison();
-      return;
-    }
-    if(idx>=0){
-      const traits=typeof sharedTraitsFromScores==='function'?sharedTraitsFromScores(scores):(Array.isArray(profile.traits)?profile.traits:[]);
-      arr[idx]={...arr[idx],state:{traits,free:summary||profile.free||profile.summary||''},scores:scores.map(x=>({key:x.key,score:Number(x.score)||50})),deepScores:deep.map(x=>({key:x.key,score:Number(x.score)||50})),updatedAt:Date.now()};
-      localStorage.setItem('cl_partner',JSON.stringify(arr));
-      setActiveProfile('partner',target);
-      apply('partner',arr[idx].state);
-      draw('partner');
-      renderTwoPersonComparison();
-      return;
-    }
-  }
-  try{ if(scores.length) applyDiagToProfile('partner',scores,deep); }catch(e){ console.warn('partner profile apply failed',e); }
-  renderTwoPersonComparison();
-}
-function renderPartnerResultOnly(container,profile,label='相手'){
-  container.innerHTML='';renderSharedAnswers(container,profile,label);
-}
-function deepDirectionText(key,score){
-  const a=DEEP_AXES[key];
-  if(score<=35)return a.left;
-  if(score>=65)return a.right;
-  return "場面・相手に応じて使い分けやすい";
-}
-function buildPairComparisonCard(myScores,partnerScores,partnerDeep,myDeepScores,myName='あなた',partnerName='相手'){
-  if(!myScores?.length||!partnerScores?.length)return null;
-  const sec=document.createElement('section');sec.className='v82-pair-card';
-  const by=(arr)=>Object.fromEntries((arr||[]).map(x=>[x.key,Number(x.score)]));
-  const bm=by(myScores),bp=by(partnerScores),bd=by(partnerDeep||[]);
-  let myDeep=by(myDeepScores||[]);
-  if(!Object.keys(myDeep).length){try{myDeep=by(JSON.parse(localStorage.getItem('cl_extra_result_my')||'null')?.scores||[])}catch{}}
-
-  const allRows=[];
-  Object.keys(AXES).forEach(key=>allRows.push({type:'base',key,diff:Math.abs((bm[key]??50)-(bp[key]??50))}));
-  if(Object.keys(myDeep).length && Object.keys(bd).length){
-    Object.keys(DEEP_AXES).forEach(key=>allRows.push({type:'deep',key,diff:Math.abs((myDeep[key]??50)-(bd[key]??50))}));
-  }
-
-  const sideFor=(score)=>score<=35?'left':score>=65?'right':'middle';
-  const short={
-    language:{left:'言葉ではっきり',right:'流れから受け取る',middle:'言葉と流れを使い分け'},
-    thinking:{left:'筋道を整理',right:'ひらめきを広げる',middle:'整理と発想を行き来'},
-    emotion:{left:'話して整理',right:'時間を置いて整理',middle:'話す・考えるを使い分け'},
-    distance:{left:'一緒に整理',right:'ひとりで整理',middle:'状況に合わせて距離調整'},
-    change:{left:'見通してから',right:'動きながら',middle:'見通しと柔軟さを両立'},
-    communication:{left:'まず気持ち',right:'まず具体策',middle:'気持ちと具体策を両方見る'},
-    attach:{left:'つながりを確認',right:'自分で整理してから',middle:'近さと距離を調整'},
-    sensory:{left:'刺激を減らして整理',right:'その場で切り替える',middle:'刺激量で切り替える'},
-    process:{left:'順番を整えてから',right:'まず動いて調整',middle:'計画と柔軟さを使い分け'}
-  };
-  const getLabel=(row,score)=>{
-    const dict=short[row.key]||{};return dict[sideFor(score)]||'場面に応じて使い分け';
-  };
-  const getAxis=(row)=>row.type==='base'?AXES[row.key]:DEEP_AXES[row.key];
-  const getScores=(row)=>row.type==='base'?[bm[row.key]??50,bp[row.key]??50]:[myDeep[row.key]??50,bd[row.key]??50];
-
-  const ranked=allRows.slice().sort((a,b)=>b.diff-a.diff);
-  const top=ranked.slice(0,3);
-  const topRows=top.filter(r=>r.diff>=8);
-
-  sec.innerHTML=`
-    <div class="v82-compare-head">
-      <div class="v82-kicker">👥 2人のコミュニケーション比較</div>
-      <p class="v82-lead">同じ会話でも、自然に選びやすい「入口」が違うと、すれ違いが起きることがあります。</p>
-    </div>
-    <div class="v82-section-title">特に違いが出やすい3つ</div>
-    <div class="v82-top3"></div>
-    <div class="v82-section-title v82-list-title">9つのコミュニケーション傾向</div>
-    <div class="v82-axis-head"><span></span><b>${escapeHtml(myName||'自分')}</b><b>${escapeHtml(partnerName||'相手')}</b></div>
-    <div class="v82-axis-list"></div>
-    <div class="v82-advice">
-      <div class="v82-section-title">💡 この2人がラクになるポイント</div>
-      <div class="v82-advice-grid"></div>
-    </div>
-    <div class="v82-footer-note">違いは、良し悪しではなく会話の入口の違い。相手の入口が分かると、伝え方も少し変えられます。</div>`;
-
-  const topEl=sec.querySelector('.v82-top3');
-  if(topRows.length){
-    topRows.forEach((row,i)=>{
-      const axis=getAxis(row),[ms,ps]=getScores(row),ml=getLabel(row,ms),pl=getLabel(row,ps);
-      const el=document.createElement('div');el.className='v82-top-item';
-      el.innerHTML=`<div class="v82-top-num">0${i+1}</div><div class="v82-top-main"><div class="v82-top-axis">${axis.icon||''} ${escapeHtml(axis.label)}</div><div class="v82-top-contrast"><b>${escapeHtml(ml)}</b><span>×</span><b>${escapeHtml(pl)}</b></div></div>`;
-      topEl.appendChild(el);
-    });
-  }else{
-    topEl.innerHTML='<div class="v82-similar">大きな差は少なめ。似た入口から会話を進めやすい2人です。</div>';
-  }
-
-  const list=sec.querySelector('.v82-axis-list');
-  allRows.forEach(row=>{
-    const axis=getAxis(row),[ms,ps]=getScores(row),ml=getLabel(row,ms),pl=getLabel(row,ps);
-    const el=document.createElement('div');el.className='v82-axis-row';
-    el.innerHTML=`<div class="v82-axis-name">${axis.icon||''} ${escapeHtml(axis.label)}</div><div>${escapeHtml(ml)}</div><div>${escapeHtml(pl)}</div>`;
-    list.appendChild(el);
-  });
-
-  const adviceEl=sec.querySelector('.v82-advice-grid');
-  const adviceMap={
-    language:{left:'大事なことは、言葉を短くして確認する',right:'大事なことは、最後に一言だけ確認する'},
-    thinking:{left:'案を出す前に、まずゴールを共有する',right:'広げた案は、最後に一つへ絞る'},
-    emotion:{left:'「今は聞いてほしい」と先に伝える',right:'時間が必要なら「あとで話したい」と伝える'},
-    distance:{left:'今話したい理由を一言添える',right:'離れたい時は「落ち着いたら話す」と伝える'},
-    change:{left:'変更があるなら、先に知らせて余白を残す',right:'変える前に「ここまではこのまま」と伝える'},
-    communication:{left:'「まず聞いてほしい」と先に伝える',right:'解決策の前に「まず聞くよ」を一言添える'},
-    attach:{left:'確認したい時は、何を知りたいかを一つに絞る',right:'距離を置く時は、戻るタイミングを伝える'},
-    sensory:{left:'情報が重なったら、いったん量を減らす',right:'相手の余裕を見て、話す量を調整する'},
-    process:{left:'先に「次に何をするか」を一つ決める',right:'まず小さく始めて、途中で調整する'}
-  };
-  const adviceRows=ranked.slice(0,2);
-  if(adviceRows.length){
-    adviceRows.forEach(row=>{
-      const axis=getAxis(row),[ms,ps]=getScores(row),dict=adviceMap[row.key]||{},ml=sideFor(ms),pl=sideFor(ps);
-      const leftTip=dict[ml]||dict.left||'相手に伝わりやすい形を一つ選ぶ';
-      const rightTip=dict[pl]||dict.right||'相手のペースも一度確認する';
-      const el=document.createElement('div');el.className='v82-advice-item';
-      el.innerHTML=`<b>${axis.icon||'💬'} ${escapeHtml(axis.label)}</b><p>${escapeHtml(leftTip)}。</p><p>${escapeHtml(rightTip)}。</p>`;
-      adviceEl.appendChild(el);
-    });
-  }
-  return sec;
-}
-function pairSide(score){if(score<=35)return'left';if(score>=65)return'right';return'mid'}
-function pairAxisTip(key,myScore,theirScore,type){
-  const a=pairSide(myScore),b=pairSide(theirScore);
-  const tips={
-    language:{
-      'left-right':'あなたは言葉の意味や条件をはっきりさせたくなりやすく、相手は前後の流れから察しやすいことがあります。確認の回数や「言わなくても分かるはず」の期待がズレやすいポイントです。',
-      'right-left':'あなたは文脈や全体像から受け取りやすく、相手は具体的な言葉や条件を求めやすいことがあります。説明が短いと相手が不安になり、長いとあなたがくどく感じることがあります。',
-      'default':'情報の受け取り方が違うと、「伝わったつもり」と「まだ分からない」が同時に起きやすくなります。大事なことは一度、具体と意図の両方で確認すると安心です。'
-    },
-    thinking:{
-      'left-right':'あなたは根拠を揃えてから進みたく、相手は感覚や可能性から動きたくなることがあります。結論の速さや「ちゃんと考えた？」の温度差が出やすいです。',
-      'right-left':'あなたは直感や複数の可能性から考えやすく、相手は理由を整理してから決めたいことがあります。話が飛ぶ／固い、の印象差になりやすいです。',
-      'default':'考え方の順番が違うと、同じ議題でも「まだ早い」「もう遅い」と感じることがあります。先にゴールか、先に材料か、を短く共有すると噛み合いやすいです。'
-    },
-    emotion:{
-      'left-right':'あなたは気持ちを言葉にして整理したく、相手は一度内省してから話したいことがあります。すぐ話したいか、間が欲しいかですれ違いやすいです。',
-      'right-left':'あなたは時間を置いてから感情を整理したく、相手は早めに言葉にしたいことがあります。「冷たい」「詰まる」と誤解されやすい組み合わせです。',
-      'default':'感情の扱い方が違うと、沈黙やペースの差が拒絶に見えやすくなります。今は話したいか、少し置きたいかを一言あるだけで楽になります。'
-    },
-    distance:{
-      'left-right':'あなたはその場で共有・相談したく、相手は自分の時間を確保したくなりやすいことがあります。連絡の頻度や「今話す？」のタイミングがズレやすいです。',
-      'right-left':'あなたは一人の時間を大切にしやすく、相手は早めに共有して安心したくなりやすいことがあります。距離の取り方が、慎重と孤独の取り違えになりやすいです。',
-      'default':'距離感の好みが違うと、近づき方も引き方も「温度差」に感じられます。今どのくらい繋がりたいかを、回数や時間で具体化すると衝突が減ります。'
-    },
-    change:{
-      'left-right':'あなたは見通しや慣れを重視しやすく、相手は新しいやり方を試したくなりやすいことがあります。予定変更のストレスの感じ方が大きく違います。',
-      'right-left':'あなたは変化や新しい方法に乗りやすく、相手は流れが決まっていると安心しやすいことがあります。「柔軟」と「不安」が同時に出やすい組み合わせです。',
-      'default':'変化への耐性が違うと、同じ変更でも一方はチャンス、他方は負荷に感じます。変更点を一つに絞って伝えると、お互いに動きやすくなります。'
-    },
-    communication:{
-      'left-right':'あなたは共感や気持ちを先に受け取りたく、相手は具体策や結論を求めたくなりやすいことがあります。「分かってほしい」と「どうすればいい」がすれ違いやすいです。',
-      'right-left':'あなたは次の一手や具体策を考えやすく、相手はまず気持ちを受け止めてほしがりやすいことがあります。解決が早く感じる／冷たく感じる、の差が出やすいです。',
-      'default':'伝え方の優先が違うと、善意のアドバイスがズレた反応になります。先に「聞いてほしい／案がほしい」を確認すると噛み合いやすいです。'
-    },
-    attach:{
-      'left-right':'あなたは気になるとつながりを確かめやすく、相手は一度距離を置いて整理したくなりやすいことがあります。追いかけと後退が同時に起きやすい典型です。',
-      'right-left':'あなたは自分の中で整理してから距離を調整しやすく、相手は早めに反応や安心を求めやすいことがあります。静かにするほど相手の不安が増えることがあります。',
-      'default':'近づき方と引き方が違うと、会話の開始タイミングそのものが衝突しやすいです。「今すぐ／あとで」を先に決めるだけでも楽になります。'
-    },
-    sensory:{
-      'left-right':'あなたは刺激や情報量が多いと一度減らしたくなりやすく、相手はその場で切り替えながら対応しやすいことがあります。休憩の必要性の感じ方が違います。',
-      'right-left':'あなたは刺激があっても切り替えやすく、相手は情報量が重なると整理したくなりやすいことがあります。予定の密度で疲れ方に差が出やすいです。',
-      'default':'刺激への反応が違うと、同じ場所・同じ予定でも回復の必要量が変わります。今日の余裕を一言共有すると、無理の押し付けが減ります。'
-    },
-    process:{
-      'left-right':'あなたは順番や見通しを整えてから進みたく、相手はまず動いて途中で調整したくなりやすいことがあります。「準備不足」と「固すぎ」の印象差が出やすいです。',
-      'right-left':'あなたは動きながら決めやすく、相手は手順が見えてから安心しやすいことがあります。計画の粒度でストレスの方向が逆になります。',
-      'default':'進め方の好みが違うと、同じゴールでもプロセスの不満が残りやすいです。固定する部分と自由にしてよい部分を分けると衝突が減ります。'
-    }
-  };
-  const bag=tips[key]||{};
-  const pair=a+'-'+b;
-  if(bag[pair])return bag[pair];
-  if(a===b&&a!=='mid')return bag['default']||'似た方向でも、強さやタイミングが違うとすれ違うことがあります。具体的な場面で「今どうしたい？」を短く合わせるとよいです。';
-  return bag['default']||'この違いは、性格の優劣ではなく、場面ごとの得意な進め方の差として見ると扱いやすくなります。';
-}
-function buildPairNarrative(myScores,partnerScores){
-  const byMy=Object.fromEntries((myScores||[]).map(x=>[x.key,Number(x.score)]));
-  const byP=Object.fromEntries((partnerScores||[]).map(x=>[x.key,Number(x.score)]));
-  const rows=Object.keys(AXES).map(key=>({key,diff:Math.abs((byMy[key]??50)-(byP[key]??50))})).sort((a,b)=>b.diff-a.diff);
-  const top=rows.filter(x=>x.diff>=15).slice(0,2);
-  const sec=document.createElement('section');sec.className='v36-pair-card';
-  sec.innerHTML='<div class="v36-pair-head">👥 2人で見ると、こうなりやすい</div><div class="v36-pair-body"></div>';
-  const body=sec.querySelector('.v36-pair-body');
-  const mine=buildTraitSummary(myScores,'あなた');const partner=buildTraitSummary(partnerScores,'相手');
-  if(mine){const wrap=document.createElement('div');wrap.className='v36-pair-person';wrap.innerHTML='<h4>👤 あなた</h4>';const traits=mine.querySelectorAll('.v36-trait');traits.forEach(t=>wrap.appendChild(t.cloneNode(true)));body.appendChild(wrap)}
-  if(partner){const wrap=document.createElement('div');wrap.className='v36-pair-person';wrap.innerHTML='<h4>👥 相手</h4>';const traits=partner.querySelectorAll('.v36-trait');traits.forEach(t=>wrap.appendChild(t.cloneNode(true)));body.appendChild(wrap)}
-  const mm=document.createElement('div');mm.className='v33-mismatch';
-  if(top.length){const lines=top.map(x=>{const a=AXES[x.key],m=AXIS_MEANINGS[x.key],ms=byMy[x.key],ps=byP[x.key];const mine=ms<=35?m.left:ms>=65?m.right:'場面に応じて使い分けやすい';const theirs=ps<=35?m.left:ps>=65?m.right:'場面に応じて使い分けやすい';return `<b>${a.label}</b>では、あなたは「${escapeHtml(mine)}」になりやすく、相手は「${escapeHtml(theirs)}」になりやすい組み合わせです。`}).join('<br><br>');mm.innerHTML=lines+`<br><br><b>ポイント：</b>同じ言葉でも、求めているものや受け取り方が違うと、善意のやり取りがすれ違いに見えることがあります。`;}else{mm.textContent='6つの方向では大きな差は出ていません。実際の会話では、同じ傾向でも言い方や状況によってすれ違いが起こることがあります。'}
-  body.appendChild(mm);return sec;
-}
-function v29HostInviteActive(){const inv=v23GetInviteState();return !!(inv?.token&&inv?.ownerToken)}
-function v29InvitePartnerRadar(){try{return JSON.parse(localStorage.getItem('cl_v29_invite_partner_radar')||'null')}catch{return null}}
-function clearV29InviteView(){
-  ['cl_v29_invite_partner_radar','cl_v29_invite_partner_extra','cl_v29_invite_partner_profile'].forEach(k=>{try{localStorage.removeItem(k)}catch{}});
-  ['cl_shared_partner_profile'].forEach(k=>{try{localStorage.removeItem(k)}catch{}});
-}
-function compareSourceOptions(side){
-  const out=[];
-  try{
-    const live=JSON.parse(localStorage.getItem('cl_diag_result_'+side)||'null');
-    if(Array.isArray(live?.scores)&&live.scores.length){
-      const deep=(()=>{try{return JSON.parse(localStorage.getItem('cl_extra_result_'+side)||'null')?.scores||[]}catch{return[]}})();
-      out.push({id:'live:'+side,label:side==='my'?'いまの自分チェック':'いまの相手チェック',scores:live.scores,deep});
-    }
-  }catch{}
-  list(side).forEach(p=>{
-    if(Array.isArray(p.scores)&&p.scores.length){
-      out.push({id:'prof:'+side+':'+p.name,label:p.name,scores:p.scores,deep:Array.isArray(p.deepScores)?p.deepScores:[]});
-    }
-  });
-  // de-dupe by label preferring live first
-  const seen=new Set();
-  return out.filter(x=>{if(seen.has(x.label))return false;seen.add(x.label);return true});
-}
-function getCompareSelection(side,options){
-  const key='cl_compare_sel_'+side;
-  let id=null;try{id=localStorage.getItem(key)}catch{}
-  if(id&&options.some(o=>o.id===id))return id;
-  return options[0]?.id||'';
-}
-function setCompareSelection(side,id){try{localStorage.setItem('cl_compare_sel_'+side,id)}catch{}}
-function deleteCompareProfile(side, profileName){
-  const key=side==='my'?'my':'partner';
-  const arr=list(key);
-  const idx=arr.findIndex(x=>x.name===profileName);
-  if(idx<0)return;
-  if(!confirm('「'+profileName+'」を削除しますか？'))return;
-  arr.splice(idx,1);
-  localStorage.setItem('cl_'+key,JSON.stringify(arr));
-  if(activeProfile(key)===profileName)localStorage.removeItem('cl_'+key+'_active');
-  if(getCompareSelection(side,compareSourceOptions(side))==='prof:'+side+':'+profileName){
-    try{localStorage.removeItem('cl_compare_sel_'+side)}catch{}
-  }
-  draw(key);
-  renderTwoPersonComparison();
-}
-function renderCompareOptionButtons(container, options, selectedId, side){
-  if(!container)return;
-  container.innerHTML='';
-  options.forEach(o=>{
-    const b=document.createElement('button');
-    b.type='button';
-    b.className='v60-compare-option'+(o.id===selectedId?' active':'');
-    b.textContent=o.label;
-    const saved=o.id.indexOf('prof:')===0;
-    if(saved){
-      const h=document.createElement('span');h.className='hint';h.textContent='タップで比較　・　長押しで削除';b.appendChild(h);
-    }else{
-      const h=document.createElement('span');h.className='hint';h.textContent='現在のチェック結果';b.appendChild(h);
-    }
-    let timer=null,longPressed=false;
-    const cancel=()=>{if(timer){clearTimeout(timer);timer=null}};
-    b.addEventListener('pointerdown',()=>{
-      longPressed=false;
-      timer=setTimeout(()=>{
-        timer=null;
-        if(!saved)return;
-        longPressed=true;
-        deleteCompareProfile(side,o.label);
-      },650);
-    });
-    b.addEventListener('pointerup',cancel);
-    b.addEventListener('pointercancel',cancel);
-    b.addEventListener('pointerleave',cancel);
-    b.addEventListener('click',()=>{
-      if(longPressed)return;
-      setCompareSelection(side,o.id);
-      renderTwoPersonComparison();
-    });
-    container.appendChild(b);
-  });
-}
-function renderTwoPersonComparison(){
-  const card=document.getElementById('v21CompareCard'),grid=document.getElementById('v21CompareGrid'),listEl=document.getElementById('v21CompareList');
-  if(!card||!grid||!listEl)return;
-  const myName=activeProfile('my'),paName=activeProfile('partner');
-  const myOpts=compareSourceOptions('my'),paOpts=compareSourceOptions('partner');
-  const myPick=myOpts.find(o=>o.id==='prof:my:'+myName)||myOpts.find(o=>o.id==='live:my');
-  const paPick=paOpts.find(o=>o.id==='prof:partner:'+paName)||paOpts.find(o=>o.id==='live:partner');
-  const dl=document.getElementById('v73DownloadCompare');
-  if(!myPick||!paPick){card.style.display='none';grid.innerHTML='';listEl.innerHTML='';if(dl)dl.style.display='none';return;}
-  if(dl)dl.style.display='block';
-  card.hidden=false;card.style.removeProperty('display');card.style.display='block';card.classList.add('v46-compare-only');
-  grid.innerHTML='';listEl.innerHTML='';
-  const pair=buildPairComparisonCard(myPick.scores,paPick.scores,paPick.deep,myPick.deep,myName||'あなた',paName||'相手');
-  if(pair)listEl.appendChild(pair);
-}
-
-function showRadar(before,after,caption){
-  /* 基本18問のプロフィールは結果カード内に表示するため、旧静的カードは使わない。 */
-  renderTwoPersonComparison();
-}
-
-// v38: 追加チェックの広告ゲート状態を明示的に初期化し、DOM参照を明示化。
 let extraTimer=null;
 let extraTarget="my";
 let extraPlan=[];
@@ -1218,6 +574,12 @@ function cl55ShowPane(which){
   selfDiag.setAttribute('aria-selected',which==='my'?'true':'false');
   otherDiag.setAttribute('aria-selected',which==='partner'?'true':'false');
 }
+function placeDiagButton(which){
+  const btn=document.getElementById("v72OpenDiag");
+  const pane=document.getElementById(which==="my"?"profileMyPane":"profilePartnerPane");
+  const fold=pane?.querySelector(".v74-traits-fold");
+  if(btn&&fold)fold.parentNode.insertBefore(btn,fold);
+}
 selfDiag.onclick=()=>{target="my";cl55ShowPane('my');const n=document.getElementById('targetNote');if(n)n.textContent="自分自身について、気づいていることやチェック結果を残せます。";restoreDiagAnswers("my")};
 otherDiag.onclick=()=>{target="partner";cl55ShowPane('partner');restoreDiagAnswers("partner")};
 
@@ -1225,9 +587,15 @@ function showDiagQuestions(){const panel=document.getElementById("diagQuestionPa
 function hideDiagQuestions(){/* v36: 質問は常時表示。過去回答をそのまま残すため非表示化しない。 */}
 function restoreDiagAnswers(p){
   try{
+    document.querySelectorAll('#questions input[type="radio"]').forEach(x=>x.checked=false);
     const saved=JSON.parse(localStorage.getItem("cl_diag_result_"+p)||"null");
     const answers=Array.isArray(saved?.answers)?saved.answers:[];
-    if(answers.length!==Q.length)return false;
+    const resultEl=document.getElementById("diagResult");
+    const moreEl=document.getElementById("moreDiag");
+    if(resultEl)resultEl.innerHTML="";
+    if(moreEl)moreEl.style.display="none";
+    showDiagQuestions();
+    if(answers.length!==Q.length){diagAnswers=[];diagScores=[];return false;}
     for(let i=0;i<Q.length;i++){
       const value=String(answers[i]);
       const input=document.querySelector(`input[name="q${i}"][value="${value}"]`);
@@ -1672,11 +1040,11 @@ loadSharedFromUrl();
     if(which==='my'){
       profileMyPane.style.display='block'; profilePartnerPane.style.display='none'; title.textContent='👤 自分のプロフィール';
       const n=activeProfile('my'); if(n){const x=list('my').find(z=>z.name===n);if(x){apply('my',x.state);const ne=document.getElementById('myName');if(ne)ne.value=x.name;}} else {const ne=document.getElementById('myName');if(ne)ne.value='';}
-      if(diagBtn){const fold=profileMyPane.querySelector('.v74-traits-fold'); if(fold) fold.parentNode.insertBefore(diagBtn,fold);}
+      placeDiagButton('my');
     }else{
       profileMyPane.style.display='none'; profilePartnerPane.style.display='block'; title.textContent='👥 相手のプロフィール';
       const n=activeProfile('partner'); if(n){const x=list('partner').find(z=>z.name===n);if(x){apply('partner',x.state);const ne=document.getElementById('partnerName');if(ne)ne.value=x.name;}} else {const ne=document.getElementById('partnerName');if(ne)ne.value='';}
-      if(diagBtn){const fold=profilePartnerPane.querySelector('.v74-traits-fold'); if(fold) fold.parentNode.insertBefore(diagBtn,fold);}
+      placeDiagButton('partner');
     }
     overlay.classList.add('show');
   }
@@ -1689,7 +1057,7 @@ loadSharedFromUrl();
     const arr=list(which), active=activeProfile(which);
     const add=(label,sub,fn,cls='')=>{const b=document.createElement('button');b.type='button';b.className='v72-choice '+cls;b.innerHTML=label+(sub?'<small>'+sub+'</small>':'');b.onclick=()=>{document.getElementById('v72PickerOverlay').classList.remove('show');fn();};box.appendChild(b)};
     add('＋ 新しく作る','名前をつけてプロフィールを作成',()=>openProfileNew(which),'v72-new');
-    arr.forEach(x=>add((active===x.name?'● ':'')+x.name,'このプロフィールを今回の'+(which==='my'?'自分':'相手')+'として使う',()=>{setActiveProfile(which,x.name);apply(which,x.state);draw(which);renderTwoPersonComparison();setNames();}));
+    arr.forEach(x=>add((active===x.name?'● ':'')+x.name,'このプロフィールを今回の'+(which==='my'?'自分':'相手')+'として使う',()=>{setActiveProfile(which,x.name);apply(which,x.state);if(typeof syncDiagnosisForProfile==='function')syncDiagnosisForProfile(which,x);else restoreDiagAnswers(which);placeDiagButton(which);draw(which);renderTwoPersonComparison();setNames();}));
     if(arr.length) add('⚙️ 選択中のプロフィールを編集',active||'',()=>openProfile(which));
     document.getElementById('v72PickerOverlay').classList.add('show');
   }
@@ -1723,6 +1091,17 @@ loadSharedFromUrl();
     document.getElementById('v72DiagOverlay').classList.add('show');
   };
   document.getElementById('v72DiagClose').onclick=()=>{document.getElementById('v72DiagOverlay').classList.remove('show');setNames();renderTwoPersonComparison();};
+  document.getElementById('v72DiagSaveClose').onclick=()=>{
+    const which=target;
+    const answers=[];
+    for(let i=0;i<Q.length;i++){const x=document.querySelector(`input[name="q${i}"]:checked`);if(!x){alert('前半18問すべてに回答してください。1〜5で選んでね。');return}answers.push(Number(x.value));}
+    runDiag.click();
+    save(which,{close:false,toast:false});
+    document.getElementById('v72DiagOverlay').classList.remove('show');
+    placeDiagButton(which);
+    setNames();
+    renderTwoPersonComparison();
+  };
   // Reflect saves/profile switches in the top page.
   const oldSaveMy=saveMy.onclick,oldSavePartner=savePartner.onclick;
   saveMy.addEventListener('click',()=>setTimeout(setNames,50));
@@ -1761,11 +1140,6 @@ loadSharedFromUrl();
   }
   document.getElementById('deleteMyProfile')?.addEventListener('click',()=>deleteProfile('my'));
   document.getElementById('deletePartnerProfile')?.addEventListener('click',()=>deleteProfile('partner'));
-  function getActiveCompareData(){
-    const myName=activeProfile('my'),paName=activeProfile('partner');
-    const myOpts=compareSourceOptions('my'),paOpts=compareSourceOptions('partner');
-    return {myName:myName||'あなた',paName:paName||'相手',my:myOpts.find(o=>o.id==='prof:my:'+myName)||myOpts.find(o=>o.id==='live:my'),partner:paOpts.find(o=>o.id==='prof:partner:'+paName)||paOpts.find(o=>o.id==='live:partner')};
-  }
   function escSvg(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
   function cardSide(score){const n=Number(score);if(n<=35)return 'left';if(n>=65)return 'right';return 'middle';}
   function cardDirection(key,score){
@@ -1858,8 +1232,6 @@ loadSharedFromUrl();
     const sc=src.children,dc=dst.children;
     for(let i=0;i<sc.length;i++)if(dc[i])copyComputedStyles(sc[i],dc[i]);
   }
-  // compare-export.js から現在の比較データを参照できるよう公開する。
-  window.getActiveCompareData = getActiveCompareData;
   // Page tracking.
   const io=new IntersectionObserver(entries=>entries.forEach(en=>{if(en.isIntersecting){const i=pages.indexOf(en.target);dots.forEach((d,n)=>d.classList.toggle('on',n===i));}}),{root:shell,threshold:.6});
   pages.forEach(p=>io.observe(p));
@@ -1867,6 +1239,7 @@ loadSharedFromUrl();
 </script>
 
 <link rel="stylesheet" href="/css/app.css">
+<style>.v72-diag-bottom-actions{padding:12px 16px 18px;border-top:1px solid #eee;text-align:center;position:sticky;bottom:0;background:rgba(255,255,255,.96);z-index:5}.v72-diag-bottom-actions button{width:100%;max-width:420px}</style>
 <script src="/js/compare-export.js"></script>
 </body></html>
 
