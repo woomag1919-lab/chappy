@@ -58,6 +58,9 @@
       const box=card.querySelector('.v82-top3');if(!box)return false;
       const rows=getRows(data).sort((a,b)=>b.diff-a.diff);
       const candidates=rows.filter(r=>r.diff>=8&&r.myLabel!==r.partnerLabel).slice(0,3);
+      const signature=candidates.map(r=>r.key+'|'+r.my+'|'+r.partner+'|'+r.myLabel+'|'+r.partnerLabel).join(';;')||'__none__';
+      if(box.dataset.v120Signature===signature)return true;
+      box.dataset.v120Signature=signature;
       box.innerHTML='';
       if(!candidates.length){box.innerHTML='<div class="v82-similar">大きな差は少なめ。似た入口から会話を進めやすい2人です。</div>';return true}
       candidates.forEach((r,i)=>{
@@ -87,7 +90,19 @@
   }
 
   function refresh(){const a=refreshTop();refreshAdvice();return a}
+  function installObserver(){
+    try{
+      const card=document.getElementById('v21CompareCard');
+      if(!card||card.__v120Observer)return false;
+      const observer=new MutationObserver(()=>{refresh()});
+      observer.observe(card,{subtree:true,childList:true,characterData:true});
+      card.__v120Observer=observer;
+      refresh();
+      return true;
+    }catch(e){console.warn('v120 comparison observer failed',e);return false}
+  }
+
   let tries=0;
-  const timer=setInterval(()=>{if(refresh()||++tries>=120)clearInterval(timer)},100);
-  window.addEventListener('load',()=>{refresh();setTimeout(refresh,300);setTimeout(refresh,1000);setTimeout(refresh,2000)});
+  const timer=setInterval(()=>{const ok=installObserver();if(ok||++tries>=120)clearInterval(timer)},100);
+  window.addEventListener('load',()=>{installObserver();refresh();setTimeout(refresh,300);setTimeout(refresh,1000);setTimeout(refresh,2000)});
 })();
