@@ -2198,9 +2198,8 @@ loadSharedFromUrl();
     const bodyTop=621,rowH=48;
     rows.slice(0,9).forEach((r,i)=>{
       const cy=bodyTop+i*rowH;
-      // 見本に合わせて表の本文をほんの少しだけ大きく。長い文だけ自動で縮める。
-      text(r.a,510,cy,fit(r.a,210,18,'500',12),'500',gray,'left');
-      text(r.b,750,cy,fit(r.b,210,18,'500',12),'500',gray,'left');
+      text(r.a,510,cy,fit(r.a,210,17,'500',10),'500',gray,'left');
+      text(r.b,750,cy,fit(r.b,210,17,'500',10),'500',gray,'left');
     });
 
     // ---- Advice cards: the cards themselves are fixed; only their contents change ----
@@ -2211,20 +2210,11 @@ loadSharedFromUrl();
     adv.forEach((a,i)=>{
       const x=i===0?125:575;
       const iconX=i===0?85:535;
-      const bodyX=i===0?88:548;
       const head=a.head.replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim();
       drawAxisIcon(head,iconX,1168,48);
       text(head,x+55,1186,fit(head,280,22,'700',14),'700',navy,'left');
-
-      // 見本のカード本文は「1文ずつ」大きく見せる。
-      // 旧実装のように2文まとめてfitすると、全文を1行に収めようとして
-      // フォントが必要以上に小さくなるため、段落ごとにサイズを決める。
-      let by=1228;
-      a.ps.slice(0,2).forEach(p=>{
-        const w=wrap(p,385,19,'500',1,16);
-        drawLines(w.lines,bodyX,by,w.size,'500',gray,31);
-        by+=34;
-      });
+      const w=wrap(a.ps.join(' '),345,17,'500',3,12);
+      drawLines(w.lines,x+5,1228,w.size,'500',gray,31);
     });
 
     return canvas;
