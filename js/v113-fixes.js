@@ -60,7 +60,11 @@
 (function(){
   try{
     if(!document.querySelector('script[data-corelingual-v120]')){
-      const s=document.createElement('script');s.src='/js/v120-fixes.js';s.dataset.corelingualV120='1';document.body.appendChild(s);
+      const s=document.createElement('script');
+      /* Cache-bust the feature file so deployed browsers cannot keep the pre-fix v120 bundle. */
+      s.src='/js/v120-fixes.js?v=1202';
+      s.dataset.corelingualV120='1';
+      document.body.appendChild(s);
     }
   }catch(e){console.warn('v120 loader failed',e)}
 })();
