@@ -134,4 +134,35 @@
       if(installDiagScrollReset() || ++tries>=40) clearInterval(timer);
     },50);
   }
+
+  /* v118 — 比較画面の見出しを内容に依存しない表記へ */
+  function normalizeComparisonHeadings(){
+    try{
+      const card=document.getElementById('v21CompareCard');
+      if(!card)return;
+      card.querySelectorAll('.v82-section-title').forEach(el=>{
+        const t=(el.textContent||'').trim();
+        if(t==='特に違いが出やすい3つ') el.textContent='特に違いが出やすいポイント';
+        if(t==='9つのコミュニケーション傾向') el.textContent='コミュニケーション傾向';
+      });
+    }catch(e){console.warn('v118 comparison heading normalize failed',e)}
+  }
+
+  function installComparisonHeadingFix(){
+    try{
+      normalizeComparisonHeadings();
+      if(window.__v118CompareHeadingFix)return true;
+      window.__v118CompareHeadingFix=true;
+      const card=document.getElementById('v21CompareCard');
+      if(card)new MutationObserver(normalizeComparisonHeadings).observe(card,{subtree:true,childList:true,characterData:true});
+      return true;
+    }catch(e){return false}
+  }
+
+  if(!installComparisonHeadingFix()){
+    let tries=0;
+    const timer=setInterval(()=>{
+      if(installComparisonHeadingFix() || ++tries>=40) clearInterval(timer);
+    },50);
+  }
 })();
