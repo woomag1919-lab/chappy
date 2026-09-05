@@ -166,11 +166,21 @@ function startExtra(){
 }
 
 const EXTRA_DRAFT_PREFIX="cl_extra_draft_";
-function extraDraftKey(p){return EXTRA_DRAFT_PREFIX+p;}
+function extraDraftKey(p){
+  let name=null;
+  try{name=activeProfile(p)}catch{}
+  return EXTRA_DRAFT_PREFIX+p+"_"+encodeURIComponent(name||"__none__");
+}
 function readExtraDraft(p){
   try{
     const d=JSON.parse(localStorage.getItem(extraDraftKey(p))||"null");
-    return d&&Array.isArray(d.answers)?d:null;
+    if(d&&Array.isArray(d.answers))return d;
+    const ap=activeProfile(p);
+    const prof=ap?list(p).find(x=>x.name===ap):null;
+    if(prof&&Array.isArray(prof.deepAnswers)&&prof.deepAnswers.length){
+      return {answers:prof.deepAnswers.slice(0,18),free:prof.state?.free||"",updatedAt:prof.updatedAt||Date.now()};
+    }
+    return null;
   }catch{return null}
 }
 function saveExtraDraft(p,answers,free){
