@@ -1,23 +1,19 @@
-/* CoreLingual v120 — comparison differences made visible */
+/* CoreLingual v120.2 — comparison difference/advice fix */
 (function(){
   'use strict';
-
   const BASE_AXES=['情報の受け取り方','考え方','感情の扱い方','人との距離感','変化への対応','伝え方・受け止め方'];
-  const DEEP_KEY={'近づき方・距離の取り方':'attach','刺激への反応':'sensory','進め方・柔軟性':'process'};
-  const AXIS_KEY={'情報の受け取り方':'language','考え方':'thinking','感情の扱い方':'emotion','人との距離感':'distance','変化への対応':'change','伝え方・受け止め方':'communication','近づき方・距離の取り方':'attach','刺激への反応':'sensory','進め方・柔軟性':'process'};
+  const DEEP_AXES=['近づき方・距離の取り方','刺激への反応','進め方・柔軟性'];
+  const KEY={'情報の受け取り方':'language','考え方':'thinking','感情の扱い方':'emotion','人との距離感':'distance','変化への対応':'change','伝え方・受け止め方':'communication','近づき方・距離の取り方':'attach','刺激への反応':'sensory','進め方・柔軟性':'process'};
   const LABELS={
-    language:{left:'言葉ではっきり',right:'流れから受け取る',middle:'言葉と流れを使い分け'},
-    thinking:{left:'筋道を整理',right:'ひらめきを広げる',middle:'整理と発想を行き来'},
-    emotion:{left:'話して整理',right:'時間を置いて整理',middle:'話す・考えるを使い分け'},
-    distance:{left:'一緒に整理',right:'ひとりで整理',middle:'状況に合わせて距離調整'},
-    change:{left:'見通してから',right:'動きながら',middle:'見通しと柔軟さを両立'},
-    communication:{left:'まず気持ち',right:'まず具体策',middle:'気持ちと具体策を両方見る'},
-    attach:{left:'つながりを確認',right:'自分で整理してから',middle:'近さと距離を調整'},
-    sensory:{left:'刺激を減らして整理',right:'その場で切り替える',middle:'刺激量で切り替える'},
-    process:{left:'順番を整えてから',right:'まず動いて調整',middle:'計画と柔軟さを使い分け'}
-  };
-  const NUANCE={
-    language:{low:'やや言葉寄り',high:'やや流れ寄り'},thinking:{low:'やや整理寄り',high:'やや発想寄り'},emotion:{low:'やや話す寄り',high:'やや時間を置く寄り'},distance:{low:'やや共有寄り',high:'やや一人の時間寄り'},change:{low:'やや見通し寄り',high:'やや柔軟寄り'},communication:{low:'やや気持ち寄り',high:'やや具体策寄り'},attach:{low:'ややつながり寄り',high:'やや距離寄り'},sensory:{low:'やや刺激を減らす寄り',high:'やや切り替える寄り'},process:{low:'やや順番寄り',high:'やや柔軟寄り'}
+    language:{left:'言葉ではっきり',right:'流れから受け取る',middle:'言葉と流れを使い分け',low:'やや言葉寄り',high:'やや流れ寄り'},
+    thinking:{left:'筋道を整理',right:'ひらめきを広げる',middle:'整理と発想を行き来',low:'やや整理寄り',high:'やや発想寄り'},
+    emotion:{left:'話して整理',right:'時間を置いて整理',middle:'話す・考えるを使い分け',low:'やや話す寄り',high:'やや時間を置く寄り'},
+    distance:{left:'一緒に整理',right:'ひとりで整理',middle:'状況に合わせて距離調整',low:'やや共有寄り',high:'やや一人の時間寄り'},
+    change:{left:'見通してから',right:'動きながら',middle:'見通しと柔軟さを両立',low:'やや見通し寄り',high:'やや柔軟寄り'},
+    communication:{left:'まず気持ち',right:'まず具体策',middle:'気持ちと具体策を両方見る',low:'やや気持ち寄り',high:'やや具体策寄り'},
+    attach:{left:'つながりを確認',right:'自分で整理してから',middle:'近さと距離を調整',low:'ややつながり寄り',high:'やや距離寄り'},
+    sensory:{left:'刺激を減らして整理',right:'その場で切り替える',middle:'刺激量で切り替える',low:'やや刺激を減らす寄り',high:'やや切り替える寄り'},
+    process:{left:'順番を整えてから',right:'まず動いて調整',middle:'計画と柔軟さを使い分け',low:'やや順番寄り',high:'やや柔軟寄り'}
   };
   const ADVICE={
     language:{left:'要点を短く区切って伝えると、行き違いを減らしやすい。',right:'話の最後に、認識が合っているか一度確かめる。',middle:'大事な点だけ、短く確認しておくと行き違いを防ぎやすい。',same:'2人とも言葉と流れの両方を使えるので、場面に合わせて確認の仕方を選ぶと進めやすい。'},
@@ -30,79 +26,35 @@
     sensory:{left:'情報が重なった時は、いったん話す量を減らして整理する。',right:'相手の余裕を見ながら、その場で扱う情報量を調整する。',middle:'その時の余裕に合わせて、受け取る情報量を加減する。',same:'2人とも刺激量に合わせて切り替えやすいので、情報が多い時は一度整理してから続けるとよい。'},
     process:{left:'最初に「次はこれ」と一つ決めてから進めると安心しやすい。',right:'まず小さく動いてみて、途中でやり方を整えていく。',middle:'大まかな段取りを持ちつつ、途中で必要なら調整する。',same:'2人とも計画と柔軟さを使い分けやすいので、最初は大枠だけ決めて細部は途中で調整すると進めやすい。'}
   };
-
-  function side(score){const n=Number(score);return n<=35?'left':n>=65?'right':'middle'}
-  function label(key,score){
-    const s=side(score),n=Number(score),dict=LABELS[key]||{};
-    if(s!=='middle')return dict[s]||'場面に応じて使い分け';
-    if(n<=47&&NUANCE[key])return NUANCE[key].low;
-    if(n>=53&&NUANCE[key])return NUANCE[key].high;
-    return dict.middle||'場面に応じて使い分け';
+  const side=n=>Number(n)<=35?'left':Number(n)>=65?'right':'middle';
+  function label(key,n){const d=LABELS[key]||{},v=Number(n);if(v<=35)return d.left||'';if(v>=65)return d.right||'';if(v<=47)return d.low||d.middle||'';if(v>=53)return d.high||d.middle||'';return d.middle||'';}
+  function rows(data){
+    const my=Object.fromEntries((data?.my?.scores||[]).map(x=>[x.key,Number(x.score)])),pa=Object.fromEntries((data?.partner?.scores||[]).map(x=>[x.key,Number(x.score)]));
+    const out=BASE_AXES.map(axis=>{const k=KEY[axis],a=my[k]??50,b=pa[k]??50;return{axis,key:k,type:'base',my:a,partner:b,diff:Math.abs(a-b),myLabel:label(k,a),partnerLabel:label(k,b)}});
+    const md=Object.fromEntries((data?.my?.deep||[]).map(x=>[x.key,Number(x.score)])),pd=Object.fromEntries((data?.partner?.deep||[]).map(x=>[x.key,Number(x.score)]));
+    if(Object.keys(md).length&&Object.keys(pd).length)DEEP_AXES.forEach(axis=>{const k=KEY[axis];if(md[k]!=null&&pd[k]!=null){const a=md[k],b=pd[k];out.push({axis,key:k,type:'deep',my:a,partner:b,diff:Math.abs(a-b),myLabel:label(k,a),partnerLabel:label(k,b)})}});
+    return out;
   }
-  function getRows(data){
-    const my=data?.my?.scores||[],pa=data?.partner?.scores||[];
-    const bm=Object.fromEntries(my.map(x=>[x.key,Number(x.score)])),bp=Object.fromEntries(pa.map(x=>[x.key,Number(x.score)]));
-    const rows=BASE_AXES.map(axis=>{const key=AXIS_KEY[axis];return {key,axis,type:'base',my:bm[key]??50,partner:bp[key]??50}});
-    const md=data?.my?.deep||[],pd=data?.partner?.deep||[];
-    if(md.length&&pd.length){
-      const dm=Object.fromEntries(md.map(x=>[x.key,Number(x.score)])),dp=Object.fromEntries(pd.map(x=>[x.key,Number(x.score)]));
-      Object.keys(DEEP_KEY).forEach(axis=>{const key=DEEP_KEY[axis];if(dm[key]!=null&&dp[key]!=null)rows.push({key,axis,type:'deep',my:dm[key],partner:dp[key]})});
-    }
-    return rows.map(r=>({...r,diff:Math.abs(r.my-r.partner),myLabel:label(r.key,r.my),partnerLabel:label(r.key,r.partner)}));
+  function getData(){try{return window.getActiveCompareData?.()||null}catch{return null}}
+  function icon(r){try{return r.type==='base'&&typeof AXES!=='undefined'?(AXES[r.key]?.icon||''):r.type==='deep'&&typeof DEEP_AXES!=='undefined'?(DEEP_AXES[r.key]?.icon||''):''}catch{return''}}
+  function refreshTop(card,d){
+    const box=card.querySelector('.v82-top3');if(!box)return false;
+    const candidates=rows(d).sort((a,b)=>b.diff-a.diff).filter(r=>r.diff>=8&&r.myLabel!==r.partnerLabel).slice(0,3);
+    const signature=candidates.map(r=>r.key+'|'+r.my+'|'+r.partner+'|'+r.myLabel+'|'+r.partnerLabel).join(';;')||'__none__';
+    if(box.dataset.v120Signature===signature)return true;
+    box.dataset.v120Signature=signature;box.innerHTML='';
+    if(!candidates.length){box.innerHTML='<div class="v82-similar">大きな差は少なめ。似た入口から会話を進めやすい2人です。</div>';return true}
+    candidates.forEach((r,i)=>{const el=document.createElement('div');el.className='v82-top-item';el.innerHTML='<div class="v82-top-num">0'+(i+1)+'</div><div class="v82-top-main"><div class="v82-top-axis">'+icon(r)+' '+r.axis+'</div><div class="v82-top-contrast"><b>'+r.myLabel+'</b><span>×</span><b>'+r.partnerLabel+'</b></div></div>';box.appendChild(el)});
+    return true;
   }
-
-  function refreshTop(){
-    try{
-      const card=document.getElementById('v21CompareCard');if(!card)return false;
-      const data=window.getActiveCompareData?.();if(!data?.my||!data?.partner)return false;
-      const box=card.querySelector('.v82-top3');if(!box)return false;
-      const rows=getRows(data).sort((a,b)=>b.diff-a.diff);
-      const candidates=rows.filter(r=>r.diff>=8&&r.myLabel!==r.partnerLabel).slice(0,3);
-      const signature=candidates.map(r=>r.key+'|'+r.my+'|'+r.partner+'|'+r.myLabel+'|'+r.partnerLabel).join(';;')||'__none__';
-      if(box.dataset.v120Signature===signature)return true;
-      box.dataset.v120Signature=signature;
-      box.innerHTML='';
-      if(!candidates.length){box.innerHTML='<div class="v82-similar">大きな差は少なめ。似た入口から会話を進めやすい2人です。</div>';return true}
-      candidates.forEach((r,i)=>{
-        const el=document.createElement('div');el.className='v82-top-item';
-        const icon=(r.type==='base'&&typeof AXES!=='undefined'&&AXES[r.key]?.icon)||(r.type==='deep'&&typeof DEEP_AXES!=='undefined'&&DEEP_AXES[r.key]?.icon)||'';
-        el.innerHTML='<div class="v82-top-num">0'+(i+1)+'</div><div class="v82-top-main"><div class="v82-top-axis">'+icon+' '+(typeof escapeHtml==='function'?escapeHtml(r.axis):r.axis)+'</div><div class="v82-top-contrast"><b>'+ (typeof escapeHtml==='function'?escapeHtml(r.myLabel):r.myLabel) +'</b><span>×</span><b>'+ (typeof escapeHtml==='function'?escapeHtml(r.partnerLabel):r.partnerLabel) +'</b></div></div>';
-        box.appendChild(el);
-      });
-      return true;
-    }catch(e){console.warn('v120 top comparison refresh failed',e);return false}
+  function refreshAdvice(card,d){
+    const items=[...card.querySelectorAll('.v82-advice-item')];if(!items.length)return false;
+    const ranked=rows(d).sort((a,b)=>b.diff-a.diff).slice(0,2);
+    items.forEach((item,i)=>{const r=ranked[i];if(!r)return;const dict=ADVICE[r.key]||{},a=side(r.my),b=side(r.partner),texts=a===b?[dict.same||dict[a]||'']:[dict[a]||dict.middle||'',dict[b]||dict.middle||''];const ps=item.querySelectorAll('p');if(ps[0])ps[0].textContent=texts[0];if(ps[1]){ps[1].textContent=texts[1]||'';ps[1].style.display=texts[1]?'':'none'}});
+    return true;
   }
-
-  function refreshAdvice(){
-    try{
-      const card=document.getElementById('v21CompareCard');if(!card)return false;
-      const data=window.getActiveCompareData?.();if(!data?.my||!data?.partner)return false;
-      const rows=getRows(data),byKey=Object.fromEntries(rows.map(r=>[r.key,r]));
-      card.querySelectorAll('.v82-advice-item').forEach(item=>{
-        const axis=(item.querySelector('b')?.textContent||'').replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim(),key=AXIS_KEY[axis],r=byKey[key];if(!r)return;
-        const dict=ADVICE[key]||{},a=side(r.my),b=side(r.partner),ps=item.querySelectorAll('p');if(!ps.length)return;
-        if(a===b){ps[0].textContent=dict.same||dict[a]||'';if(ps[1])ps[1].textContent='';}
-        else{ps[0].textContent=dict[a]||dict.middle||'';if(ps[1])ps[1].textContent=dict[b]||dict.middle||'';}
-        item.style.display='';
-      });
-      return true;
-    }catch(e){console.warn('v120 advice refresh failed',e);return false}
-  }
-
-  function refresh(){const a=refreshTop();refreshAdvice();return a}
-  function installObserver(){
-    try{
-      const card=document.getElementById('v21CompareCard');
-      if(!card||card.__v120Observer)return false;
-      const observer=new MutationObserver(()=>{refresh()});
-      observer.observe(card,{subtree:true,childList:true,characterData:true});
-      card.__v120Observer=observer;
-      refresh();
-      return true;
-    }catch(e){console.warn('v120 comparison observer failed',e);return false}
-  }
-
-  let tries=0;
-  const timer=setInterval(()=>{const ok=installObserver();if(ok||++tries>=120)clearInterval(timer)},100);
-  window.addEventListener('load',()=>{installObserver();refresh();setTimeout(refresh,300);setTimeout(refresh,1000);setTimeout(refresh,2000)});
+  function refresh(){const card=document.getElementById('v21CompareCard'),d=getData();if(!card||!d?.my||!d?.partner)return false;refreshTop(card,d);refreshAdvice(card,d);return true}
+  function installObserver(){try{const card=document.getElementById('v21CompareCard');if(!card||card.__v120Observer)return false;const observer=new MutationObserver(()=>refresh());observer.observe(card,{subtree:true,childList:true,characterData:true});card.__v120Observer=observer;refresh();return true}catch(e){console.warn('v120 observer failed',e);return false}}
+  let tries=0;const timer=setInterval(()=>{const ok=installObserver();if(ok||++tries>=120)clearInterval(timer)},100);
+  window.addEventListener('load',()=>{installObserver();[0,300,800,1500,2500].forEach(t=>setTimeout(refresh,t))});
 })();
