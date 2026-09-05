@@ -1003,6 +1003,8 @@ loadSharedFromUrl();
     document.getElementById('v72PartnerName').textContent=partner||'未設定';
     document.getElementById('v72ContextLine').textContent=(my||'自分')+' × '+(partner||'相手')+' の会話として解析します。プロフィールや特性チェックは後からでも設定できます。';
   }
+  // v113: expose the page-local name refresher to split JS files.
+  window.setNames=setNames;
   function go(i){pages[i].scrollIntoView({behavior:'smooth',block:'start'});dots.forEach((d,n)=>d.classList.toggle('on',n===i));}
   dots.forEach(d=>d.addEventListener('click',()=>go(Number(d.dataset.page))));
   document.getElementById('v72StartConversation').onclick=()=>go(1);
@@ -1242,6 +1244,7 @@ loadSharedFromUrl();
 <style>.v72-diag-bottom-actions{padding:12px 16px 18px;border-top:1px solid #eee;text-align:center;position:sticky;bottom:0;background:rgba(255,255,255,.96);z-index:5}.v72-diag-bottom-actions button{width:100%;max-width:420px}</style>
 <script src="/js/compare-export.js"></script>
 <script src="/js/v112-fixes.js"></script>
+<script src="/js/v113-fixes.js"></script>
 </body></html>
 
 <script>
