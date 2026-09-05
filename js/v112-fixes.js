@@ -35,7 +35,6 @@
   bindProfileReset('my');
   bindProfileReset('partner');
 
-  // Also reset immediately when profiles.js changes the active profile by clicking a saved profile.
   const originalSync=window.syncDiagnosisForProfile;
   if(typeof originalSync==='function'){
     window.syncDiagnosisForProfile=function(p,profile){
@@ -45,7 +44,6 @@
     };
   }
 
-  // The bottom button should save both halves when the deep 18 questions have been completed.
   const saveClose=document.getElementById('v72DiagSaveClose');
   if(saveClose){
     saveClose.onclick=()=>{
@@ -73,22 +71,12 @@
           const scores=extraScore();
           saveExtraDraft(which,deep,free);
           renderExtraResult(scores,deep,free);
-
-          // 36問分を、現在選択中のプロフィールそのものに保存する。
           const activeName=activeProfile(which);
           if(activeName){
             const arr=list(which);
             const idx=arr.findIndex(x=>x.name===activeName);
             if(idx>=0){
-              arr[idx]={
-                ...arr[idx],
-                state:state(which),
-                scores:diagScores.map(x=>({key:x.key,score:Number(x.score)||50})),
-                answers:base.slice(0,18),
-                deepScores:scores.map(x=>({key:x.key,score:Number(x.score)||50})),
-                deepAnswers:deep.slice(0,18),
-                updatedAt:Date.now()
-              };
+              arr[idx]={...arr[idx],state:state(which),scores:diagScores.map(x=>({key:x.key,score:Number(x.score)||50})),answers:base.slice(0,18),deepScores:scores.map(x=>({key:x.key,score:Number(x.score)||50})),deepAnswers:deep.slice(0,18),updatedAt:Date.now()};
               localStorage.setItem('cl_'+which,JSON.stringify(arr));
               draw(which);
             }
@@ -105,7 +93,6 @@
     };
   }
 
-  // Android Chrome is more reliable with a Blob URL than a data: URL for canvas downloads.
   async function fixedDownloadCompareCard(){
     const data=window.getActiveCompareData?.();
     if(!data?.my||!data?.partner){alert('2人分の比較データがまだありません。');return;}
@@ -129,41 +116,8 @@
     }catch(e){console.error('comparison image export failed',e);alert('画像の作成に失敗しました。\n'+(e?.message||e));}
   }
 
-  // If both people have exactly the same short description, avoid printing the same sentence twice.
-  // This is presentation-only; the underlying scores remain unchanged.
-  function dedupeSameComparisonText(){
-    const card=document.getElementById('v21CompareCard');
-    if(!card)return;
-    card.querySelectorAll('.v82-axis-row').forEach(row=>{
-      const cells=row.querySelectorAll(':scope > div');
-      if(cells.length>=3){
-        const a=(cells[1].textContent||'').trim();
-        const b=(cells[2].textContent||'').trim();
-        if(a&&a===b)cells[2].textContent='共通';
-      }
-    });
-    card.querySelectorAll('.v82-top-item').forEach(item=>{
-      const bs=item.querySelectorAll('.v82-top-contrast b');
-      if(bs.length>=2){
-        const a=(bs[0].textContent||'').trim();
-        const b=(bs[1].textContent||'').trim();
-        if(a&&a===b)bs[1].textContent='共通';
-      }
-    });
-  }
-  if(typeof window.renderTwoPersonComparison==='function'){
-    const originalRender=window.renderTwoPersonComparison;
-    window.renderTwoPersonComparison=function(){
-      const out=originalRender.apply(this,arguments);
-      setTimeout(dedupeSameComparisonText,0);
-      return out;
-    };
-  }
-  setTimeout(dedupeSameComparisonText,0);
-
   const downloadBtn=document.getElementById('v73DownloadCompare');
   if(downloadBtn){
-    // Replace the button node so the old anonymous listener from compare-export.js is removed.
     const clone=downloadBtn.cloneNode(true);
     downloadBtn.replaceWith(clone);
     clone.addEventListener('click',fixedDownloadCompareCard);
