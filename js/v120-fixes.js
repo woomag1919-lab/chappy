@@ -3,13 +3,8 @@
   'use strict';
 
   const BASE_AXES=['情報の受け取り方','考え方','感情の扱い方','人との距離感','変化への対応','伝え方・受け止め方'];
-  const DEEP_KEY={
-    '近づき方・距離の取り方':'attach','刺激への反応':'sensory','進め方・柔軟性':'process'
-  };
-  const AXIS_KEY={
-    '情報の受け取り方':'language','考え方':'thinking','感情の扱い方':'emotion','人との距離感':'distance','変化への対応':'change','伝え方・受け止め方':'communication',
-    '近づき方・距離の取り方':'attach','刺激への反応':'sensory','進め方・柔軟性':'process'
-  };
+  const DEEP_KEY={'近づき方・距離の取り方':'attach','刺激への反応':'sensory','進め方・柔軟性':'process'};
+  const AXIS_KEY={'情報の受け取り方':'language','考え方':'thinking','感情の扱い方':'emotion','人との距離感':'distance','変化への対応':'change','伝え方・受け止め方':'communication','近づき方・距離の取り方':'attach','刺激への反応':'sensory','進め方・柔軟性':'process'};
   const LABELS={
     language:{left:'言葉ではっきり',right:'流れから受け取る',middle:'言葉と流れを使い分け'},
     thinking:{left:'筋道を整理',right:'ひらめきを広げる',middle:'整理と発想を行き来'},
@@ -62,7 +57,6 @@
       const data=window.getActiveCompareData?.();if(!data?.my||!data?.partner)return false;
       const box=card.querySelector('.v82-top3');if(!box)return false;
       const rows=getRows(data).sort((a,b)=>b.diff-a.diff);
-      // TOP欄は「差がある」だけでなく、画面上でも左右の違いが見える項目だけを選ぶ。
       const candidates=rows.filter(r=>r.diff>=8&&r.myLabel!==r.partnerLabel).slice(0,3);
       box.innerHTML='';
       if(!candidates.length){box.innerHTML='<div class="v82-similar">大きな差は少なめ。似た入口から会話を進めやすい2人です。</div>';return true}
@@ -96,6 +90,4 @@
   let tries=0;
   const timer=setInterval(()=>{if(refresh()||++tries>=120)clearInterval(timer)},100);
   window.addEventListener('load',()=>{refresh();setTimeout(refresh,300);setTimeout(refresh,1000);setTimeout(refresh,2000)});
-  const card=document.getElementById('v21CompareCard');
-  if(card)new MutationObserver(()=>refresh()).observe(card,{subtree:true,childList:true});
 })();
