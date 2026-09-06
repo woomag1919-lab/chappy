@@ -1,4 +1,4 @@
-/* CoreLingual v135 — align exported comparison text to the approved 1024x1536 templates */
+/* CoreLingual v136 — align exported comparison text to the approved 1024x1536 templates */
 (function(){
   'use strict';
 
@@ -74,31 +74,53 @@
       while(s>min&&ctx.measureText(String(str??'')).width>maxW){s-=1;setFont(s,weight);}
       return s;
     };
+
+    /*
+      Robust Japanese line wrapping.
+      IMPORTANT: do not shrink the entire sentence until it fits on one line.
+      The previous implementation did that first, which made long advice text
+      stay on one huge line and overflow the card. Instead, wrap at the target
+      font size first, then reduce size only when the requested max line count
+      cannot contain the text.
+    */
     function wrap(str,maxW,size,weight='500',maxLines=2,min=10){
-      const source=String(str??'');
-      let s=fit(source,maxW,size,weight,min);
-      setFont(s,weight);
-      const lines=[];
-      let cur='';
-      for(const ch of [...source]){
-        const next=cur+ch;
-        if(ctx.measureText(next).width<=maxW){
-          cur=next;
-          continue;
+      const source=String(str??'').trim();
+      if(!source)return{lines:[],size};
+
+      const makeLines=(fontSize)=>{
+        setFont(fontSize,weight);
+        const lines=[];
+        let cur='';
+        for(const ch of [...source]){
+          const next=cur+ch;
+          if(ctx.measureText(next).width<=maxW || !cur){
+            cur=next;
+          }else{
+            lines.push(cur);
+            cur=ch;
+          }
         }
         if(cur)lines.push(cur);
-        cur=ch;
-        if(lines.length>=maxLines-1)break;
+        return lines;
+      };
+
+      let s=size;
+      let lines=makeLines(s);
+      while(lines.length>maxLines && s>min){
+        s-=1;
+        lines=makeLines(s);
       }
-      if(cur)lines.push(cur);
-      if(lines.length>maxLines)lines.length=maxLines;
-      if(lines.length===maxLines){
+
+      if(lines.length>maxLines){
+        lines=lines.slice(0,maxLines);
+        setFont(s,weight);
         let last=lines[maxLines-1]||'';
-        while(last.length>1&&ctx.measureText(last+'…').width>maxW)last=last.slice(0,-1);
-        if(source.length>lines.join('').length)lines[maxLines-1]=last+'…';
+        while(last.length>1 && ctx.measureText(last+'…').width>maxW)last=last.slice(0,-1);
+        lines[maxLines-1]=last+'…';
       }
       return{lines,size:s};
     }
+
     const drawCenteredLines=(lines,x,centerY,size,weight,color,lineH,align='left')=>{
       const total=(lines.length-1)*lineH;
       const firstY=centerY-total/2;
@@ -186,14 +208,18 @@
       drawAxisIcon(head,iconX,iconY,48);
       text(head,x+55,layout.advice.titleY,fit(head,280,22,'700',14),'700',navy,'left');
 
-      /* Keep the entire advice text block inside the card. */
+      /*
+        Advice cards are intentionally constrained to the card width.
+        Three lines are allowed so normal Japanese sentences never cross
+        the card boundary. Keep the font close to the approved 15–16px look.
+      */
       const parts=[];
       a.ps.slice(0,2).forEach(p=>{
-        const w=wrap(p,385,17,'500',2,14);
+        const w=wrap(p,385,16,'500',3,13);
         parts.push(...w.lines);
       });
       const lines=parts.slice(0,3);
-      drawCenteredLines(lines,bodyX,layout.advice.bodyY,17,'500',gray,layout.advice.lineH,'left');
+      drawCenteredLines(lines,bodyX,layout.advice.bodyY,16,'500',gray,layout.advice.lineH,'left');
     });
 
     return canvas;
