@@ -1,4 +1,4 @@
-/* CoreLingual v128 — apply 1-row template advice positioning to the shared 0/1 template */
+/* CoreLingual v129 — fine-tune 0/1-difference advice spacing */
 (function(){
   'use strict';
 
@@ -41,7 +41,7 @@
     text(paName,857,layout.nameY,fit(paName,145,21,'700',12),'700','#fff','center');
     rows.slice(0,axisCount).forEach((r,i)=>{const cy=layout.bodyTop+i*layout.rowH;text(r.a,510,cy,fit(r.a,210,18,'500',12),'500',gray,'left');text(r.b,750,cy,fit(r.b,210,18,'500',12),'500',gray,'left');});
     const adv=[...document.querySelectorAll('#v21CompareCard .v82-advice-item')].slice(0,2).map(el=>({head:el.querySelector('b')?.textContent||'',ps:[...el.querySelectorAll('p')].map(p=>p.textContent||'')}));
-    adv.forEach((a,i)=>{const x=i===0?125:575,iconX=i===0?85:535,bodyX=i===0?88:548,head=a.head.replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim();const isOneRowTemplate=differenceCount<=1;drawAxisIcon(head,iconX,isOneRowTemplate?1156:1168,48);text(head,x+55,isOneRowTemplate?1178:1186,fit(head,280,22,'700',14),'700',navy,'left');let by=isOneRowTemplate?1208:1228;const adviceSize=isOneRowTemplate?18:19;const adviceLineH=isOneRowTemplate?26:31;const adviceStep=isOneRowTemplate?26:34;a.ps.slice(0,2).forEach(p=>{const w=wrap(p,385,adviceSize,'500',1,16);drawLines(w.lines,bodyX,by,w.size,'500',gray,adviceLineH);by+=adviceStep;});});
+    adv.forEach((a,i)=>{const x=i===0?125:575,iconX=i===0?85:535,bodyX=i===0?88:548,head=a.head.replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim();const isOneDifference=differenceCount<=1;drawAxisIcon(head,iconX,isOneDifference?1148:1168,48);text(head,x+55,isOneDifference?1170:1186,fit(head,280,22,'700',14),'700',navy,'left');let by=isOneDifference?1202:1228;const adviceSize=isOneDifference?18:19;const adviceLineH=isOneDifference?26:31;const adviceStep=isOneDifference?26:34;a.ps.slice(0,2).forEach(p=>{const w=wrap(p,385,adviceSize,'500',1,16);drawLines(w.lines,bodyX,by,w.size,'500',gray,adviceLineH);by+=adviceStep;});});
     return canvas;
   }
 
