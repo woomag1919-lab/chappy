@@ -1,4 +1,4 @@
-/* CoreLingual v130 — optical vertical alignment for 9-axis result labels */
+/* CoreLingual v131 — align 9-axis result rows to template labels */
 (function(){
   'use strict';
 
@@ -27,7 +27,7 @@
     const wrap=(str,maxW,size,weight='500',maxLines=2,min=10)=>{let s=fit(str,maxW,size,weight,min);setFont(s,weight);const lines=[];let cur='';for(const ch of [...String(str??'')]){const t=cur+ch;if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=ch;if(lines.length===maxLines-1)break;}else cur=t;}if(cur)lines.push(cur);return{lines,size:s};};
     const drawLines=(lines,x,y,size,weight,color,lineH)=>lines.forEach((l,i)=>text(l,x,y+i*lineH,size,weight,color,'left'));
 
-    const layout9=differenceCount<=1?{bodyTop:472,rowH:60,nameY:411,topY:differenceCount===0?[]:[286],iconTop:[448,508,568,628,688,748,808,868,928]}:{bodyTop:551,rowH:60,nameY:488,topY:differenceCount===2?[300,380]:[271,334,396],iconTop:[527,587,647,707,767,827,887,947,1007]};
+    const layout9=differenceCount<=1?{bodyTop:472,rowH:63,nameY:411,topY:differenceCount===0?[]:[286],iconTop:[448,511,574,637,700,763,826,889,952]}:{bodyTop:551,rowH:63,nameY:488,topY:differenceCount===2?[300,380]:[271,334,396],iconTop:[527,590,653,716,779,842,905,968,1031]};
     const layout6={bodyTop:621,rowH:48,nameY:568,topY:differenceCount===2?[286,370]:differenceCount>=3?[270,334,398]:[286],iconTop:[577,625,673,721,769,817]};
     const layout=axisCount===9?layout9:layout6;
     const iconSource={};
@@ -39,7 +39,7 @@
     const myName=data.myName||'あなた',paName=data.paName||'相手';
     text(myName,617,layout.nameY,fit(myName,145,21,'700',12),'700','#fff','center');
     text(paName,857,layout.nameY,fit(paName,145,21,'700',12),'700','#fff','center');
-    rows.slice(0,axisCount).forEach((r,i)=>{const cy=layout.bodyTop+i*layout.rowH;const resultY=cy-4;text(r.a,510,resultY,fit(r.a,210,18,'500',12),'500',gray,'left');text(r.b,750,resultY,fit(r.b,210,18,'500',12),'500',gray,'left');});
+    rows.slice(0,axisCount).forEach((r,i)=>{const cy=layout.bodyTop+i*layout.rowH;const resultY=axisCount===9?cy:cy-4;text(r.a,510,resultY,fit(r.a,210,18,'500',12),'500',gray,'left');text(r.b,750,resultY,fit(r.b,210,18,'500',12),'500',gray,'left');});
     const adv=[...document.querySelectorAll('#v21CompareCard .v82-advice-item')].slice(0,2).map(el=>({head:el.querySelector('b')?.textContent||'',ps:[...el.querySelectorAll('p')].map(p=>p.textContent||'')}));
     adv.forEach((a,i)=>{const x=i===0?125:575,iconX=i===0?85:535,bodyX=i===0?88:548,head=a.head.replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim();const isOneDifference=differenceCount<=1;drawAxisIcon(head,iconX,isOneDifference?1148:1168,48);text(head,x+55,isOneDifference?1170:1186,fit(head,280,22,'700',14),'700',navy,'left');let by=isOneDifference?1202:1228;const adviceSize=isOneDifference?18:19;const adviceLineH=isOneDifference?26:31;const adviceStep=isOneDifference?26:34;a.ps.slice(0,2).forEach(p=>{const w=wrap(p,385,adviceSize,'500',1,16);drawLines(w.lines,bodyX,by,w.size,'500',gray,adviceLineH);by+=adviceStep;});});
     return canvas;
