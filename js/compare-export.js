@@ -1,4 +1,4 @@
-/* CoreLingual v122 — comparison card spacing refinement */
+/* CoreLingual v123 — per-template comparison coordinates */
 (function(){
   'use strict';
 
@@ -27,10 +27,15 @@
     const wrap=(str,maxW,size,weight='500',maxLines=2,min=10)=>{let s=fit(str,maxW,size,weight,min);setFont(s,weight);const lines=[];let cur='';for(const ch of [...String(str??'')]){const t=cur+ch;if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=ch;if(lines.length===maxLines-1)break;}else cur=t;}if(cur)lines.push(cur);return{lines,size:s};};
     const drawLines=(lines,x,y,size,weight,color,lineH)=>lines.forEach((l,i)=>text(l,x,y+i*lineH,size,weight,color,'left'));
 
-    // 9軸は下半分が詰まりすぎないよう、行間を少しだけ圧縮。
-    const layout9=differenceCount<=1?{bodyTop:472,rowH:57,nameY:411,topY:differenceCount===0?[]:[286],iconTop:[448,505,562,619,676,733,790,847,904]}:{bodyTop:551,rowH:57,nameY:488,topY:differenceCount===2?[300,380]:[271,334,396],iconTop:[527,584,641,698,755,812,869,926,983]};
-    const layout6={bodyTop:621,rowH:48,nameY:568,topY:differenceCount===2?[286,370]:differenceCount>=3?[270,334,398]:[286],iconTop:[577,625,673,721,769,817]};
-    const layout=axisCount===9?layout9:layout6;
+    /* Each supplied template has its own fixed row coordinates. Do not derive 9-axis positions from a shared row pitch. */
+    const layouts9=[
+      {bodyYs:[472,532,592,652,712,772,832,892,952],nameY:411,topY:[],iconTop:[448,508,568,628,688,748,808,868,928]},
+      {bodyYs:[472,532,592,652,712,772,832,892,952],nameY:411,topY:[286],iconTop:[448,508,568,628,688,748,808,868,928]},
+      {bodyYs:[551,611,671,731,791,851,911,971,1031],nameY:488,topY:[300,380],iconTop:[527,587,647,707,767,827,887,947,1007]},
+      {bodyYs:[551,611,671,731,791,851,911,971,1031],nameY:488,topY:[271,334,396],iconTop:[527,587,647,707,767,827,887,947,1007]}
+    ];
+    const layout6={bodyYs:[621,669,717,765,813,861],nameY:568,topY:[286],iconTop:[577,625,673,721,769,817]};
+    const layout=axisCount===9?layouts9[differenceCount]:layout6;
 
     const iconSource={};
     const iconNames=['情報の受け取り方','考え方','感情の扱い方','人との距離感','変化への対応','伝え方・受け止め方','近づき方・距離の取り方','刺激への反応','進め方・柔軟性'];
@@ -43,10 +48,10 @@
     const myName=data.myName||'あなた',paName=data.paName||'相手';
     text(myName,617,layout.nameY,fit(myName,145,21,'700',12),'700','#fff','center');
     text(paName,857,layout.nameY,fit(paName,145,21,'700',12),'700','#fff','center');
-    rows.slice(0,axisCount).forEach((r,i)=>{const cy=layout.bodyTop+i*layout.rowH;text(r.a,510,cy,fit(r.a,210,18,'500',12),'500',gray,'left');text(r.b,750,cy,fit(r.b,210,18,'500',12),'500',gray,'left');});
+    rows.slice(0,axisCount).forEach((r,i)=>{const cy=layout.bodyYs[i];text(r.a,510,cy,fit(r.a,210,18,'500',12),'500',gray,'left');text(r.b,750,cy,fit(r.b,210,18,'500',12),'500',gray,'left');});
 
     const adv=[...document.querySelectorAll('#v21CompareCard .v82-advice-item')].slice(0,2).map(el=>({head:el.querySelector('b')?.textContent||'',ps:[...el.querySelectorAll('p')].map(p=>p.textContent||'')}));
-    adv.forEach((a,i)=>{const x=i===0?125:575,iconX=i===0?85:535,bodyX=i===0?88:548,head=a.head.replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim();drawAxisIcon(head,iconX,1168,48);text(head,x+55,1180,fit(head,280,22,'700',14),'700',navy,'left');let by=1208;a.ps.slice(0,2).forEach(p=>{const w=wrap(p,385,19,'500',1,16);drawLines(w.lines,bodyX,by,w.size,'500',gray,30);by+=32;});});
+    adv.forEach((a,i)=>{const x=i===0?125:575,iconX=i===0?85:535,bodyX=i===0?88:548,head=a.head.replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim();drawAxisIcon(head,iconX,1168,48);text(head,x+55,1186,fit(head,280,22,'700',14),'700',navy,'left');let by=1218;a.ps.slice(0,2).forEach(p=>{const w=wrap(p,385,19,'500',1,16);drawLines(w.lines,bodyX,by,w.size,'500',gray,30);by+=32;});});
     return canvas;
   }
 
