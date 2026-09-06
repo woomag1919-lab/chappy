@@ -1,4 +1,4 @@
-/* CoreLingual v133 — match comparison result font to sample */
+/* CoreLingual v134 — tune 6-axis layouts for all comparison patterns */
 (function(){
   'use strict';
 
@@ -28,7 +28,7 @@
     const drawLines=(lines,x,y,size,weight,color,lineH)=>lines.forEach((l,i)=>text(l,x,y+i*lineH,size,weight,color,'left'));
 
     const layout9=differenceCount<=1?{bodyTop:472,rowH:63,nameY:411,topY:differenceCount===0?[]:[286],iconTop:[448,508,568,628,688,748,808,868,928]}:{bodyTop:551,rowH:60,nameY:488,topY:differenceCount===2?[300,380]:[271,334,396],iconTop:[527,587,647,707,767,827,887,947,1007]};
-    const layout6={bodyTop:621,rowH:48,nameY:568,topY:differenceCount===2?[286,370]:differenceCount>=3?[270,334,398]:[286],iconTop:[577,625,673,721,769,817]};
+    const layout6=differenceCount<=1?{bodyTop:530,rowH:74,nameY:462,topY:differenceCount===0?[]:[286],iconTop:[505,579,653,727,801,875]}:{bodyTop:612,rowH:69,nameY:548,topY:differenceCount===2?[286,370]:[270,334,398],iconTop:[586,655,724,793,862,931]};
     const layout=axisCount===9?layout9:layout6;
     const iconSource={};
     const iconNames=['情報の受け取り方','考え方','感情の扱い方','人との距離感','変化への対応','伝え方・受け止め方','近づき方・距離の取り方','刺激への反応','進め方・柔軟性'];
