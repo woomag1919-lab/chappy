@@ -1,4 +1,4 @@
-/* CoreLingual v124 — restore v121 comparison template spacing */
+/* CoreLingual v125 — tune 0/1-difference comparison templates */
 (function(){
   'use strict';
 
@@ -27,7 +27,7 @@
     const wrap=(str,maxW,size,weight='500',maxLines=2,min=10)=>{let s=fit(str,maxW,size,weight,min);setFont(s,weight);const lines=[];let cur='';for(const ch of [...String(str??'')]){const t=cur+ch;if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=ch;if(lines.length===maxLines-1)break;}else cur=t;}if(cur)lines.push(cur);return{lines,size:s};};
     const drawLines=(lines,x,y,size,weight,color,lineH)=>lines.forEach((l,i)=>text(l,x,y+i*lineH,size,weight,color,'left'));
 
-    /* v121 layout restored: each template keeps its original row rhythm and icon alignment. */
+    /* v121 layout restored for the 2/3-difference templates. */
     const layout9=differenceCount<=1?{bodyTop:472,rowH:60,nameY:411,topY:differenceCount===0?[]:[286],iconTop:[448,508,568,628,688,748,808,868,928]}:{bodyTop:551,rowH:60,nameY:488,topY:differenceCount===2?[300,380]:[271,334,396],iconTop:[527,587,647,707,767,827,887,947,1007]};
     const layout6={bodyTop:621,rowH:48,nameY:568,topY:differenceCount===2?[286,370]:differenceCount>=3?[270,334,398]:[286],iconTop:[577,625,673,721,769,817]};
     const layout=axisCount===9?layout9:layout6;
@@ -35,14 +35,14 @@
     const iconNames=['情報の受け取り方','考え方','感情の扱い方','人との距離感','変化への対応','伝え方・受け止め方','近づき方・距離の取り方','刺激への反応','進め方・柔軟性'];
     iconNames.forEach((name,i)=>iconSource[name]={x:75,y:layout.iconTop[i]});
     const drawAxisIcon=(name,dx,dy,size=48)=>{const s=iconSource[name];if(!s)return;const off=document.createElement('canvas');off.width=50;off.height=50;const oc=off.getContext('2d');oc.drawImage(src,s.x,s.y,50,50,0,0,50,50);const im=oc.getImageData(0,0,50,50);for(let k=0;k<im.data.length;k+=4){const r=im.data[k],g=im.data[k+1],b=im.data[k+2];if(r>238&&g>238&&b>238)im.data[k+3]=0;}oc.putImageData(im,0,0);ctx.drawImage(off,dx,dy,size,size);};
-    if(!topItems.length){text('大きな差は少なめ。似た入口から会話を進めやすい2人です。',512,286,20,'500',gray,'center');}
+    if(!topItems.length){text('大きな差は少なめ。似た入口から会話を進めやすい2人です。',512,286,24,'700',gray,'center');}
     else topItems.forEach((it,i)=>{const cy=layout.topY[i]??layout.topY[layout.topY.length-1]??286;drawAxisIcon(it.axis,176,cy-27,48);const axis=wrap(it.axis,205,18,'700',2,11);drawLines(axis.lines,248,cy-15,axis.size,'700',navy,19);text(it.a,360,cy+18,fit(it.a,210,24,'700',13),'700',navy,'center');text('×',520,cy+18,30,'500','#b83f58','center');text(it.b,650,cy+18,fit(it.b,210,24,'700',13),'700',navy,'center');});
     const myName=data.myName||'あなた',paName=data.paName||'相手';
     text(myName,617,layout.nameY,fit(myName,145,21,'700',12),'700','#fff','center');
     text(paName,857,layout.nameY,fit(paName,145,21,'700',12),'700','#fff','center');
     rows.slice(0,axisCount).forEach((r,i)=>{const cy=layout.bodyTop+i*layout.rowH;text(r.a,510,cy,fit(r.a,210,18,'500',12),'500',gray,'left');text(r.b,750,cy,fit(r.b,210,18,'500',12),'500',gray,'left');});
     const adv=[...document.querySelectorAll('#v21CompareCard .v82-advice-item')].slice(0,2).map(el=>({head:el.querySelector('b')?.textContent||'',ps:[...el.querySelectorAll('p')].map(p=>p.textContent||'')}));
-    adv.forEach((a,i)=>{const x=i===0?125:575,iconX=i===0?85:535,bodyX=i===0?88:548,head=a.head.replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim();drawAxisIcon(head,iconX,1168,48);text(head,x+55,1186,fit(head,280,22,'700',14),'700',navy,'left');let by=1228;a.ps.slice(0,2).forEach(p=>{const w=wrap(p,385,19,'500',1,16);drawLines(w.lines,bodyX,by,w.size,'500',gray,31);by+=34;});});
+    adv.forEach((a,i)=>{const x=i===0?125:575,iconX=i===0?85:535,bodyX=i===0?88:548,head=a.head.replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim();drawAxisIcon(head,iconX,1168,48);text(head,x+55,1186,fit(head,280,22,'700',14),'700',navy,'left');let by=(differenceCount===1?1196:1228);a.ps.slice(0,2).forEach(p=>{const w=wrap(p,385,19,'500',1,16);drawLines(w.lines,bodyX,by,w.size,'500',gray,31);by+=34;});});
     return canvas;
   }
 
