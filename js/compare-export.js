@@ -1,4 +1,4 @@
-/* CoreLingual v138 — improve readability and prevent advice-card text overlap */
+/* CoreLingual v139 — keep advice cards inside the shorter 1-difference layout */
 (function(){
   'use strict';
 
@@ -63,12 +63,12 @@
     const drawCenteredLines=(lines,x,centerY,size,weight,color,lineH,align='left')=>{const total=(lines.length-1)*lineH,firstY=centerY-total/2;lines.forEach((line,i)=>text(line,x,firstY+i*lineH,size,weight,color,align));};
 
     const layout6={
-      1:{topY:[326],bodyCenters:[530,604,678,752,826,900],nameY:462,advice:{iconY:1142,titleY:1170,bodyY:1224,lineH:24}},
+      1:{topY:[326],bodyCenters:[530,604,678,752,826,900],nameY:462,advice:{iconY:1084,titleY:1112,bodyY:1164,lineH:22}},
       2:{topY:[333,424],bodyCenters:[612,681,750,819,888,957],nameY:548,advice:{iconY:1142,titleY:1170,bodyY:1224,lineH:24}},
       3:{topY:[288,366,444],bodyCenters:[612,681,750,819,888,957],nameY:548,advice:{iconY:1142,titleY:1170,bodyY:1224,lineH:24}}
     };
     const layout9={
-      1:{topY:[286],bodyCenters:[472,535,598,661,724,787,850,913,976],nameY:411,advice:{iconY:1142,titleY:1170,bodyY:1224,lineH:24}},
+      1:{topY:[286],bodyCenters:[472,535,598,661,724,787,850,913,976],nameY:411,advice:{iconY:1084,titleY:1112,bodyY:1164,lineH:22}},
       2:{topY:[300,380],bodyCenters:[551,611,671,731,791,851,911,971,1031],nameY:488,advice:{iconY:1142,titleY:1170,bodyY:1224,lineH:24}},
       3:{topY:[271,334,396],bodyCenters:[551,611,671,731,791,851,911,971,1031],nameY:488,advice:{iconY:1142,titleY:1170,bodyY:1224,lineH:24}}
     };
