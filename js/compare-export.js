@@ -1,4 +1,4 @@
-/* CoreLingual v136 — align exported comparison text to the approved 1024x1536 templates */
+/* CoreLingual v137 — align exported comparison text to the approved 1024x1536 templates */
 (function(){
   'use strict';
 
@@ -25,9 +25,9 @@
     if(!data?.my||!data?.partner)throw new Error('比較データが取得できませんでした');
 
     await Promise.all([
-      document.fonts.load('700 34px "Zen Kaku Gothic New"'),
-      document.fonts.load('500 24px "Zen Kaku Gothic New"'),
-      document.fonts.load('400 20px "Zen Kaku Gothic New"')
+      document.fonts.load('700 36px "Zen Kaku Gothic New"'),
+      document.fonts.load('500 26px "Zen Kaku Gothic New"'),
+      document.fonts.load('400 22px "Zen Kaku Gothic New"')
     ]);
 
     const rows=[...document.querySelectorAll('#v21CompareCard .v82-axis-row')].map(el=>{
@@ -75,14 +75,7 @@
       return s;
     };
 
-    /*
-      Robust Japanese line wrapping.
-      IMPORTANT: do not shrink the entire sentence until it fits on one line.
-      The previous implementation did that first, which made long advice text
-      stay on one huge line and overflow the card. Instead, wrap at the target
-      font size first, then reduce size only when the requested max line count
-      cannot contain the text.
-    */
+    /* Wrap first at the requested readable size, then reduce only if necessary. */
     function wrap(str,maxW,size,weight='500',maxLines=2,min=10){
       const source=String(str??'').trim();
       if(!source)return{lines:[],size};
@@ -127,21 +120,15 @@
       lines.forEach((line,i)=>text(line,x,firstY+i*lineH,size,weight,color,align));
     };
 
-    /*
-      The three approved 6-axis templates have fixed vertical centers.
-      Do not move the whole page based on content. The variable text is
-      centered inside those fixed rows so the baked-in left labels and the
-      generated A/B text always share the same row center.
-    */
     const layout6={
-      1:{topY:[326],bodyCenters:[530,604,678,752,826,900],nameY:462,advice:{iconY:1148,titleY:1170,bodyY:1202,lineH:25}},
-      2:{topY:[333,424],bodyCenters:[612,681,750,819,888,957],nameY:548,advice:{iconY:1168,titleY:1186,bodyY:1222,lineH:25}},
-      3:{topY:[288,366,444],bodyCenters:[612,681,750,819,888,957],nameY:548,advice:{iconY:1168,titleY:1186,bodyY:1222,lineH:25}}
+      1:{topY:[326],bodyCenters:[530,604,678,752,826,900],nameY:462,advice:{iconY:1148,titleY:1170,bodyY:1202,lineH:27}},
+      2:{topY:[333,424],bodyCenters:[612,681,750,819,888,957],nameY:548,advice:{iconY:1168,titleY:1186,bodyY:1222,lineH:27}},
+      3:{topY:[288,366,444],bodyCenters:[612,681,750,819,888,957],nameY:548,advice:{iconY:1168,titleY:1186,bodyY:1222,lineH:27}}
     };
     const layout9={
-      1:{topY:[286],bodyCenters:[472,535,598,661,724,787,850,913,976],nameY:411,advice:{iconY:1148,titleY:1170,bodyY:1202,lineH:25}},
-      2:{topY:[300,380],bodyCenters:[551,611,671,731,791,851,911,971,1031],nameY:488,advice:{iconY:1168,titleY:1186,bodyY:1222,lineH:27}},
-      3:{topY:[271,334,396],bodyCenters:[551,611,671,731,791,851,911,971,1031],nameY:488,advice:{iconY:1168,titleY:1186,bodyY:1222,lineH:27}}
+      1:{topY:[286],bodyCenters:[472,535,598,661,724,787,850,913,976],nameY:411,advice:{iconY:1148,titleY:1170,bodyY:1202,lineH:27}},
+      2:{topY:[300,380],bodyCenters:[551,611,671,731,791,851,911,971,1031],nameY:488,advice:{iconY:1168,titleY:1186,bodyY:1222,lineH:29}},
+      3:{topY:[271,334,396],bodyCenters:[551,611,671,731,791,851,911,971,1031],nameY:488,advice:{iconY:1168,titleY:1186,bodyY:1222,lineH:29}}
     };
     const layout=(axisCount===9?layout9:layout6)[differenceCount]||(axisCount===9?layout9:layout6)[1];
 
@@ -168,31 +155,30 @@
     };
 
     if(!topItems.length){
-      text('大きな差は少なめ。似た入口から会話を進めやすい2人です.',512,326,22,'700',gray,'center');
+      text('大きな差は少なめ。似た入口から会話を進めやすい2人です.',512,326,25,'700',gray,'center');
     }else{
       topItems.forEach((it,i)=>{
         const cy=layout.topY[i]??layout.topY[layout.topY.length-1];
-        drawAxisIcon(it.axis,176,cy-27,48);
-        const axis=wrap(it.axis,205,18,'700',2,11);
-        drawCenteredLines(axis.lines,248,cy-10,axis.size,'700',navy,19,'left');
-        text(it.a,360,cy+18,fit(it.a,210,24,'700',13),'700',navy,'center');
-        text('×',520,cy+18,30,'500','#b83f58','center');
-        text(it.b,650,cy+18,fit(it.b,210,24,'700',13),'700',navy,'center');
+        drawAxisIcon(it.axis,174,cy-29,52);
+        const axis=wrap(it.axis,220,20,'700',2,12);
+        drawCenteredLines(axis.lines,248,cy-13,axis.size,'700',navy,21,'left');
+        text(it.a,365,cy+19,fit(it.a,215,27,'700',14),'700',navy,'center');
+        text('×',520,cy+19,32,'500','#b83f58','center');
+        text(it.b,652,cy+19,fit(it.b,215,27,'700',14),'700',navy,'center');
       });
     }
 
     const myName=data.myName||'あなた',paName=data.paName||'相手';
-    text(myName,617,layout.nameY,fit(myName,145,21,'700',12),'700','#fff','center');
-    text(paName,857,layout.nameY,fit(paName,145,21,'700',12),'700','#fff','center');
+    text(myName,617,layout.nameY,fit(myName,150,22,'700',12),'700','#fff','center');
+    text(paName,857,layout.nameY,fit(paName,150,22,'700',12),'700','#fff','center');
 
-    /* Table: use the template's baked icon centers as the single source of truth. */
     rows.slice(0,axisCount).forEach((r,i)=>{
       const cy=layout.bodyCenters[i];
       if(cy==null)return;
-      const a=wrap(r.a,210,20,'500',2,13);
-      const b=wrap(r.b,210,20,'500',2,13);
-      drawCenteredLines(a.lines,510,cy,a.size,'500',gray,24,'left');
-      drawCenteredLines(b.lines,750,cy,b.size,'500',gray,24,'left');
+      const a=wrap(r.a,212,22,'500',2,14);
+      const b=wrap(r.b,212,22,'500',2,14);
+      drawCenteredLines(a.lines,510,cy,a.size,'500',gray,27,'left');
+      drawCenteredLines(b.lines,750,cy,b.size,'500',gray,27,'left');
     });
 
     const adv=[...document.querySelectorAll('#v21CompareCard .v82-advice-item')].slice(0,2).map(el=>({
@@ -205,21 +191,16 @@
       const bodyX=i===0?88:548;
       const head=a.head.replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim();
       const iconY=layout.advice.iconY;
-      drawAxisIcon(head,iconX,iconY,48);
-      text(head,x+55,layout.advice.titleY,fit(head,280,22,'700',14),'700',navy,'left');
+      drawAxisIcon(head,iconX,iconY,52);
+      text(head,x+55,layout.advice.titleY,fit(head,280,23,'700',15),'700',navy,'left');
 
-      /*
-        Advice cards are intentionally constrained to the card width.
-        Three lines are allowed so normal Japanese sentences never cross
-        the card boundary. Keep the font close to the approved 15–16px look.
-      */
       const parts=[];
       a.ps.slice(0,2).forEach(p=>{
-        const w=wrap(p,385,16,'500',3,13);
+        const w=wrap(p,385,18,'500',3,14);
         parts.push(...w.lines);
       });
       const lines=parts.slice(0,3);
-      drawCenteredLines(lines,bodyX,layout.advice.bodyY,16,'500',gray,layout.advice.lineH,'left');
+      drawCenteredLines(lines,bodyX,layout.advice.bodyY,18,'500',gray,layout.advice.lineH,'left');
     });
 
     return canvas;
