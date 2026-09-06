@@ -1,4 +1,4 @@
-/* CoreLingual v139 — keep advice cards inside the shorter 1-difference layout */
+/* CoreLingual v140 — align exported icons to their actual source rows */
 (function(){
   'use strict';
 
@@ -77,7 +77,17 @@
     const iconSource={},iconNames=['情報の受け取り方','考え方','感情の扱い方','人との距離感','変化への対応','伝え方・受け止め方','近づき方・距離の取り方','刺激への反応','進め方・柔軟性'];
     const iconTop=axisCount===9?(differenceCount===1?[448,508,568,628,688,748,808,868,928]:[527,587,647,707,767,827,887,947,1007]):(differenceCount===1?[505,579,653,727,801,875]:[586,655,724,793,862,931]);
     iconNames.forEach((name,i)=>iconSource[name]={x:75,y:iconTop[i]});
-    const drawAxisIcon=(name,dx,dy,size=48)=>{const s=iconSource[name];if(!s)return;const off=document.createElement('canvas');off.width=50;off.height=50;const oc=off.getContext('2d');oc.drawImage(src,s.x,s.y,50,50,0,0,50,50);const im=oc.getImageData(0,0,50,50);for(let k=0;k<im.data.length;k+=4){const r=im.data[k],g=im.data[k+1],b=im.data[k+2];if(r>238&&g>238&&b>238)im.data[k+3]=0;}oc.putImageData(im,0,0);ctx.drawImage(off,dx,dy,size,size);};
+    const drawAxisIcon=(name,dx,dy,size=48)=>{
+      const s=iconSource[name];
+      if(!s)return;
+      const off=document.createElement('canvas');off.width=50;off.height=50;
+      const oc=off.getContext('2d');
+      oc.drawImage(src,s.x,s.y,50,50,0,0,50,50);
+      const im=oc.getImageData(0,0,50,50);
+      for(let k=0;k<im.data.length;k+=4){const r=im.data[k],g=im.data[k+1],b=im.data[k+2];if(r>238&&g>238&&b>238)im.data[k+3]=0;}
+      oc.putImageData(im,0,0);
+      ctx.drawImage(off,dx,dy,size,size);
+    };
 
     if(!topItems.length){
       text('大きな差は少なめ。似た入口から会話を進めやすい2人です.',512,326,25,'700',gray,'center');
@@ -92,6 +102,8 @@
     const adv=[...document.querySelectorAll('#v21CompareCard .v82-advice-item')].slice(0,2).map(el=>({head:el.querySelector('b')?.textContent||'',ps:[...el.querySelectorAll('p')].map(p=>p.textContent||'')}));
     adv.forEach((a,i)=>{
       const x=i===0?125:575,iconX=i===0?85:535,bodyX=i===0?88:548,head=a.head.replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim();
+      // Bottom-card icons must be sampled from the actual axis row for this heading,
+      // not from the blank destination area of the template.
       drawAxisIcon(head,iconX,layout.advice.iconY,52);
       text(head,x+55,layout.advice.titleY,fit(head,280,23,'700',15),'700',navy,'left');
       const parts=[];a.ps.slice(0,2).forEach(p=>{const w=wrap(p,385,18,'500',2,14);parts.push(...w.lines);});
