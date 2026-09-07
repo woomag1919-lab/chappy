@@ -64,3 +64,38 @@
   window.CoreLingualCompareExport={buildCompareTemplateCanvas,downloadCompareCard,pickTemplatePath};
   document.getElementById('v73DownloadCompare')?.addEventListener('click',downloadCompareCard);
 })();
+
+/* CoreLingual v142 — diagnosis/deep-check UI cleanup */
+(function(){
+  'use strict';
+  function clean(){
+    document.querySelectorAll('.v77-gentle-note').forEach(el=>el.remove());
+    const more=document.getElementById('moreDiag');
+    const extra=document.getElementById('extraDiag');
+    if(extra && getComputedStyle(extra).display!=='none' && more) more.style.display='none';
+    const ad=document.getElementById('ad30');
+    if(ad){
+      const strong=ad.querySelector('strong'); if(strong) strong.textContent='📺 広告表示中';
+      const first=ad.querySelector('div'); if(first && !first.id) first.textContent='広告終了後、自動で後半18問が始まります。';
+    }
+    const note=document.querySelector('#moreDiag .v36-more-note');
+    if(note) note.style.display='none';
+  }
+  function install(){
+    clean();
+    const root=document.getElementById('diagResult')||document.body;
+    if(!root.__v142Observer){
+      const obs=new MutationObserver(clean);obs.observe(root,{subtree:true,childList:true,characterData:true});root.__v142Observer=obs;
+    }
+    const overlay=document.getElementById('v72DiagOverlay');
+    const adbar=document.getElementById('clFixedWebAd');
+    if(overlay && !overlay.__v142Ad){
+      overlay.__v142Ad=true;
+      const sync=()=>{if(adbar) adbar.style.visibility=overlay.classList.contains('show')?'hidden':'';};
+      new MutationObserver(sync).observe(overlay,{attributes:true,attributeFilter:['class']});
+      sync();
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+  window.addEventListener('load',install);
+})();
