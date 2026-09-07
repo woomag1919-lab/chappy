@@ -113,7 +113,13 @@
     snapshot=null;
   }
 
-  function markSaved(){if(snapshot)snapshot.saved=true;snapshot=null}
+  function markSavedIfClosed(){
+    if(!snapshot)return;
+    const overlay=document.getElementById('v72DiagOverlay');
+    if(overlay && overlay.classList.contains('show'))return;
+    snapshot.saved=true;
+    snapshot=null;
+  }
 
   function install(){
     const open=document.getElementById('v72OpenDiag');
@@ -137,7 +143,7 @@
     }
     if(!save.__v121){
       save.__v121=true;
-      save.addEventListener('click',()=>setTimeout(markSaved,0));
+      save.addEventListener('click',()=>setTimeout(markSavedIfClosed,0));
     }
     return true;
   }
