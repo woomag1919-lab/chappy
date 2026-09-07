@@ -48,3 +48,26 @@
   let tries=0;const timer=setInterval(()=>{const ok=installObserver();if(ok||++tries>=120)clearInterval(timer)},100);
   window.addEventListener('load',()=>{installObserver();[0,300,800,1500,2500].forEach(t=>setTimeout(refresh,t))});
 })();
+
+/* v145 — after finishing the deep 18 questions, scroll to the generated result */
+(function(){
+  'use strict';
+  function installDeepResultScroll(){
+    const btn=document.getElementById('runExtra');
+    const result=document.getElementById('extraResult');
+    if(!btn||!result||btn.__v145ScrollBound)return !!btn;
+    btn.__v145ScrollBound=true;
+    btn.addEventListener('click',()=>{
+      setTimeout(()=>{
+        if(!result.children.length)return;
+        result.style.scrollMarginTop='18px';
+        result.scrollIntoView({behavior:'smooth',block:'start'});
+      },80);
+    });
+    return true;
+  }
+  if(!installDeepResultScroll()){
+    let tries=0;
+    const timer=setInterval(()=>{if(installDeepResultScroll()||++tries>=120)clearInterval(timer)},100);
+  }
+})();
