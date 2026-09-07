@@ -91,3 +91,43 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
   window.addEventListener('load',install);
 })();
+
+/* v144 — after starting the deep check, reveal the newly inserted questions */
+(function(){
+  'use strict';
+  function isVisible(el){return !!el && getComputedStyle(el).display!=='none' && el.getClientRects().length>0;}
+  function scrollToDeepCheck(){
+    const extra=document.getElementById('extraDiag');
+    if(!isVisible(extra))return false;
+    const sheet=extra.closest('.v72-sheet');
+    if(sheet){
+      const extraRect=extra.getBoundingClientRect();
+      const sheetRect=sheet.getBoundingClientRect();
+      const target=sheet.scrollTop+(extraRect.top-sheetRect.top)-90;
+      sheet.scrollTo({top:Math.max(0,target),behavior:'smooth'});
+    }else{
+      extra.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    return true;
+  }
+  function install(){
+    const btn=document.getElementById('startMore');
+    const extra=document.getElementById('extraDiag');
+    if(!btn||!extra||btn.__v144Bound)return;
+    btn.__v144Bound=true;
+    let waiting=false;
+    const tryScroll=()=>{
+      if(!waiting)return;
+      if(scrollToDeepCheck()){waiting=false;observer.disconnect();}
+    };
+    const observer=new MutationObserver(tryScroll);
+    observer.observe(extra,{attributes:true,attributeFilter:['style','class'],childList:true,subtree:true});
+    btn.addEventListener('click',()=>{
+      waiting=true;
+      requestAnimationFrame(()=>requestAnimationFrame(tryScroll));
+    });
+    window.addEventListener('load',tryScroll,{once:false});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+  window.addEventListener('load',install);
+})();
