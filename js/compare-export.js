@@ -1,8 +1,6 @@
-/* CoreLingual v141 — fixed web ad slot */
+/* CoreLingual v143 — fixed web ad stays visible with modal clearance */
 (function(){
   'use strict';
-
-  // Web版の常設広告枠。旧ページ内広告を撤去し、画面下部へ固定する。
   function mountFixedWebAd(){
     const old=document.getElementById('bannerAd');
     if(old)old.remove();
@@ -12,10 +10,12 @@
     style.textContent=`
       :root{--cl-web-ad-height:60px}
       body{padding-bottom:calc(var(--cl-web-ad-height) + env(safe-area-inset-bottom,0px)) !important}
-      #clFixedWebAd{position:fixed;left:0;right:0;bottom:0;height:var(--cl-web-ad-height);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:content-box;background:rgba(255,255,255,.98);border-top:1px solid #e3e7ec;box-shadow:0 -2px 12px rgba(20,45,72,.08);z-index:9998;display:flex;align-items:center;justify-content:center}
+      #clFixedWebAd{position:fixed;left:0;right:0;bottom:0;height:var(--cl-web-ad-height);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:content-box;background:rgba(255,255,255,.98);border-top:1px solid #e3e7ec;box-shadow:0 -2px 12px rgba(20,45,72,.08);z-index:10001;display:flex;align-items:center;justify-content:center}
       #clFixedWebAd .cl-web-ad-inner{width:min(100%,728px);height:60px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:4px 10px}
       #clFixedWebAd .cl-web-ad-placeholder{width:100%;height:50px;display:flex;align-items:center;justify-content:center;border:1px dashed #d7dce2;border-radius:8px;color:#8a919a;font-size:11px;background:#fafbfc}
       @media(min-width:601px){:root{--cl-web-ad-height:90px}#clFixedWebAd .cl-web-ad-inner{height:90px}#clFixedWebAd .cl-web-ad-placeholder{height:70px}}
+      /* 特性チェックのフローティングウインドウは広告ぶんだけ上へ逃がす */
+      .v72-diag-overlay.show .v72-sheet{margin-bottom:calc(var(--cl-web-ad-height) + env(safe-area-inset-bottom,0px));max-height:calc(92vh - var(--cl-web-ad-height) - env(safe-area-inset-bottom,0px));}
     `;
     document.head.appendChild(style);
     const bar=document.createElement('div');bar.id='clFixedWebAd';bar.setAttribute('aria-label','広告');
@@ -65,7 +65,7 @@
   document.getElementById('v73DownloadCompare')?.addEventListener('click',downloadCompareCard);
 })();
 
-/* CoreLingual v142 — diagnosis/deep-check UI cleanup */
+/* Keep diagnosis/deep-check cleanup, but never hide the fixed ad. */
 (function(){
   'use strict';
   function clean(){
@@ -84,16 +84,8 @@
   function install(){
     clean();
     const root=document.getElementById('diagResult')||document.body;
-    if(!root.__v142Observer){
-      const obs=new MutationObserver(clean);obs.observe(root,{subtree:true,childList:true,characterData:true});root.__v142Observer=obs;
-    }
-    const overlay=document.getElementById('v72DiagOverlay');
-    const adbar=document.getElementById('clFixedWebAd');
-    if(overlay && !overlay.__v142Ad){
-      overlay.__v142Ad=true;
-      const sync=()=>{if(adbar) adbar.style.visibility=overlay.classList.contains('show')?'hidden':'';};
-      new MutationObserver(sync).observe(overlay,{attributes:true,attributeFilter:['class']});
-      sync();
+    if(!root.__v143Observer){
+      const obs=new MutationObserver(clean);obs.observe(root,{subtree:true,childList:true,characterData:true});root.__v143Observer=obs;
     }
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
