@@ -131,3 +131,41 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
   window.addEventListener('load',install);
 })();
+
+/* v145 — after showing the first 18-question results, reveal the result section */
+(function(){
+  'use strict';
+  function isVisible(el){return !!el && getComputedStyle(el).display!=='none' && el.getClientRects().length>0;}
+  function scrollToFirstResult(){
+    const result=document.getElementById('diagResult');
+    if(!isVisible(result) || !result.textContent.trim())return false;
+    const sheet=result.closest('.v72-sheet');
+    if(sheet){
+      const resultRect=result.getBoundingClientRect();
+      const sheetRect=sheet.getBoundingClientRect();
+      const target=sheet.scrollTop+(resultRect.top-sheetRect.top)-70;
+      sheet.scrollTo({top:Math.max(0,target),behavior:'smooth'});
+    }else{
+      result.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    return true;
+  }
+  function install(){
+    const btn=document.getElementById('runDiag');
+    const result=document.getElementById('diagResult');
+    if(!btn||!result||btn.__v145Bound)return;
+    btn.__v145Bound=true;
+    let waiting=false;
+    const observer=new MutationObserver(()=>{
+      if(!waiting)return;
+      if(scrollToFirstResult()){waiting=false;observer.disconnect();}
+    });
+    observer.observe(result,{attributes:true,attributeFilter:['style','class'],childList:true,subtree:true,characterData:true});
+    btn.addEventListener('click',()=>{
+      waiting=true;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>scrollToFirstResult()));
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+  window.addEventListener('load',install);
+})();
