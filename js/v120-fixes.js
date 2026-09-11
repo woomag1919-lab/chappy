@@ -155,3 +155,60 @@
     const timer=setInterval(()=>{if(install()||++tries>=120)clearInterval(timer)},100);
   }
 })();
+
+/* v147 — restore self card and make the 5-step pager authoritative */
+(function(){
+  'use strict';
+  function install(){
+    const shell=document.getElementById('v72Shell');
+    const page1=document.getElementById('v72Page1');
+    const partnerPage=document.getElementById('v146PartnerPage');
+    const oldPage2=document.getElementById('v72Page2');
+    const page3=document.getElementById('v72Page3');
+    const page4=document.getElementById('v72Page4');
+    const my=document.getElementById('v72MyPicker');
+    if(!shell||!page1||!partnerPage||!oldPage2||!page3||!page4||!my)return false;
+
+    const row=page1.querySelector('.v72-person-row');
+    if(row&& !row.contains(my)) row.insertBefore(my,row.firstChild);
+    if(my.parentElement!==row){
+      if(row)row.appendChild(my);
+      else{
+        const inner=page1.querySelector('.v72-page-inner');
+        const newRow=document.createElement('div');newRow.className='v72-person-row';newRow.appendChild(my);inner?.insertBefore(newRow,document.getElementById('v72StartConversation'));
+      }
+    }
+    my.style.display='';
+
+    const selfCard=my.closest('.v72-person-card');
+    if(selfCard){selfCard.style.display='';selfCard.style.visibility='visible';}
+
+    const oldPagers=[...document.querySelectorAll('.v72-page-dots')];
+    oldPagers.forEach((p,i)=>{if(i>0)p.remove();});
+    let pager=oldPagers[0];
+    if(!pager){
+      pager=document.createElement('div');pager.className='v72-page-dots';pager.setAttribute('aria-hidden','true');document.body.appendChild(pager);
+    }
+    pager.innerHTML='';
+    const pages=[page1,partnerPage,oldPage2,page3,page4];
+    pages.forEach((p,i)=>{
+      const d=document.createElement('button');
+      d.type='button';d.className='v72-dot'+(i===0?' on':'');d.dataset.page=String(i);
+      d.addEventListener('click',()=>p.scrollIntoView({behavior:'smooth',block:'start'}));
+      pager.appendChild(d);
+    });
+    if(pager.__v147IO) return true;
+    pager.__v147IO=new IntersectionObserver(entries=>{
+      const hit=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+      if(!hit)return;
+      const i=pages.indexOf(hit.target);
+      [...pager.querySelectorAll('.v72-dot')].forEach((d,n)=>d.classList.toggle('on',n===i));
+    },{root:shell,threshold:[.55,.7,.9]});
+    pages.forEach(p=>pager.__v147IO.observe(p));
+    return true;
+  }
+  if(!install()){
+    let tries=0;
+    const timer=setInterval(()=>{if(install()||++tries>=120)clearInterval(timer)},100);
+  }
+})();
