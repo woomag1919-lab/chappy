@@ -20,9 +20,10 @@
 - `v150-profile-fix.js` has been superseded by `relationship.js` and archived at `archive/js/v150-profile-fix.js`.
 
 ## Historical compatibility implementation
-- `v112-fixes.js` — still runtime-active; contains profile-specific deep-check reset/save and comparison image export compatibility behavior.
-- `v113-fixes.js` — still runtime-active; contains compatibility patches through v146 and dynamically loads `v120-fixes.js`.
-- `v120-fixes.js` — still runtime-active through `v113-fixes.js`; comparison difference/advice and later UI compatibility patches.
+- `v112-fixes.js` — still runtime-active; contains profile-specific deep-check reset/save compatibility behavior.
+- `v113-fixes.js` — still runtime-active; provides the comparison-data bridge, diagnosis-sheet scroll reset, and dynamically loads `v120-fixes.js`.
+- `v120-fixes.js` — still runtime-active through `v113-fixes.js`; owns comparison difference/advice behavior.
+- `v121` compatibility code remains inside `v113-fixes.js` for draft cancellation when editing an existing diagnosis.
 - `fixes.js` — archived because `index.html` loads the active compatibility modules directly and no runtime reference to this entry point remains.
 
 ## Rule going forward
