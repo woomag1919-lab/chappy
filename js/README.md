@@ -6,8 +6,11 @@
 - `profiles.js` — profile storage, selection and save
 - `diagnosis.js` — diagnosis / result logic
 - `diagnosis-save.js` — diagnosis save/close behavior
+- `diagnosis-draft.js` — diagnosis edit cancel/restore behavior
+- `diagnosis-scroll.js` — diagnosis sheet scroll reset
 - `profile-diagnosis-reset.js` — deep-check UI reset when switching profiles
 - `compare.js` — two-person comparison
+- `compare-data.js` — active profile data bridge used by comparison/export
 - `compare-export.js` — comparison image export
 - `analyze.js` — conversation analysis
 - `invite.js` — partner invite/share flow
@@ -23,10 +26,9 @@
 
 ## Historical compatibility implementation
 - `v112-fixes.js` is now only a compatibility loader for the stable diagnosis/profile modules.
-- `v113-fixes.js` — still runtime-active; provides the comparison-data bridge, diagnosis-sheet scroll reset, and dynamically loads `v120-fixes.js` and `diagnosis-draft.js`.
-- `v120-fixes.js` — still runtime-active through `v113-fixes.js`; owns comparison difference/advice behavior.
-- `diagnosis-draft.js` — stable module for existing-profile diagnosis edit cancellation and restore behavior, previously embedded in v121.
-- `fixes.js` — archived because `index.html` loads the active compatibility modules directly and no runtime reference to this entry point remains.
+- `v113-fixes.js` is now only a compatibility loader for `compare-data.js`, `diagnosis-scroll.js`, `v120-fixes.js`, and `diagnosis-draft.js`.
+- `v120-fixes.js` — still runtime-active; owns comparison difference/advice behavior.
+- `fixes.js` — archived because the active compatibility modules are loaded directly by `index.html`.
 
 ## Rule going forward
 Avoid creating `v151`, `v152`, ... just for small UI fixes. Prefer updating the stable module that owns the behavior, and use a numbered file only when a genuinely isolated migration/rollback layer is needed.
