@@ -10,12 +10,20 @@
 - Removed superseded runtime files `v148-relationship-ui.js` and `v149-polish.js`.
 - Archived the former `v150-profile-fix.js` as `archive/js/v150-profile-fix.js`.
 - Archived the former `js/fixes.js` entry point as `archive/js/fixes.js` because the active compatibility files are loaded directly by `index.html`.
-- Updated `js/README.md` so the runtime/legacy distinction is explicit.
+- Removed obsolete v145/v146 logic from `js/v120-fixes.js` and kept only the active comparison difference/advice behavior.
+- Removed the obsolete v119 wrapper and migrated the new-profile draft reset into `profiles.js`.
+- Removed the duplicate comparison-export override from `js/v112-fixes.js` because `compare-export.js` is the active owner.
+- Extracted the former v121 diagnosis edit cancel/restore behavior into stable `js/diagnosis-draft.js`.
+- Extracted the former v112 diagnosis save/close behavior into stable `js/diagnosis-save.js`.
+- Extracted the former v112 profile deep-check reset behavior into stable `js/profile-diagnosis-reset.js`.
+- Reduced `js/v112-fixes.js` to a small compatibility loader for those stable modules.
+- Updated `js/README.md` to reflect the new stable module ownership.
 
 ### Still active
-- `js/v112-fixes.js` contains profile-specific deep-check reset/save behavior and comparison image export compatibility behavior.
-- `js/v113-fixes.js` contains several compatibility patches and loads `js/v120-fixes.js`.
-- `js/v120-fixes.js` owns comparison difference/advice compatibility behavior and later compatibility patches.
+- `js/v112-fixes.js` is now only a compatibility loader and is a candidate for final removal after runtime-load verification.
+- `js/v113-fixes.js` still provides the comparison-data bridge, diagnosis-sheet scroll reset, and dynamically loads `js/v120-fixes.js` and `js/diagnosis-draft.js`.
+- `js/v120-fixes.js` owns comparison difference/advice behavior.
+- `js/v147-relationship-check.js` remains isolated as the relationship-specific question/scoring implementation.
 
 ### Next step
-Do not delete the remaining compatibility layers yet. Audit their functions one by one, identify duplicate behavior, migrate only safe responsibilities to stable modules, and archive each obsolete layer after verification.
+Verify runtime loading of the newly extracted stable modules, then remove the now-redundant v112 loader. Continue auditing v113 one responsibility at a time.
