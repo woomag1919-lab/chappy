@@ -33,29 +33,6 @@
   if(!installComparisonHeadingFix()){let tries=0;const timer=setInterval(()=>{if(installComparisonHeadingFix()||++tries>=40)clearInterval(timer)},50)}
 })();
 
-/* CoreLingual v119 — 比較アドバイス文言を、意味を保ったまま言い回しを整理 */
-(function(){
-  'use strict';
-  const adviceMap={
-    language:{left:'要点を短く区切って伝えると、行き違いを減らしやすい。',right:'話の最後に、認識が合っているか一度確かめる。'},
-    thinking:{left:'まず目的をそろえてから、具体的な案を出していく。',right:'いくつかの案を広げたあと、最後に選択肢を絞り込む。'},
-    emotion:{left:'気持ちを受け止めてほしい時は、最初にそう伝えておく。',right:'少し考える時間がほしい時は、あとで話すことを先に知らせる。'},
-    distance:{left:'今話したい理由を添えると、相手も意図をつかみやすい。',right:'距離を置く時は、いつ頃また話すかを伝えておく。'},
-    change:{left:'予定が変わる時は、早めに知らせて心の準備をしてもらう。',right:'変える部分と変えない部分を分けて伝えると進めやすい。'},
-    communication:{left:'「まず聞いてほしい」と伝えてから、気持ちを話す。',right:'解決策を出す前に、相手の話を受け止める時間をつくる。'},
-    attach:{left:'確認したいことを一つに絞ると、安心につながりやすい。',right:'少し距離を置く時は、また話せるタイミングを伝えておく。'},
-    sensory:{left:'情報が重なった時は、いったん話す量を減らして整理する。',right:'相手の余裕を見ながら、その場で扱う情報量を調整する。'},
-    process:{left:'最初に「次はこれ」と一つ決めてから進めると安心しやすい。',right:'まず小さく動いてみて、途中でやり方を整えていく。'}
-  };
-  const middle={language:'大事な点だけ、短く確認しておくと行き違いを防ぎやすい。',thinking:'目的を共有したうえで、考えを広げたり整理したりすると進めやすい。',emotion:'話すか少し置くか、その時の気持ちに合わせてペースを決める。',distance:'今の距離感に合わせて、話すタイミングを調整する。',change:'見通しを持ちながら、必要なところだけ柔軟に変えていく。',communication:'気持ちと具体策のどちらを先に扱うか、場面に合わせて決める。',attach:'近づきたい時も距離を置きたい時も、タイミングを言葉にしておく。',sensory:'その時の余裕に合わせて、受け取る情報量を加減する。',process:'大まかな段取りを持ちつつ、途中で必要なら調整する。'};
-  const axisKey={'情報の受け取り方':'language','考え方':'thinking','感情の扱い方':'emotion','人との距離感':'distance','変化への対応':'change','伝え方・受け止め方':'communication','近づき方・距離の取り方':'attach','刺激への反応':'sensory','進め方・柔軟性':'process'};
-  const leftLabel={language:'言葉ではっきり',thinking:'筋道を整理',emotion:'話して整理',distance:'一緒に整理',change:'見通してから',communication:'まず気持ち',attach:'つながりを確認',sensory:'刺激を減らして整理',process:'順番を整えてから'};
-  const rightLabel={language:'流れから受け取る',thinking:'ひらめきを広げる',emotion:'時間を置いて整理',distance:'ひとりで整理',change:'動きながら',communication:'まず具体策',attach:'自分で整理してから',sensory:'その場で切り替える',process:'まず動いて調整'};
-  function sideFromText(text,key){const s=String(text||'').trim();if(s===leftLabel[key])return'left';if(s===rightLabel[key])return'right';return'middle'}
-  function refreshAdvice(){try{const card=document.getElementById('v21CompareCard');if(!card)return false;card.querySelectorAll('.v82-advice-item').forEach(item=>{const axis=(item.querySelector('b')?.textContent||'').replace(/^[^ぁ-んァ-ン一-龥A-Za-z0-9]+/,'').trim(),key=axisKey[axis];if(!key)return;const axisRow=[...card.querySelectorAll('.v82-axis-row')].find(r=>r.querySelector('.v82-axis-name')?.textContent?.includes(axis));if(!axisRow)return;const cells=axisRow.querySelectorAll(':scope > div'),ps=item.querySelectorAll('p'),a=sideFromText(cells[1]?.textContent,key),b=sideFromText(cells[2]?.textContent,key);if(ps[0])ps[0].textContent=a==='middle'?middle[key]:adviceMap[key][a];if(ps[1])ps[1].textContent=b==='middle'?middle[key]:adviceMap[key][b]}) ;return true}catch(e){console.warn('v119 advice refresh failed',e);return false}}
-  let tries=0;const timer=setInterval(()=>{if(refreshAdvice()||++tries>=80)clearInterval(timer)},100);window.addEventListener('load',refreshAdvice);
-})();
-
 /* CoreLingual v120 — load comparison difference visibility fix */
 (function(){
   try{
