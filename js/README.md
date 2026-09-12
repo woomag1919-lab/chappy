@@ -11,19 +11,15 @@
 - `invite.js` — partner invite/share flow
 
 ## Stable feature entry points
-- `relationship.js` — relationship-specific partner check + relationship selector. It loads the currently versioned relationship implementation in the required order.
-- `fixes.js` — compatibility/fix entry point for historical fixes.
+- `relationship.js` — single owner for relationship selector, relationship persistence bridge, result wording, and loading of the relationship-specific question/scoring module
+- `fixes.js` — compatibility/fix entry point for historical fixes
 
-## Versioned implementation files
-The `v###-*.js` files are retained temporarily as implementation modules for compatibility and rollback. New code should normally be added to the stable entry points or the main modules above rather than adding another numbered loader.
+## Relationship implementation status
+- `relationship.js` now owns the relationship UI and persistence behavior.
+- `v147-relationship-check.js` remains temporarily as the isolated relationship-specific question/scoring module.
+- `v148-relationship-ui.js`, `v149-polish.js`, and `v150-profile-fix.js` are no longer runtime dependencies of `relationship.js` and are candidates for archive after final verification.
 
-### Current relationship implementation
-- `v147-relationship-check.js` — relationship-specific question sets and scoring
-- `v148-relationship-ui.js` — relationship persistence bridge
-- `v149-polish.js` — result wording / profile-apply polish
-- `v150-profile-fix.js` — relationship selector visibility and immediate profile-name sync
-
-### Historical compatibility implementation
+## Historical compatibility implementation
 - `v112-fixes.js`
 - `v113-fixes.js`
 - `v120-fixes.js` (loaded by the v113 compatibility layer)
