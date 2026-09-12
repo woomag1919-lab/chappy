@@ -14,6 +14,8 @@ CoreLingual is a web app for understanding communication differences and convers
 - `fixes.js` has been superseded as a runtime entry point and archived at `archive/js/fixes.js`.
 - `v112-fixes.js` and `v113-fixes.js` are now compatibility loaders only.
 - `v120-fixes.js` is now a compatibility loader only; its required comparison behavior lives in `comparison-differences.js`.
+- The former v144/v145 diagnosis reveal-scroll layers have been migrated into `diagnosis-scroll.js` and removed from `compare-export.js`.
+- `compare-export.js` now keeps the still-active v143 fixed-ad behavior, comparison image export, and related result cleanup responsibilities.
 
 ## Stable extracted modules
 - `diagnosis-save.js` — diagnosis save/close behavior formerly embedded in v112.
@@ -21,7 +23,7 @@ CoreLingual is a web app for understanding communication differences and convers
 - `profile-diagnosis-reset.js` — deep-check UI reset behavior formerly embedded in v112.
 - `compare-data.js` — active profile comparison-data bridge formerly embedded in v113.
 - `comparison-differences.js` — comparison difference/advice behavior formerly embedded in v120.
-- `diagnosis-scroll.js` — diagnosis-sheet scroll reset formerly embedded in v113/v117.
+- `diagnosis-scroll.js` — diagnosis-sheet reset plus former v144/v145 reveal-scroll behavior.
 - `relationship-check.js` — relationship-specific partner questions, deep questions, scoring, and partner diagnosis hooks formerly owned by v147.
 
 ## Important IDs / storage keys
@@ -42,4 +44,4 @@ CoreLingual is a web app for understanding communication differences and convers
 6. After meaningful code changes, update `docs/CORELINGUAL_HISTORY.md`.
 
 ## Next cleanup target
-Verify the stable modules in the deployed app. Then remove the now-loader-only legacy compatibility entries from the runtime path when the main HTML entry can be safely updated. After that, continue auditing remaining numbered modules and other historical compatibility code.
+Verify the deployed app with the extracted stable modules. Then remove the now-loader-only v112/v113/v120 script entries from `index.html` and archive the compatibility files, while preserving direct loading of the stable modules. After that, continue auditing remaining numbered modules and historical compatibility code.
