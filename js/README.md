@@ -16,7 +16,8 @@
 ## Relationship implementation status
 - `relationship.js` now owns the relationship UI and persistence behavior.
 - `v147-relationship-check.js` remains temporarily as the isolated relationship-specific question/scoring module.
-- `v148-relationship-ui.js`, `v149-polish.js`, and `v150-profile-fix.js` are no longer runtime dependencies of `relationship.js` and are candidates for archive after final verification.
+- `v148-relationship-ui.js` and `v149-polish.js` have already been removed from the runtime tree.
+- `v150-profile-fix.js` has been superseded by `relationship.js` and archived at `archive/js/v150-profile-fix.js`.
 
 ## Historical compatibility implementation
 - `v112-fixes.js` — still runtime-active; contains profile-specific deep-check reset/save and comparison image export compatibility behavior.
