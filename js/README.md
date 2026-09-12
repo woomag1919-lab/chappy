@@ -5,6 +5,8 @@
 - `data.js` — questionnaire data
 - `profiles.js` — profile storage, selection and save
 - `diagnosis.js` — diagnosis / result logic
+- `diagnosis-save.js` — diagnosis save/close behavior
+- `profile-diagnosis-reset.js` — deep-check UI reset when switching profiles
 - `compare.js` — two-person comparison
 - `compare-export.js` — comparison image export
 - `analyze.js` — conversation analysis
@@ -20,10 +22,10 @@
 - `v150-profile-fix.js` has been superseded by `relationship.js` and archived at `archive/js/v150-profile-fix.js`.
 
 ## Historical compatibility implementation
-- `v112-fixes.js` — still runtime-active; contains profile-specific deep-check reset/save compatibility behavior.
-- `v113-fixes.js` — still runtime-active; provides the comparison-data bridge, diagnosis-sheet scroll reset, and dynamically loads `v120-fixes.js`.
+- `v112-fixes.js` is now only a compatibility loader for the stable diagnosis/profile modules.
+- `v113-fixes.js` — still runtime-active; provides the comparison-data bridge, diagnosis-sheet scroll reset, and dynamically loads `v120-fixes.js` and `diagnosis-draft.js`.
 - `v120-fixes.js` — still runtime-active through `v113-fixes.js`; owns comparison difference/advice behavior.
-- `v121` compatibility code remains inside `v113-fixes.js` for draft cancellation when editing an existing diagnosis.
+- `diagnosis-draft.js` — stable module for existing-profile diagnosis edit cancellation and restore behavior, previously embedded in v121.
 - `fixes.js` — archived because `index.html` loads the active compatibility modules directly and no runtime reference to this entry point remains.
 
 ## Rule going forward
