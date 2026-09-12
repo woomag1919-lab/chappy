@@ -21,9 +21,6 @@
   function wrapRestoreDiagAnswers(){try{const orig=window.restoreDiagAnswers;if(typeof orig!=='function'||orig.__v115Wrapped)return !!orig;const wrapped=function(p){resetBaseDiagnosisBeforeRestore();const result=orig(p);if(!result)resetBaseDiagnosisBeforeRestore();return result};wrapped.__v115Wrapped=true;window.restoreDiagAnswers=wrapped;return true}catch(e){console.warn('v115 restore wrapper failed',e);return false}}
   if(!wrapRestoreDiagAnswers()){let tries=0;const timer=setInterval(()=>{if(wrapRestoreDiagAnswers()||++tries>=40)clearInterval(timer)},50)}
 
-  function wrapProfileSave(){try{const orig=window.save;if(typeof orig!=='function'||orig.__v116Wrapped)return !!orig;const wrapped=function(p,opts){try{const input=document.getElementById(p+'Name'),name=input?.value?.trim()||'';if(name&&typeof list==='function'){const exists=list(p).some(x=>x?.name===name);if(!exists){localStorage.removeItem('cl_extra_draft_'+p+'_'+encodeURIComponent(name));localStorage.removeItem('cl_extra_draft_'+p)}}}catch(e){console.warn('v116 draft reset failed',e)}return orig.apply(this,arguments)};wrapped.__v116Wrapped=true;window.save=wrapped;return true}catch(e){console.warn('v116 save wrapper failed',e);return false}}
-  if(!wrapProfileSave()){let tries=0;const timer=setInterval(()=>{if(wrapProfileSave()||++tries>=40)clearInterval(timer)},50)}
-
   function resetDiagSheetScroll(){try{const overlay=document.getElementById('v72DiagOverlay'),sheet=overlay?.querySelector('.v72-sheet');if(sheet)sheet.scrollTop=0}catch(e){console.warn('v117 diagnosis scroll reset failed',e)}}
   function installDiagScrollReset(){try{const overlay=document.getElementById('v72DiagOverlay');if(!overlay||overlay.__v117ScrollReset)return !!overlay;overlay.__v117ScrollReset=true;const reset=()=>{resetDiagSheetScroll();requestAnimationFrame(resetDiagSheetScroll);setTimeout(resetDiagSheetScroll,50)};const openBtn=document.getElementById('v72OpenDiag');if(openBtn)openBtn.addEventListener('click',reset,true);new MutationObserver(()=>{if(overlay.classList.contains('show'))reset()}).observe(overlay,{attributes:true,attributeFilter:['class']});return true}catch(e){console.warn('v117 diagnosis scroll hook failed',e);return false}}
   if(!installDiagScrollReset()){let tries=0;const timer=setInterval(()=>{if(installDiagScrollReset()||++tries>=40)clearInterval(timer)},50)}
@@ -34,7 +31,6 @@
   try{
     if(!document.querySelector('script[data-corelingual-v120]')){
       const s=document.createElement('script');
-      /* Cache-bust the feature file so deployed browsers cannot keep the pre-fix v120 bundle. */
       s.src='/js/v120-fixes.js?v=1202';
       s.dataset.corelingualV120='1';
       document.body.appendChild(s);
