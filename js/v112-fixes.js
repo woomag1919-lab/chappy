@@ -1,4 +1,4 @@
-/* CoreLingual v112 — profile-specific deep-check reset/save + Android image export helpers */
+/* CoreLingual v112 — profile-specific deep-check reset/save compatibility */
 (function(){
   'use strict';
 
@@ -12,10 +12,7 @@
       const ad=document.getElementById('ad30');
       const c=document.getElementById('ad30Countdown');
       const btn=document.getElementById('startMore');
-      if(q){
-        q.querySelectorAll('input[type="radio"]').forEach(x=>x.checked=false);
-        const free=q.querySelector('#extraFree'); if(free)free.value='';
-      }
+      if(q)q.querySelectorAll('input[type="radio"]').forEach(x=>x.checked=false);
       const free=document.getElementById('extraFree'); if(free)free.value='';
       if(r)r.innerHTML='';
       if(d)d.style.display='none';
