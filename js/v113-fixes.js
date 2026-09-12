@@ -1,8 +1,4 @@
-/* CoreLingual v113–v121 — historical compatibility layer.
- *
- * v145/v146 conversation-flow behavior now lives in conversation-flow.js.
- * Relationship behavior is owned by relationship.js.
- */
+/* CoreLingual v113 — expose comparison data to export layer */
 (function(){
   'use strict';
 
@@ -37,6 +33,7 @@
   if(!installComparisonHeadingFix()){let tries=0;const timer=setInterval(()=>{if(installComparisonHeadingFix()||++tries>=40)clearInterval(timer)},50)}
 })();
 
+/* CoreLingual v119 — 比較アドバイス文言を、意味を保ったまま言い回しを整理 */
 (function(){
   'use strict';
   const adviceMap={
@@ -59,10 +56,12 @@
   let tries=0;const timer=setInterval(()=>{if(refreshAdvice()||++tries>=80)clearInterval(timer)},100);window.addEventListener('load',refreshAdvice);
 })();
 
+/* CoreLingual v120 — load comparison difference visibility fix */
 (function(){
   try{
     if(!document.querySelector('script[data-corelingual-v120]')){
       const s=document.createElement('script');
+      /* Cache-bust the feature file so deployed browsers cannot keep the pre-fix v120 bundle. */
       s.src='/js/v120-fixes.js?v=1202';
       s.dataset.corelingualV120='1';
       document.body.appendChild(s);
@@ -70,13 +69,26 @@
   }catch(e){console.warn('v120 loader failed',e)}
 })();
 
+/* CoreLingual v121 — existing-profile diagnosis edit is a draft; × cancels it completely. */
 (function(){
   'use strict';
+
   const KEY_PREFIXES=['cl_diag_result_','cl_diag_radar_','cl_extra_result_','cl_extra_radar_'];
   let snapshot=null;
+
   function getWhich(){try{return typeof target!=='undefined'&&target?target:'my'}catch{return'my'}}
-  function draftKey(which){try{const name=typeof activeProfile==='function'?activeProfile(which):null;return 'cl_extra_draft_'+which+'_'+encodeURIComponent(name||'__none__')}catch{return null}}
-  function captureSnapshot(which){const keys=KEY_PREFIXES.map(prefix=>prefix+which);const dk=draftKey(which);if(dk)keys.push(dk);const values={};keys.forEach(k=>{values[k]=localStorage.getItem(k)});snapshot={which,values,saved:false}}
+  function draftKey(which){
+    try{
+      const name=typeof activeProfile==='function'?activeProfile(which):null;
+      return 'cl_extra_draft_'+which+'_'+encodeURIComponent(name||'__none__');
+    }catch{return null}
+  }
+  function captureSnapshot(which){
+    const keys=KEY_PREFIXES.map(prefix=>prefix+which);
+    const dk=draftKey(which);if(dk)keys.push(dk);
+    const values={};keys.forEach(k=>{values[k]=localStorage.getItem(k)});
+    snapshot={which,values,saved:false};
+  }
   function restoreSnapshot(){
     if(!snapshot||snapshot.saved)return;
     Object.entries(snapshot.values).forEach(([k,v])=>{if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)});
@@ -91,7 +103,8 @@
     }catch(e){console.warn('v121 diagnosis cancel UI restore failed',e)}
     try{
       if(typeof extraTarget!=='undefined')extraTarget=snapshot.which;
-      const q=document.getElementById('extraQuestions');if(q)q.querySelectorAll('input[type="radio"]').forEach(x=>x.checked=false);
+      const q=document.getElementById('extraQuestions');
+      if(q)q.querySelectorAll('input[type="radio"]').forEach(x=>x.checked=false);
       const free=document.getElementById('extraFree');if(free)free.value='';
       const d=document.getElementById('extraDiag');if(d)d.style.display='none';
       const ad=document.getElementById('ad30');if(ad)ad.style.display='none';
@@ -99,14 +112,41 @@
     }catch(e){console.warn('v121 deep cancel UI cleanup failed',e)}
     snapshot=null;
   }
-  function markSavedIfClosed(){if(!snapshot)return;const overlay=document.getElementById('v72DiagOverlay');if(overlay&&overlay.classList.contains('show'))return;snapshot.saved=true;snapshot=null}
+
+  function markSavedIfClosed(){
+    if(!snapshot)return;
+    const overlay=document.getElementById('v72DiagOverlay');
+    if(overlay && overlay.classList.contains('show'))return;
+    snapshot.saved=true;
+    snapshot=null;
+  }
+
   function install(){
-    const open=document.getElementById('v72OpenDiag'),close=document.getElementById('v72DiagClose'),save=document.getElementById('v72DiagSaveClose');
+    const open=document.getElementById('v72OpenDiag');
+    const close=document.getElementById('v72DiagClose');
+    const save=document.getElementById('v72DiagSaveClose');
     if(!open||!close||!save)return false;
-    if(!open.__v121){open.__v121=true;open.addEventListener('click',()=>{const which=getWhich();captureSnapshot(which);setTimeout(()=>{try{if(typeof restoreDiagAnswers==='function')restoreDiagAnswers(which)}catch(e){console.warn('v121 base diagnosis restore failed',e)}},30)})}
-    if(!close.__v121){close.__v121=true;close.addEventListener('click',()=>setTimeout(restoreSnapshot,0))}
-    if(!save.__v121){save.__v121=true;save.addEventListener('click',()=>setTimeout(markSavedIfClosed,0))}
+
+    if(!open.__v121){
+      open.__v121=true;
+      open.addEventListener('click',()=>{
+        const which=getWhich();
+        captureSnapshot(which);
+        setTimeout(()=>{
+          try{if(typeof restoreDiagAnswers==='function')restoreDiagAnswers(which)}catch(e){console.warn('v121 base diagnosis restore failed',e)}
+        },30);
+      });
+    }
+    if(!close.__v121){
+      close.__v121=true;
+      close.addEventListener('click',()=>setTimeout(restoreSnapshot,0));
+    }
+    if(!save.__v121){
+      save.__v121=true;
+      save.addEventListener('click',()=>setTimeout(markSavedIfClosed,0));
+    }
     return true;
   }
+
   if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=80)clearInterval(timer)},50)}
 })();
