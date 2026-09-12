@@ -17,13 +17,16 @@
 - Extracted the former v112 diagnosis save/close behavior into stable `js/diagnosis-save.js`.
 - Extracted the former v112 profile deep-check reset behavior into stable `js/profile-diagnosis-reset.js`.
 - Reduced `js/v112-fixes.js` to a small compatibility loader for those stable modules.
-- Updated `js/README.md` to reflect the new stable module ownership.
+- Extracted the former v113 comparison-data bridge into stable `js/compare-data.js`.
+- Extracted the former v117 diagnosis-sheet scroll reset into stable `js/diagnosis-scroll.js`.
+- Reduced `js/v113-fixes.js` to a small compatibility loader for the stable comparison/diagnosis modules and the still-active `v120-fixes.js`.
+- Updated `js/README.md` and `CORELINGUAL.md` to reflect the new stable module ownership.
 
 ### Still active
 - `js/v112-fixes.js` is now only a compatibility loader and is a candidate for final removal after runtime-load verification.
-- `js/v113-fixes.js` still provides the comparison-data bridge, diagnosis-sheet scroll reset, and dynamically loads `js/v120-fixes.js` and `js/diagnosis-draft.js`.
-- `js/v120-fixes.js` owns comparison difference/advice behavior.
+- `js/v113-fixes.js` is now only a compatibility loader and is a candidate for final removal after runtime-load verification.
+- `js/v120-fixes.js` owns the active comparison difference/advice behavior.
 - `js/v147-relationship-check.js` remains isolated as the relationship-specific question/scoring implementation.
 
 ### Next step
-Verify runtime loading of the newly extracted stable modules, then remove the now-redundant v112 loader. Continue auditing v113 one responsibility at a time.
+Verify runtime loading of the newly extracted stable modules in the deployed app. Then remove the now-loader-only v112/v113 runtime entries while preserving their stable modules. Continue with a function-by-function audit of v120.
