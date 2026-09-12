@@ -100,4 +100,5 @@
   if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=120)clearInterval(timer)},50)}
   const obs=new MutationObserver(()=>{mount();wrapSave();patchDiagOpen()});
   obs.observe(document.body,{childList:true,subtree:true});
+  try{if(!document.querySelector('script[data-corelingual-v149]')){const s=document.createElement('script');s.src='/js/v149-polish.js?v=1491';s.dataset.corelingualV149='1';document.body.appendChild(s)}}catch(e){console.warn('v149 polish loader failed',e)}
 })();
