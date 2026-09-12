@@ -17,10 +17,6 @@
   }
   if(!exposeCompareData()){let tries=0;const timer=setInterval(()=>{if(exposeCompareData()||++tries>=20)clearInterval(timer)},50)}
 
-  function resetBaseDiagnosisBeforeRestore(){try{document.querySelectorAll('#questions input[type="radio"]').forEach(x=>x.checked=false);if(typeof diagAnswers!=='undefined')diagAnswers=[];if(typeof diagScores!=='undefined')diagScores=[];const resultEl=document.getElementById('diagResult'),moreEl=document.getElementById('moreDiag');if(resultEl)resultEl.innerHTML='';if(moreEl)moreEl.style.display='none'}catch(e){console.warn('v115 diagnosis reset failed',e)}}
-  function wrapRestoreDiagAnswers(){try{const orig=window.restoreDiagAnswers;if(typeof orig!=='function'||orig.__v115Wrapped)return !!orig;const wrapped=function(p){resetBaseDiagnosisBeforeRestore();const result=orig(p);if(!result)resetBaseDiagnosisBeforeRestore();return result};wrapped.__v115Wrapped=true;window.restoreDiagAnswers=wrapped;return true}catch(e){console.warn('v115 restore wrapper failed',e);return false}}
-  if(!wrapRestoreDiagAnswers()){let tries=0;const timer=setInterval(()=>{if(wrapRestoreDiagAnswers()||++tries>=40)clearInterval(timer)},50)}
-
   function resetDiagSheetScroll(){try{const overlay=document.getElementById('v72DiagOverlay'),sheet=overlay?.querySelector('.v72-sheet');if(sheet)sheet.scrollTop=0}catch(e){console.warn('v117 diagnosis scroll reset failed',e)}}
   function installDiagScrollReset(){try{const overlay=document.getElementById('v72DiagOverlay');if(!overlay||overlay.__v117ScrollReset)return !!overlay;overlay.__v117ScrollReset=true;const reset=()=>{resetDiagSheetScroll();requestAnimationFrame(resetDiagSheetScroll);setTimeout(resetDiagSheetScroll,50)};const openBtn=document.getElementById('v72OpenDiag');if(openBtn)openBtn.addEventListener('click',reset,true);new MutationObserver(()=>{if(overlay.classList.contains('show'))reset()}).observe(overlay,{attributes:true,attributeFilter:['class']});return true}catch(e){console.warn('v117 diagnosis scroll hook failed',e);return false}}
   if(!installDiagScrollReset()){let tries=0;const timer=setInterval(()=>{if(installDiagScrollReset()||++tries>=40)clearInterval(timer)},50)}
