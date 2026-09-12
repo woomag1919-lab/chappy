@@ -71,11 +71,14 @@
     const rel=get();
     box.querySelectorAll('[data-rel]').forEach(btn=>{
       const on=btn.dataset.rel===rel;
-      btn.classList.toggle('on',on);
-      btn.setAttribute('aria-checked',on?'true':'false');
-      btn.style.background=on?'#ffe6f0':'#fff';
-      btn.style.borderColor=on?'#df4d86':'#ddd';
-      btn.style.boxShadow=on?'0 0 0 2px rgba(223,77,134,.12)':'none';
+      const background=on?'#ffe6f0':'#fff';
+      const borderColor=on?'#df4d86':'#ddd';
+      const boxShadow=on?'0 0 0 2px rgba(223,77,134,.12)':'none';
+      if(btn.classList.contains('on')!==on)btn.classList.toggle('on',on);
+      if(btn.getAttribute('aria-checked')!==(on?'true':'false'))btn.setAttribute('aria-checked',on?'true':'false');
+      if(btn.style.background!==background)btn.style.background=background;
+      if(btn.style.borderColor!==borderColor)btn.style.borderColor=borderColor;
+      if(btn.style.boxShadow!==boxShadow)btn.style.boxShadow=boxShadow;
     });
   }
 
@@ -83,7 +86,7 @@
     const name=activeName()||'未設定';
     ['v146PartnerName','v72PartnerName'].forEach(id=>{
       const el=document.getElementById(id);
-      if(el)el.textContent=name;
+      if(el&&el.textContent!==name)el.textContent=name;
     });
   }
 
