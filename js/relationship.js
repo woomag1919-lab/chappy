@@ -1,8 +1,8 @@
 /* CoreLingual — stable relationship feature entry point
  *
  * Owns the relationship selector, persistence bridge, and relationship-result
- * wording. The relationship question/scoring implementation remains isolated
- * in v147-relationship-check.js for now.
+ * wording. Relationship-specific questions/scoring load through the stable
+ * relationship-check.js entry point.
  */
 (function(){
   'use strict';
@@ -48,8 +48,6 @@
     const pane=document.getElementById('profilePartnerPane');
     if(!pane)return false;
     let box=document.getElementById('clRelationshipBox');
-
-    /* If a legacy layer created the box, keep it and only normalize/update it. */
     if(!box){
       box=document.createElement('div');
       box.id='clRelationshipBox';
@@ -59,7 +57,6 @@
       if(name&&name.parentNode)name.parentNode.insertBefore(box,name.nextSibling);
       else pane.insertBefore(box,pane.firstChild);
     }
-
     if(!box.dataset.corelingualRelationshipBound){
       box.dataset.corelingualRelationshipBound='1';
       box.querySelectorAll('[data-rel]').forEach(btn=>btn.addEventListener('click',()=>set(btn.dataset.rel)));
@@ -96,15 +93,22 @@
     const isPartner=typeof extraTarget!=='undefined'&&extraTarget==='partner';
     const isMy=typeof extraTarget!=='undefined'&&extraTarget==='my';
     root.querySelectorAll('.overview-head').forEach(el=>{
-      if(el.textContent.includes('36問で見えた'))el.textContent='🧩 36問で見えた、'+(isPartner?'相手':'自分')+'のコミュニケーション特性';
+      if(el.textContent.includes('36問で見えた')){
+        const text='🧩 36問で見えた、'+(isPartner?'相手':'自分')+'のコミュニケーション特性';
+        if(el.textContent!==text)el.textContent=text;
+      }
     });
     root.querySelectorAll('.v36-profile-apply button').forEach(btn=>{
-      btn.textContent='🧩 この36問の特性チェック結果をプロフィールに反映する';
+      const text='🧩 この36問の特性チェック結果をプロフィールに反映する';
+      if(btn.textContent!==text)btn.textContent=text;
     });
     if(isPartner||isMy){
       root.querySelectorAll('.v36-cause').forEach(el=>{
         const h=el.querySelector('b');
-        if(h&&h.textContent.includes('本人が追加したメモ'))h.textContent='📝 '+(isPartner?'相手':'自分')+'が追加したメモ';
+        if(h&&h.textContent.includes('本人が追加したメモ')){
+          const text='📝 '+(isPartner?'相手':'自分')+'が追加したメモ';
+          if(h.textContent!==text)h.textContent=text;
+        }
       });
     }
   }
@@ -147,16 +151,12 @@
     if(!document.body){setTimeout(start,25);return;}
     sync();
     bindResultApply();
-
-    /* One observer replaces the old v148/v149/v150 observer stack. */
     const obs=new MutationObserver(()=>sync());
     obs.observe(document.body,{childList:true,subtree:true});
     window.addEventListener('storage',sync);
     window.addEventListener('corelingual:profile-change',sync);
     window.addEventListener('corelingual:profile-save',sync);
     window.addEventListener('corelingual:relationship-change',sync);
-
-    /* Short retry window covers the profile overlay being mounted later. */
     let tries=0;
     const timer=setInterval(()=>{
       sync();
@@ -167,12 +167,11 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
   else start();
 
-  /* Load the relationship-specific question/scoring module only. */
-  const src='/js/v147-relationship-check.js?v=1473';
-  if(!document.querySelector('script[data-corelingual-v147]')){
+  const src='/js/relationship-check.js?v=1';
+  if(!document.querySelector('script[data-corelingual-relationship-check]')){
     const s=document.createElement('script');
     s.src=src;
-    s.dataset.corelingualV147='1';
+    s.dataset.corelingualRelationshipCheck='1';
     s.onload=()=>window.dispatchEvent(new CustomEvent('corelingual:relationship-ready'));
     s.onerror=()=>console.warn('CoreLingual relationship questionnaire failed to load:',src);
     (document.body||document.documentElement).appendChild(s);
