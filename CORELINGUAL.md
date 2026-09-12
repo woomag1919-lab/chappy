@@ -7,7 +7,8 @@ CoreLingual is a web app for understanding communication differences and convers
 
 ## Current cleanup state
 - `relationship.js` is the single runtime owner for the relationship selector, relationship persistence, partner-name sync, and relationship-result wording.
-- `v147-relationship-check.js` remains as the isolated relationship-specific question/scoring implementation.
+- `relationship-check.js` is now the stable runtime owner for relationship-specific questions, scoring, and partner diagnosis hooks; the former v147 implementation is archived at `archive/js/v147-relationship-check.js`.
+- `v147-relationship-check.js` has been removed from the runtime tree after migration to the stable module.
 - `v148-relationship-ui.js` and `v149-polish.js` have been removed from the runtime tree.
 - `v150-profile-fix.js` has been superseded and archived at `archive/js/v150-profile-fix.js`.
 - `fixes.js` has been superseded as a runtime entry point and archived at `archive/js/fixes.js`.
@@ -21,6 +22,7 @@ CoreLingual is a web app for understanding communication differences and convers
 - `compare-data.js` — active profile comparison-data bridge formerly embedded in v113.
 - `comparison-differences.js` — comparison difference/advice behavior formerly embedded in v120.
 - `diagnosis-scroll.js` — diagnosis-sheet scroll reset formerly embedded in v113/v117.
+- `relationship-check.js` — relationship-specific partner questions, deep questions, scoring, and partner diagnosis hooks formerly owned by v147.
 
 ## Important IDs / storage keys
 - `profilePartnerPane`
@@ -40,4 +42,4 @@ CoreLingual is a web app for understanding communication differences and convers
 6. After meaningful code changes, update `docs/CORELINGUAL_HISTORY.md`.
 
 ## Next cleanup target
-Verify the stable modules in the deployed app. Then remove the now-loader-only legacy compatibility entries from the runtime path when the main HTML entry can be safely updated. After that, continue auditing remaining numbered modules, starting with the relationship-specific questionnaire/scoring implementation.
+Verify the stable modules in the deployed app. Then remove the now-loader-only legacy compatibility entries from the runtime path when the main HTML entry can be safely updated. After that, continue auditing remaining numbered modules and other historical compatibility code.
