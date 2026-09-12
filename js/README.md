@@ -30,7 +30,7 @@
 ## Historical compatibility implementation
 - `v112-fixes.js` is now only a compatibility loader for the stable diagnosis/profile modules.
 - `v113-fixes.js` is now only a compatibility loader for the stable comparison/diagnosis modules.
-- `v120-fixes.js` is now only a compatibility loader for `comparison-differences.js`.
+- `v120-fixes.js` was a temporary compatibility loader and is now archived at `archive/js/v120-fixes.js` because `comparison-differences.js` is loaded directly through the current runtime path.
 - `fixes.js` — archived because the active compatibility files are loaded directly by `index.html`.
 
 ## Rule going forward
