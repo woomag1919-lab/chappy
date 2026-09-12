@@ -158,6 +158,15 @@ function save(p,opts={}){
   let a=list(p);
   const existing=a.findIndex(x=>x.name===name);
   const old=existing>=0?a[existing]:null;
+
+  // New profile names must not inherit a stale deep-check draft from a prior profile.
+  if(existing<0){
+    try{
+      localStorage.removeItem('cl_extra_draft_'+p+'_'+encodeURIComponent(name));
+      localStorage.removeItem('cl_extra_draft_'+p);
+    }catch(e){console.warn('new profile draft reset failed',e)}
+  }
+
   const relationship=p==='partner'
     ?(document.querySelector('#clRelationshipBox [data-rel].on')?.dataset.rel||old?.relationship||localStorage.getItem('cl_partner_relationship')||'romantic')
     :null;
