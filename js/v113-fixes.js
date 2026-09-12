@@ -12,8 +12,8 @@
 
   try{
     load('/js/compare-data.js?v=1','data-corelingual-compare-data');
+    load('/js/comparison-differences.js?v=1','data-corelingual-comparison-differences');
     load('/js/diagnosis-scroll.js?v=1','data-corelingual-diagnosis-scroll');
-    load('/js/v120-fixes.js?v=1202','data-corelingual-v120');
     load('/js/diagnosis-draft.js?v=1','data-corelingual-diagnosis-draft');
   }catch(e){console.warn('CoreLingual compatibility loader failed',e)}
 })();
