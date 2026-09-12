@@ -27,10 +27,6 @@
   function resetDiagSheetScroll(){try{const overlay=document.getElementById('v72DiagOverlay'),sheet=overlay?.querySelector('.v72-sheet');if(sheet)sheet.scrollTop=0}catch(e){console.warn('v117 diagnosis scroll reset failed',e)}}
   function installDiagScrollReset(){try{const overlay=document.getElementById('v72DiagOverlay');if(!overlay||overlay.__v117ScrollReset)return !!overlay;overlay.__v117ScrollReset=true;const reset=()=>{resetDiagSheetScroll();requestAnimationFrame(resetDiagSheetScroll);setTimeout(resetDiagSheetScroll,50)};const openBtn=document.getElementById('v72OpenDiag');if(openBtn)openBtn.addEventListener('click',reset,true);new MutationObserver(()=>{if(overlay.classList.contains('show'))reset()}).observe(overlay,{attributes:true,attributeFilter:['class']});return true}catch(e){console.warn('v117 diagnosis scroll hook failed',e);return false}}
   if(!installDiagScrollReset()){let tries=0;const timer=setInterval(()=>{if(installDiagScrollReset()||++tries>=40)clearInterval(timer)},50)}
-
-  function normalizeComparisonHeadings(){try{const card=document.getElementById('v21CompareCard');if(!card)return;card.querySelectorAll('.v82-section-title').forEach(el=>{const t=(el.textContent||'').trim();if(t==='特に違いが出やすい3つ')el.textContent='特に違いが出やすいポイント';if(t==='9つのコミュニケーション傾向')el.textContent='コミュニケーション傾向'})}catch(e){console.warn('v118 comparison heading normalize failed',e)}}
-  function installComparisonHeadingFix(){try{normalizeComparisonHeadings();if(window.__v118CompareHeadingFix)return true;window.__v118CompareHeadingFix=true;const card=document.getElementById('v21CompareCard');if(card)new MutationObserver(normalizeComparisonHeadings).observe(card,{subtree:true,childList:true,characterData:true});return true}catch(e){return false}}
-  if(!installComparisonHeadingFix()){let tries=0;const timer=setInterval(()=>{if(installComparisonHeadingFix()||++tries>=40)clearInterval(timer)},50)}
 })();
 
 /* CoreLingual v120 — load comparison difference visibility fix */
