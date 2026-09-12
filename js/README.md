@@ -12,7 +12,6 @@
 
 ## Stable feature entry points
 - `relationship.js` — single owner for relationship selector, relationship persistence bridge, result wording, and loading of the relationship-specific question/scoring module
-- `fixes.js` — compatibility/fix entry point for historical fixes
 
 ## Relationship implementation status
 - `relationship.js` now owns the relationship UI and persistence behavior.
@@ -20,9 +19,10 @@
 - `v148-relationship-ui.js`, `v149-polish.js`, and `v150-profile-fix.js` are no longer runtime dependencies of `relationship.js` and are candidates for archive after final verification.
 
 ## Historical compatibility implementation
-- `v112-fixes.js`
-- `v113-fixes.js`
-- `v120-fixes.js` (loaded by the v113 compatibility layer)
+- `v112-fixes.js` — still runtime-active; contains profile-specific deep-check reset/save and comparison image export compatibility behavior.
+- `v113-fixes.js` — still runtime-active; contains compatibility patches through v146 and dynamically loads `v120-fixes.js`.
+- `v120-fixes.js` — still runtime-active through `v113-fixes.js`; comparison difference/advice and later UI compatibility patches.
+- `fixes.js` — archived because `index.html` loads the active compatibility modules directly and no runtime reference to this entry point remains.
 
 ## Rule going forward
 Avoid creating `v151`, `v152`, ... just for small UI fixes. Prefer updating the stable module that owns the behavior, and use a numbered file only when a genuinely isolated migration/rollback layer is needed.
