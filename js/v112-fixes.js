@@ -92,34 +92,4 @@
       }catch(e){console.error('diagnosis save-close failed',e);alert(e.message||'特性チェック結果の保存に失敗しました。');}
     };
   }
-
-  async function fixedDownloadCompareCard(){
-    const data=window.getActiveCompareData?.();
-    if(!data?.my||!data?.partner){alert('2人分の比較データがまだありません。');return;}
-    const overlay=document.getElementById('v73DownloadAdOverlay'),count=document.getElementById('v73DownloadAdCount');
-    overlay?.classList.add('show');
-    for(let n=5;n>=1;n--){if(count)count.textContent=String(n);await new Promise(r=>setTimeout(r,1000));}
-    overlay?.classList.remove('show');
-    try{
-      const canvas=await window.CoreLingualCompareExport.buildCompareTemplateCanvas();
-      const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('PNGの作成に失敗しました。')),'image/png'));
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url;
-      a.download='CoreLingual_2人のコミュニケーション比較.png';
-      a.rel='noopener';
-      a.style.display='none';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},1500);
-      const toast=document.createElement('div');toast.className='v73-download-toast';toast.textContent='比較結果を保存しました';document.body.appendChild(toast);setTimeout(()=>toast.remove(),2200);
-    }catch(e){console.error('comparison image export failed',e);alert('画像の作成に失敗しました。\n'+(e?.message||e));}
-  }
-
-  const downloadBtn=document.getElementById('v73DownloadCompare');
-  if(downloadBtn){
-    const clone=downloadBtn.cloneNode(true);
-    downloadBtn.replaceWith(clone);
-    clone.addEventListener('click',fixedDownloadCompareCard);
-  }
 })();
