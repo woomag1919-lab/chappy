@@ -23,6 +23,8 @@
 - Extracted the former v120 comparison difference/advice behavior into stable `js/comparison-differences.js`.
 - Reduced `js/v113-fixes.js` to a compatibility loader for the stable comparison/diagnosis modules.
 - Reduced `js/v120-fixes.js` to a compatibility loader for `comparison-differences.js`.
+- Moved the former v144 deep-check reveal scroll behavior and v145 first-result reveal scroll behavior from `js/compare-export.js` into stable `js/diagnosis-scroll.js`.
+- Reduced `js/compare-export.js` to its still-active v143 fixed-ad behavior, comparison image export, and related result cleanup responsibilities; obsolete v144/v145 scroll layers are no longer embedded there.
 - Updated `js/README.md` and the handoff documentation to reflect stable module ownership.
 
 ### Current compatibility state
@@ -30,6 +32,7 @@
 - `js/v113-fixes.js` is compatibility-loader only.
 - `js/v120-fixes.js` is compatibility-loader only.
 - `js/comparison-differences.js` is the active owner of comparison difference/advice behavior.
+- `js/diagnosis-scroll.js` owns diagnosis-sheet reset plus the former v144/v145 reveal-scroll behavior.
 - `js/relationship.js` is the active relationship feature entry point.
 - `js/relationship-check.js` is the active relationship-specific question/scoring implementation.
 - `js/v147-relationship-check.js` is no longer part of the runtime tree; its implementation is preserved under `archive/js/`.
