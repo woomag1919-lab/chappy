@@ -56,15 +56,13 @@
     });
   }
 
-  /* The result renderer lives in app.js, so keep its existing logic but correct the visible wording after render. */
   function polishResult(){
     const root=document.getElementById('extraResult');
     if(!root)return;
     const isPartner=(typeof extraTarget!=='undefined'&&extraTarget==='partner');
     const isMy=(typeof extraTarget!=='undefined'&&extraTarget==='my');
-    const name=isPartner?(activeName()||'相手'):'自分';
     root.querySelectorAll('.overview-head').forEach(el=>{
-      if(el.textContent.includes('36問で見えた'))el.textContent='🧩 36問で見えた、'+name+'のコミュニケーション特性';
+      if(el.textContent.includes('36問で見えた'))el.textContent='🧩 36問で見えた、'+(isPartner?'相手':'自分')+'のコミュニケーション特性';
     });
     root.querySelectorAll('.v36-profile-apply button').forEach(btn=>{
       btn.textContent='🧩 この36問の結果をプロフィールに反映する';
@@ -72,12 +70,11 @@
     if(isPartner||isMy){
       root.querySelectorAll('.v36-cause').forEach(el=>{
         const h=el.querySelector('b');
-        if(h&&h.textContent.includes('本人が追加したメモ'))h.textContent='📝 '+name+'が追加したメモ';
+        if(h&&h.textContent.includes('本人が追加したメモ'))h.textContent='📝 '+(isPartner?'相手':'自分')+'が追加したメモ';
       });
     }
   }
 
-  /* Replace the old alert wording without changing the underlying save operation. */
   document.addEventListener('click',function(e){
     const btn=e.target?.closest?.('.v36-profile-apply button');
     if(!btn)return;
