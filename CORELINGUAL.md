@@ -11,7 +11,15 @@ CoreLingual is a web app for understanding communication differences and convers
 - `v148-relationship-ui.js` and `v149-polish.js` have been removed from the runtime tree.
 - `v150-profile-fix.js` has been superseded and archived at `archive/js/v150-profile-fix.js`.
 - `fixes.js` has been superseded as a runtime entry point and archived at `archive/js/fixes.js`.
-- `v112-fixes.js`, `v113-fixes.js`, and `v120-fixes.js` are still runtime-active and must not be removed until their individual responsibilities are migrated and verified.
+- `v112-fixes.js` and `v113-fixes.js` are now compatibility loaders only.
+- `v120-fixes.js` remains runtime-active because it owns comparison difference/advice behavior.
+
+## Stable extracted modules
+- `diagnosis-save.js` — diagnosis save/close behavior formerly embedded in v112.
+- `diagnosis-draft.js` — existing-profile diagnosis edit cancel/restore behavior formerly embedded in v121.
+- `profile-diagnosis-reset.js` — deep-check UI reset behavior formerly embedded in v112.
+- `compare-data.js` — active profile comparison-data bridge formerly embedded in v113.
+- `diagnosis-scroll.js` — diagnosis-sheet scroll reset formerly embedded in v113/v117.
 
 ## Important IDs / storage keys
 - `profilePartnerPane`
@@ -31,4 +39,4 @@ CoreLingual is a web app for understanding communication differences and convers
 6. After meaningful code changes, update `docs/CORELINGUAL_HISTORY.md`.
 
 ## Next cleanup target
-Audit `v112-fixes.js` and `v113-fixes.js` function-by-function. Separate still-required compatibility behavior from obsolete historical patches. Migrate only safe, isolated responsibilities into stable modules, then archive the old layers one piece at a time.
+Verify the new stable modules in the deployed app. Then remove the now-loader-only `v112-fixes.js` and `v113-fixes.js` from the runtime entry path, while preserving the stable modules they now delegate to. After that, audit `v120-fixes.js` function-by-function and migrate only its still-required comparison behavior.
