@@ -1,6 +1,27 @@
 /* CoreLingual v143 — fixed web ad stays visible with modal clearance */
 (function(){
   'use strict';
+  /* Stable module bootstrap: keeps the app independent from legacy v112/v113 entry points. */
+  const STABLE_MODULES=[
+    ['/js/profile-diagnosis-reset.js?v=1','data-corelingual-profile-diagnosis-reset'],
+    ['/js/diagnosis-save.js?v=1','data-corelingual-diagnosis-save'],
+    ['/js/compare-data.js?v=1','data-corelingual-compare-data'],
+    ['/js/comparison-differences.js?v=1','data-corelingual-comparison-differences'],
+    ['/js/diagnosis-scroll.js?v=1','data-corelingual-diagnosis-scroll'],
+    ['/js/diagnosis-draft.js?v=1','data-corelingual-diagnosis-draft']
+  ];
+  function loadStableModules(){
+    const root=document.body||document.documentElement;
+    STABLE_MODULES.forEach(([src,marker])=>{
+      if(document.querySelector('script['+marker+']'))return;
+      const s=document.createElement('script');
+      s.src=src;
+      s.setAttribute(marker,'1');
+      root.appendChild(s);
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadStableModules,{once:true});else loadStableModules();
+
   function mountFixedWebAd(){
     const old=document.getElementById('bannerAd');
     if(old)old.remove();
