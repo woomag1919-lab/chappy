@@ -142,7 +142,6 @@
   }
 
   window.CoreLingualRelationship={RELS,get,set,refresh};
-  window.CoreLingualRelationshipV149={get,set,refresh};
 
   function start(){
     if(!document.body){setTimeout(start,25);return;}
