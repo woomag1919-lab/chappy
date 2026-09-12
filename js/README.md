@@ -18,10 +18,12 @@
 
 ## Stable feature entry points
 - `relationship.js` — single owner for relationship selector, relationship persistence bridge, result wording, and loading of the relationship-specific question/scoring module
+- `relationship-check.js` — relationship-specific partner questions, deep questions, scoring, and partner diagnosis hooks
 
 ## Relationship implementation status
-- `relationship.js` now owns the relationship UI and persistence behavior.
-- `v147-relationship-check.js` remains temporarily as the isolated relationship-specific question/scoring module.
+- `relationship.js` owns the relationship UI and persistence behavior.
+- `relationship-check.js` now owns the relationship-specific question/scoring implementation migrated from v147.
+- The former `v147-relationship-check.js` implementation is archived at `archive/js/v147-relationship-check.js`.
 - `v148-relationship-ui.js` and `v149-polish.js` have already been removed from the runtime tree.
 - `v150-profile-fix.js` has been superseded by `relationship.js` and archived at `archive/js/v150-profile-fix.js`.
 
