@@ -1,0 +1,40 @@
+/* CoreLingual comparison-differences — active comparison difference/advice behavior */
+(function(){
+  'use strict';
+  const BASE_AXES=['情報の受け取り方','考え方','感情の扱い方','人との距離感','変化への対応','伝え方・受け止め方'];
+  const DEEP_AXES=['近づき方・距離の取り方','刺激への反応','進め方・柔軟性'];
+  const KEY={'情報の受け取り方':'language','考え方':'thinking','感情の扱い方':'emotion','人との距離感':'distance','変化への対応':'change','伝え方・受け止め方':'communication','近づき方・距離の取り方':'attach','刺激への反応':'sensory','進め方・柔軟性':'process'};
+  const LABELS={language:{left:'言葉ではっきり',right:'流れから受け取る',middle:'言葉と流れを使い分け',low:'やや言葉寄り',high:'やや流れ寄り'},thinking:{left:'筋道を整理',right:'ひらめきを広げる',middle:'整理と発想を行き来',low:'やや整理寄り',high:'やや発想寄り'},emotion:{left:'話して整理',right:'時間を置いて整理',middle:'話す・考えるを使い分け',low:'やや話す寄り',high:'やや時間を置く寄り'},distance:{left:'一緒に整理',right:'ひとりで整理',middle:'状況に合わせて距離調整',low:'やや共有寄り',high:'やや一人の時間寄り'},change:{left:'見通してから',right:'動きながら',middle:'見通しと柔軟さを両立',low:'やや見通し寄り',high:'やや柔軟寄り'},communication:{left:'まず気持ち',right:'まず具体策',middle:'気持ちと具体策を両方見る',low:'やや気持ち寄り',high:'やや具体策寄り'},attach:{left:'つながりを確認',right:'自分で整理してから',middle:'近さと距離を調整',low:'ややつながり寄り',high:'やや距離寄り'},sensory:{left:'刺激を減らして整理',right:'その場で切り替える',middle:'刺激量で切り替える',low:'やや刺激を減らす寄り',high:'やや切り替える寄り'},process:{left:'順番を整えてから',right:'まず動いて調整',middle:'計画と柔軟さを使い分け',low:'やや順番寄り',high:'やや柔軟寄り'}};
+  const ADVICE={language:{left:'要点を短く区切って伝えると、行き違いを減らしやすい。',right:'話の最後に、認識が合っているか一度確かめる。',middle:'大事な点だけ、短く確認しておくと行き違いを防ぎやすい。',same:'2人とも言葉と流れの両方を使えるので、場面に合わせて確認の仕方を選ぶと進めやすい。'},thinking:{left:'まず目的をそろえてから、具体的な案を出していく。',right:'いくつかの案を広げたあと、最後に選択肢を絞り込む。',middle:'目的を共有したうえで、考えを広げたり整理したりすると進めやすい。',same:'2人とも整理と発想を行き来しやすいので、ゴールだけ共有して自由に考える時間を残すとよい。'},emotion:{left:'気持ちを受け止めてほしい時は、最初にそう伝えておく。',right:'少し考える時間がほしい時は、あとで話すことを先に知らせる。',middle:'話すか少し置くか、その時の気持ちに合わせてペースを決める。',same:'2人とも話す・考えるを使い分けやすいので、その場で無理に結論を急がないことが大切。'},distance:{left:'今話したい理由を添えると、相手も意図をつかみやすい。',right:'距離を置く時は、いつ頃また話すかを伝えておく。',middle:'今の距離感に合わせて、話すタイミングを調整する。',same:'2人とも状況に合わせて距離を調整しやすいので、今どのくらい話したいかを共有しておくと楽。'},change:{left:'予定が変わる時は、早めに知らせて心の準備をしてもらう。',right:'変える部分と変えない部分を分けて伝えると進めやすい。',middle:'見通しを持ちながら、必要なところだけ柔軟に変えていく。',same:'2人とも見通しと柔軟さを使えるので、変更点だけ先に共有しておくと動きやすい。'},communication:{left:'「まず聞いてほしい」と伝えてから、気持ちを話す。',right:'解決策を出す前に、相手の話を受け止める時間をつくる。',middle:'気持ちと具体策のどちらを先に扱うか、場面に合わせて決める。',same:'2人とも気持ちと具体策を使い分けやすいので、今は聞くのか考えるのかを最初にそろえるとよい。'},attach:{left:'確認したいことを一つに絞ると、安心につながりやすい。',right:'少し距離を置く時は、また話せるタイミングを伝えておく。',middle:'近づきたい時も距離を置きたい時も、タイミングを言葉にしておく。',same:'2人とも近さと距離を調整しやすいので、つながる・離れるの合図を曖昧にしないと安心しやすい。'},sensory:{left:'情報が重なった時は、いったん話す量を減らして整理する。',right:'相手の余裕を見ながら、その場で扱う情報量を調整する。',middle:'その時の余裕に合わせて、受け取る情報量を加減する。',same:'2人とも刺激量に合わせて切り替えやすいので、情報が多い時は一度整理してから続けるとよい。'},process:{left:'最初に「次はこれ」と一つ決めてから進めると安心しやすい。',right:'まず小さく動いてみて、途中でやり方を整えていく。',middle:'大まかな段取りを持ちつつ、途中で必要なら調整する。',same:'2人とも計画と柔軟さを使い分けやすいので、最初は大枠だけ決めて細部は途中で調整すると進めやすい。'}};
+  const side=n=>Number(n)<=35?'left':Number(n)>=65?'right':'middle';
+  function label(key,n){const d=LABELS[key]||{},v=Number(n);if(v<=35)return d.left||'';if(v>=65)return d.right||'';if(v<=47)return d.low||d.middle||'';if(v>=53)return d.high||d.middle||'';return d.middle||'';}
+  function rows(data){
+    const my=Object.fromEntries((data?.my?.scores||[]).map(x=>[x.key,Number(x.score)])),pa=Object.fromEntries((data?.partner?.scores||[]).map(x=>[x.key,Number(x.score)]));
+    const out=BASE_AXES.map(axis=>{const k=KEY[axis],a=my[k]??50,b=pa[k]??50;return{axis,key:k,type:'base',my:a,partner:b,diff:Math.abs(a-b),myLabel:label(k,a),partnerLabel:label(k,b)}});
+    const md=Object.fromEntries((data?.my?.deep||[]).map(x=>[x.key,Number(x.score)])),pd=Object.fromEntries((data?.partner?.deep||[]).map(x=>[x.key,Number(x.score)]));
+    if(Object.keys(md).length&&Object.keys(pd).length)DEEP_AXES.forEach(axis=>{const k=KEY[axis];if(md[k]!=null&&pd[k]!=null){const a=md[k],b=pd[k];out.push({axis,key:k,type:'deep',my:a,partner:b,diff:Math.abs(a-b),myLabel:label(k,a),partnerLabel:label(k,b)})}});
+    return out;
+  }
+  function getData(){try{return window.getActiveCompareData?.()||null}catch{return null}}
+  function icon(r){try{return r.type==='base'&&typeof AXES!=='undefined'?(AXES[r.key]?.icon||''):r.type==='deep'&&typeof DEEP_AXES!=='undefined'?(DEEP_AXES[r.key]?.icon||''):''}catch{return''}}
+  function refreshTop(card,d){
+    const box=card.querySelector('.v82-top3');if(!box)return false;
+    const candidates=rows(d).sort((a,b)=>b.diff-a.diff).filter(r=>r.diff>=8&&r.myLabel!==r.partnerLabel).slice(0,3);
+    const sig=candidates.map(r=>r.key+'|'+r.my+'|'+r.partner+'|'+r.myLabel+'|'+r.partnerLabel).join(';;')||'__none__';
+    if(box.dataset.v120Signature===sig)return true;
+    box.dataset.v120Signature=sig;box.innerHTML='';
+    if(!candidates.length){box.innerHTML='<div class="v82-similar">大きな差は少なめ。似た入口から会話を進めやすい2人です。</div>';return true}
+    candidates.forEach((r,i)=>{const el=document.createElement('div');el.className='v82-top-item';el.innerHTML='<div class="v82-top-num">0'+(i+1)+'</div><div class="v82-top-main"><div class="v82-top-axis">'+icon(r)+' '+r.axis+'</div><div class="v82-top-contrast"><b>'+r.myLabel+'</b><span>×</span><b>'+r.partnerLabel+'</b></div></div>';box.appendChild(el)});
+    return true;
+  }
+  function refreshAdvice(card,d){
+    const items=[...card.querySelectorAll('.v82-advice-item')];if(!items.length)return false;
+    const ranked=rows(d).sort((a,b)=>b.diff-a.diff).slice(0,2);
+    items.forEach((item,i)=>{const r=ranked[i];if(!r)return;const dict=ADVICE[r.key]||{},a=side(r.my),b=side(r.partner),texts=a===b?[dict.same||dict[a]||'']:[dict[a]||dict.middle||'',dict[b]||dict.middle||''];const ps=item.querySelectorAll('p');if(ps[0]&&ps[0].textContent!==texts[0])ps[0].textContent=texts[0];if(ps[1]){if(ps[1].textContent!==texts[1])ps[1].textContent=texts[1]||'';ps[1].style.display=texts[1]?'':'none'}});
+    return true;
+  }
+  function refresh(){const card=document.getElementById('v21CompareCard'),d=getData();if(!card||!d?.my||!d?.partner)return false;refreshTop(card,d);refreshAdvice(card,d);return true}
+  function installObserver(){try{const card=document.getElementById('v21CompareCard');if(!card||card.__v120Observer)return false;const observer=new MutationObserver(()=>refresh());observer.observe(card,{subtree:true,childList:true,characterData:true});card.__v120Observer=observer;refresh();return true}catch(e){console.warn('comparison differences observer failed',e);return false}}
+  let tries=0;const timer=setInterval(()=>{const ok=installObserver();if(ok||++tries>=120)clearInterval(timer)},100);
+  window.addEventListener('load',()=>{installObserver();[0,300,800,1500,2500].forEach(t=>setTimeout(refresh,t))});
+})();
