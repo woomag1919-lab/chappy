@@ -1,4 +1,8 @@
 /* CoreLingual — profile-first onboarding flow
+ *
+ * 既存のプロフィールUIそのものを再利用する。
+ * 新しいDOMをプロフィールの中身として作り直さない。
+ *
  * Page 1: 自分
  * Page 2: 相手 + 相手との関係
  * Page 3以降: 既存の36問特性チェック
@@ -13,6 +17,7 @@
 
   const CSS=`
     #clProfileFirstFlow{
+      width:100%;
       max-width:760px;
       margin:0 auto;
       padding:24px 18px 96px;
@@ -24,7 +29,6 @@
     #clProfileFirstFlow .cl-flow-lead{margin:0;color:#707780;line-height:1.75}
     #clProfileFirstFlow .cl-flow-step{display:none}
     #clProfileFirstFlow .cl-flow-step.is-active{display:block}
-    #clProfileFirstFlow .cl-flow-card{background:#fff;border:1px solid #e4e7eb;border-radius:18px;padding:18px;box-shadow:0 4px 18px rgba(20,45,72,.06)}
     #clProfileFirstFlow .cl-flow-actions{display:flex;gap:10px;margin-top:16px}
     #clProfileFirstFlow button.cl-flow-next{width:100%;border:0;border-radius:14px;padding:15px 18px;background:#df4d86;color:#fff;font-size:16px;font-weight:700}
     #clProfileFirstFlow button.cl-flow-back{width:110px;border:1px solid #ddd;border-radius:14px;background:#fff;color:#555;padding:14px;font-weight:700}
@@ -33,11 +37,25 @@
     #clProfileFirstFlow .cl-flow-dot{height:6px;flex:1;border-radius:99px;background:#e7e9ed}
     #clProfileFirstFlow .cl-flow-dot.on{background:#df4d86}
     #clProfileFirstFlow .cl-flow-note{margin:12px 0 0;padding:12px 14px;background:#fff6fa;border-radius:12px;color:#7b5967;font-size:13px;line-height:1.65}
-    #clProfileFirstFlow .cl-flow-step .person{display:block!important}
-    #clProfileFirstFlow .v74-profile-panel{margin:0!important;box-shadow:none!important;border:0!important;padding:0!important;background:transparent!important}
-    /* 既存profiles.jsがタブ切替で付けるdisplay:noneを、オンボーディングでは親STEPで管理する。 */
-    #clProfileFirstFlow #profileMyPane,
-    #clProfileFirstFlow #profilePartnerPane{display:block!important;margin-top:10px}
+
+    /* 重要: 元のv74プロフィールパネルを丸ごと残す。 */
+    #clProfileFirstFlow .v74-profile-panel{
+      display:block!important;
+      width:100%!important;
+      max-width:none!important;
+      margin:0!important;
+      box-sizing:border-box!important;
+    }
+    #clProfileFirstFlow .v74-profile-panel .person{box-sizing:border-box}
+
+    /* オンボーディングではSTEP側で自分/相手を切り替える。 */
+    #clProfileFirstFlow #profileMyPane{display:block!important}
+    #clProfileFirstFlow #profilePartnerPane{display:none!important}
+    #clProfileFirstFlow.is-partner #profileMyPane{display:none!important}
+    #clProfileFirstFlow.is-partner #profilePartnerPane{display:block!important}
+
+    /* タブは互換用なので表示しない。既存の保存済みプロフィール一覧は残す。 */
+    #clProfileFirstFlow .v73-hidden-compat{display:none!important}
   `;
 
   function inject(){
@@ -46,9 +64,9 @@
     }
 
     const profile=document.querySelector('.v74-profile-panel');
-    const oldStart=document.getElementById('v72Page1');
     const shell=document.getElementById('v72Shell');
-    if(!profile || !oldStart || !shell)return false;
+    const oldStart=document.getElementById('v72Page1');
+    if(!profile || !shell || !oldStart)return false;
 
     if(!document.getElementById('clProfileFirstFlowStyle')){
       const style=document.createElement('style');
@@ -62,21 +80,19 @@
     flow.setAttribute('aria-label','プロフィール設定');
 
     flow.innerHTML=`
-      <div class="cl-flow-head">
-        <div class="cl-flow-kicker">STEP 1</div>
-        <h1>まず、あなたについて</h1>
-        <p class="cl-flow-lead">
-          最初に自分のプロフィールを選ぶか、新しく作ります。プロフィールや特性チェックを使わなくても、そのまま進められます。
-        </p>
-      </div>
-
-      <div class="cl-flow-progress">
-        <span class="cl-flow-dot on"></span>
-        <span class="cl-flow-dot"></span>
-      </div>
-
       <div class="cl-flow-step is-active" data-step="1">
-        <div class="cl-flow-card" id="clMyFlowCard"></div>
+        <div class="cl-flow-head">
+          <div class="cl-flow-kicker">STEP 1</div>
+          <h1>まず、あなたについて</h1>
+          <p class="cl-flow-lead">
+            最初に自分のプロフィールを選ぶか、新しく作ります。プロフィールや特性チェックを使わなくても、そのまま進められます。
+          </p>
+        </div>
+        <div class="cl-flow-progress">
+          <span class="cl-flow-dot on"></span>
+          <span class="cl-flow-dot"></span>
+        </div>
+        <div id="clProfileMount"></div>
         <div class="cl-flow-actions">
           <button type="button" class="cl-flow-next" id="clMyNext">次へ：相手を設定する →</button>
         </div>
@@ -84,14 +100,14 @@
       </div>
 
       <div class="cl-flow-step" data-step="2">
-        <div class="cl-flow-head" style="padding:8px 2px 18px">
+        <div class="cl-flow-head">
           <div class="cl-flow-kicker">STEP 2</div>
           <h1>次に、相手について</h1>
           <p class="cl-flow-lead">
             今回の会話の相手を選ぶか、新しく作ります。相手のプロフィールがなくても、そのまま会話を解析できます。
           </p>
         </div>
-        <div class="cl-flow-card" id="clPartnerFlowCard"></div>
+        <div id="clProfileMountStep2"></div>
         <div class="cl-flow-note">
           ここで選んだ「相手との関係」によって、前半18問の内容が変わります。
         </div>
@@ -103,23 +119,38 @@
       </div>
     `;
 
-    /* v72Shellの外に配置する。既存の縦スクロール/scroll-snapに巻き込まれないようにする。 */
+    /* v72Shellの外に置く。既存のscroll-snapには参加させない。 */
     shell.parentNode.insertBefore(flow,shell);
 
-    const my=document.getElementById('profileMyPane');
-    const partner=document.getElementById('profilePartnerPane');
-    const compat=profile.querySelector('.v73-hidden-compat');
+    /* プロフィールパネルを丸ごと移動する。中のDOM・保存済み一覧・イベントを壊さない。 */
+    flow.querySelector('#clProfileMount').appendChild(profile);
 
-    if(compat)flow.querySelector('.cl-flow-head').after(compat);
-    if(my)flow.querySelector('#clMyFlowCard').appendChild(my);
-    if(partner)flow.querySelector('#clPartnerFlowCard').appendChild(partner);
+    /* STEP 2側にも同じパネルを置く必要はないので、共通パネルはSTEP1の直下に保持する。 */
+    /* STEP切替時にパネルだけ見える位置へ移動する。 */
+    const mount1=flow.querySelector('#clProfileMount');
+    const mount2=flow.querySelector('#clProfileMountStep2');
 
-    /* プロフィール設定中は旧UIとv72のscroll-snapを完全に隠す。 */
-    profile.style.display='none';
+    function moveProfileTo(n){
+      const target=n===2?mount2:mount1;
+      if(target && profile.parentNode!==target)target.appendChild(profile);
+    }
+
+    function setPane(n){
+      flow.classList.toggle('is-partner',n===2);
+      const myPane=document.getElementById('profileMyPane');
+      const partnerPane=document.getElementById('profilePartnerPane');
+      if(myPane)myPane.style.setProperty('display',n===1?'block':'none','important');
+      if(partnerPane)partnerPane.style.setProperty('display',n===2?'block':'none','important');
+      moveProfileTo(n);
+    }
+
+    /* 初期状態: 自分プロフィールを完全に表示。 */
+    setPane(1);
+
+    /* プロフィール設定中は旧ページ群を隠す。DOMは削除しない。 */
     oldStart.style.display='none';
     shell.style.display='none';
 
-    /* 初期表示を必ずページ先頭に戻す。 */
     window.scrollTo({top:0,behavior:'auto'});
 
     const dots=[...flow.querySelectorAll('.cl-flow-dot')];
@@ -132,6 +163,7 @@
       dots.forEach(function(dot,i){
         dot.classList.toggle('on',i<n);
       });
+      setPane(n);
       window.scrollTo({top:0,behavior:'smooth'});
     }
 
@@ -141,7 +173,7 @@
         const name=document.getElementById('myName');
         if(!name || !name.value.trim()){
           const status=document.getElementById('clMyStatus');
-          if(status)status.textContent='名前を入力してね。';
+          if(status)status.textContent='プロフィール名を入力してください';
           if(name)name.focus();
           return;
         }
@@ -153,11 +185,6 @@
         if(status)status.textContent='自分のプロフィールを保存しました。';
 
         showStep(2);
-
-        const partnerTab=document.getElementById('profilePartnerTab');
-        if(partnerTab){
-          try{partnerTab.click();}catch(e){}
-        }
       });
     }
 
@@ -165,10 +192,6 @@
     if(partnerBack){
       partnerBack.addEventListener('click',function(){
         showStep(1);
-        const myTab=document.getElementById('profileMyTab');
-        if(myTab){
-          try{myTab.click();}catch(e){}
-        }
       });
     }
 
@@ -178,7 +201,7 @@
         const name=document.getElementById('partnerName');
         if(!name || !name.value.trim()){
           const status=document.getElementById('clPartnerStatus');
-          if(status)status.textContent='相手の名前を入力してね。';
+          if(status)status.textContent='プロフィール名を入力してください';
           if(name)name.focus();
           return;
         }
@@ -201,7 +224,7 @@
         const status=document.getElementById('clPartnerStatus');
         if(status)status.textContent='相手のプロフィールを保存しました。';
 
-        /* プロフィール設定完了。ここで初めて既存のv72Shellを復帰させる。 */
+        /* プロフィール設定完了。既存のv72Shellを復帰して36問へ。 */
         shell.style.display='';
         flow.style.display='none';
 
