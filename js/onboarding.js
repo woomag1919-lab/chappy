@@ -1,169 +1,717 @@
-/* CoreLingual — profile-first onboarding
- * 既存のプロフィールUIを丸ごと再利用する。
- * 保存済みプロフィール一覧・入力欄・特性チェック・関係性UIを壊さない。
- *
+/* CoreLingual — profile-first onboarding flow
  * Page 1: 自分
  * Page 2: 相手 + 相手との関係
  * Page 3以降: 既存の36問特性チェック
+ *
+ * MBTIは使用しない。
  */
 (function(){
   'use strict';
+
   if(window.__corelingualProfileFirstFlow)return;
   window.__corelingualProfileFirstFlow=true;
 
   const CSS=`
-    #clProfileFirstFlow{width:100%;max-width:760px;margin:0 auto;padding:0 18px 110px;box-sizing:border-box}
-    #clProfileFirstFlow .cl-flow-step{display:none}
-    #clProfileFirstFlow .cl-flow-step.is-active{display:block}
-    #clProfileFirstFlow .cl-flow-head{padding:34px 2px 18px}
-    #clProfileFirstFlow .cl-flow-kicker{font-size:13px;color:#9a9fa6;letter-spacing:.08em}
-    #clProfileFirstFlow h1{font-size:28px;line-height:1.35;margin:6px 0 10px;color:#252a31}
-    #clProfileFirstFlow .cl-flow-lead{margin:0;color:#707780;line-height:1.75}
-    #clProfileFirstFlow .cl-flow-progress{display:flex;gap:8px;margin:4px 2px 18px}
-    #clProfileFirstFlow .cl-flow-dot{height:6px;flex:1;border-radius:99px;background:#e7e9ed}
-    #clProfileFirstFlow .cl-flow-dot.on{background:#df4d86}
-    #clProfileFirstFlow .cl-flow-actions{display:flex;gap:10px;margin-top:16px}
-    #clProfileFirstFlow button.cl-flow-next{width:100%;border:0;border-radius:14px;padding:15px 18px;background:#df4d86;color:#fff;font-size:16px;font-weight:700}
-    #clProfileFirstFlow button.cl-flow-back{width:110px;border:1px solid #ddd;border-radius:14px;background:#fff;color:#555;padding:14px;font-weight:700}
-    #clProfileFirstFlow .cl-flow-status{margin-top:10px;color:#8a919a;font-size:13px;min-height:1.4em}
-    #clProfileFirstFlow .cl-flow-note{margin:12px 0 0;padding:12px 14px;background:#fff6fa;border-radius:12px;color:#7b5967;font-size:13px;line-height:1.65}
+    #clProfileFirstFlow{
+      max-width:760px;
+      margin:0 auto;
+      padding:24px 18px 96px;
+      box-sizing:border-box;
+    }
 
-    /* 元のv74プロフィールパネルを加工しない。 */
-    #clProfileFirstFlow .v74-profile-panel{display:block!important;width:100%!important;max-width:none!important;margin:0!important;box-sizing:border-box!important}
-    #clProfileFirstFlow .v73-hidden-compat{display:none!important}
+    #clProfileFirstFlow .cl-flow-head{
+      padding:8px 2px 18px;
+    }
+
+    #clProfileFirstFlow .cl-flow-kicker{
+      font-size:13px;
+      color:#9a9fa6;
+      letter-spacing:.08em;
+    }
+
+    #clProfileFirstFlow h1{
+      font-size:28px;
+      line-height:1.35;
+      margin:6px 0 10px;
+      color:#252a31;
+    }
+
+    #clProfileFirstFlow .cl-flow-lead{
+      margin:0;
+      color:#707780;
+      line-height:1.75;
+    }
+
+    #clProfileFirstFlow .cl-flow-step{
+      display:none;
+    }
+
+    #clProfileFirstFlow .cl-flow-step.is-active{
+      display:block;
+    }
+
+    #clProfileFirstFlow .cl-flow-card{
+      background:#fff;
+      border:1px solid #e4e7eb;
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 4px 18px rgba(20,45,72,.06);
+    }
+
+    #clProfileFirstFlow .cl-flow-actions{
+      display:flex;
+      gap:10px;
+      margin-top:16px;
+    }
+
+    #clProfileFirstFlow button.cl-flow-next{
+      width:100%;
+      border:0;
+      border-radius:14px;
+      padding:15px 18px;
+      background:#df4d86;
+      color:#fff;
+      font-size:16px;
+      font-weight:700;
+    }
+
+    #clProfileFirstFlow button.cl-flow-back{
+      width:110px;
+      border:1px solid #ddd;
+      border-radius:14px;
+      background:#fff;
+      color:#555;
+      padding:14px;
+      font-weight:700;
+    }
+
+    #clProfileFirstFlow .cl-flow-status{
+      margin-top:10px;
+      color:#8a919a;
+      font-size:13px;
+      min-height:1.4em;
+    }
+
+    #clProfileFirstFlow .cl-flow-progress{
+      display:flex;
+      gap:7px;
+      margin:4px 0 18px;
+    }
+
+    #clProfileFirstFlow .cl-flow-dot{
+      height:6px;
+      flex:1;
+      border-radius:99px;
+      background:#e7e9ed;
+    }
+
+    #clProfileFirstFlow .cl-flow-dot.on{
+      background:#df4d86;
+    }
+
+    #clProfileFirstFlow .cl-flow-note{
+      margin:12px 0 0;
+      padding:12px 14px;
+      background:#fff6fa;
+      border-radius:12px;
+      color:#7b5967;
+      font-size:13px;
+      line-height:1.65;
+    }
+
+    #clProfileFirstFlow .cl-flow-step .person{
+      display:block!important;
+    }
+
+    #clProfileFirstFlow .v74-profile-panel{
+      margin:0!important;
+      box-shadow:none!important;
+      border:0!important;
+      padding:0!important;
+      background:transparent!important;
+    }
   `;
 
+
   function inject(){
-    if(!document.body)return false;
-    if(document.getElementById('clProfileFirstFlow'))return true;
+
+    if(
+      !document.body ||
+      document.getElementById('clProfileFirstFlow')
+    ){
+      return !!document.getElementById('clProfileFirstFlow');
+    }
 
     const profile=document.querySelector('.v74-profile-panel');
-    const shell=document.getElementById('v72Shell');
-    if(!profile||!shell)return false;
+    const oldStart=document.getElementById('v72Page1');
+
+    if(!profile || !oldStart){
+      return false;
+    }
+
+
+    /* CSS */
 
     if(!document.getElementById('clProfileFirstFlowStyle')){
+
       const style=document.createElement('style');
+
       style.id='clProfileFirstFlowStyle';
       style.textContent=CSS;
+
       document.head.appendChild(style);
+
     }
+
+
+    /* 新しいフロー */
 
     const flow=document.createElement('section');
+
     flow.id='clProfileFirstFlow';
     flow.setAttribute('aria-label','プロフィール設定');
+
     flow.innerHTML=`
-      <div class="cl-flow-step is-active" data-step="1">
-        <div class="cl-flow-head">
-          <div class="cl-flow-kicker">STEP 1</div>
-          <h1>まず、あなたについて</h1>
-          <p class="cl-flow-lead">最初に自分のプロフィールを選ぶか、新しく作ります。プロフィールや特性チェックを使わなくても、そのまま進められます。</p>
+
+      <div class="cl-flow-head">
+
+        <div class="cl-flow-kicker">
+          CoreLingual
         </div>
-        <div class="cl-flow-progress"><span class="cl-flow-dot on"></span><span class="cl-flow-dot"></span></div>
-        <div id="clMyProfileMount"></div>
-        <div class="cl-flow-actions"><button type="button" class="cl-flow-next" id="clMyNext">次へ：相手を設定する →</button></div>
-        <div class="cl-flow-status" id="clMyStatus"></div>
+
+        <h1>
+          まず、2人のプロフィールを設定します
+        </h1>
+
+        <p class="cl-flow-lead">
+          会話を分析する前に、
+          自分と相手のことを登録します。<br>
+          相手との関係性に合わせて、
+          後の質問内容も変わります。
+        </p>
+
       </div>
-      <div class="cl-flow-step" data-step="2">
-        <div class="cl-flow-head">
-          <div class="cl-flow-kicker">STEP 2</div>
-          <h1>次に、相手について</h1>
-          <p class="cl-flow-lead">今回の会話の相手を選ぶか、新しく作ります。相手のプロフィールがなくても、そのまま会話を解析できます。</p>
-        </div>
-        <div id="clPartnerProfileMount"></div>
+
+
+      <div class="cl-flow-progress">
+
+        <span class="cl-flow-dot on"></span>
+        <span class="cl-flow-dot"></span>
+
+      </div>
+
+
+      <!-- STEP 1 自分 -->
+
+      <div
+        class="cl-flow-step is-active"
+        data-step="1"
+      >
+
+        <div
+          class="cl-flow-card"
+          id="clMyFlowCard"
+        ></div>
+
         <div class="cl-flow-actions">
-          <button type="button" class="cl-flow-back" id="clPartnerBack">← 戻る</button>
-          <button type="button" class="cl-flow-next" id="clPartnerNext">次へ：特性チェックへ →</button>
+
+          <button
+            type="button"
+            class="cl-flow-next"
+            id="clMyNext"
+          >
+            自分のプロフィールを保存して次へ →
+          </button>
+
         </div>
-        <div class="cl-flow-status" id="clPartnerStatus"></div>
+
+        <div
+          class="cl-flow-status"
+          id="clMyStatus"
+        ></div>
+
       </div>
+
+
+      <!-- STEP 2 相手 -->
+
+      <div
+        class="cl-flow-step"
+        data-step="2"
+      >
+
+        <div
+          class="cl-flow-card"
+          id="clPartnerFlowCard"
+        ></div>
+
+        <div class="cl-flow-note">
+
+          ここで選んだ
+          「相手との関係」によって、
+          前半18問の内容が変わります。
+
+        </div>
+
+
+        <div class="cl-flow-actions">
+
+          <button
+            type="button"
+            class="cl-flow-back"
+            id="clPartnerBack"
+          >
+            ← 戻る
+          </button>
+
+          <button
+            type="button"
+            class="cl-flow-next"
+            id="clPartnerNext"
+          >
+            相手を保存して特性チェックへ →
+          </button>
+
+        </div>
+
+        <div
+          class="cl-flow-status"
+          id="clPartnerStatus"
+        ></div>
+
+      </div>
+
     `;
 
-    /* 新フローだけv72Shellの外。旧ページは削除しない。 */
-    shell.parentNode.insertBefore(flow,shell);
 
-    const mount1=flow.querySelector('#clMyProfileMount');
-    const mount2=flow.querySelector('#clPartnerProfileMount');
-    if(!mount1||!mount2)return false;
+    /* 既存ページ1の直前に挿入 */
 
-    /* パネル全体を一度だけ移動。中のDOM・イベント・保存済み一覧を完全保持。 */
-    mount1.appendChild(profile);
+    oldStart.parentNode.insertBefore(
+      flow,
+      oldStart
+    );
 
-    const myPane=document.getElementById('profileMyPane');
-    const partnerPane=document.getElementById('profilePartnerPane');
-    const dots=[...flow.querySelectorAll('.cl-flow-dot')];
-    const steps=[...flow.querySelectorAll('.cl-flow-step')];
 
-    function paneDisplay(el,value){
-      if(el)el.style.setProperty('display',value,'important');
+    /*
+     * 既存のプロフィールDOMそのものを移動する。
+     *
+     * cloneNode() は使わない。
+     * 既存のprofiles.js / app.js のイベントを
+     * そのまま生かすため。
+     */
+
+    const my=document.getElementById(
+      'profileMyPane'
+    );
+
+    const partner=document.getElementById(
+      'profilePartnerPane'
+    );
+
+    const compat=profile.querySelector(
+      '.v73-hidden-compat'
+    );
+
+
+    if(compat){
+
+      flow
+        .querySelector('.cl-flow-head')
+        .after(compat);
+
     }
+
+
+    if(my){
+
+      flow
+        .querySelector('#clMyFlowCard')
+        .appendChild(my);
+
+    }
+
+
+    if(partner){
+
+      flow
+        .querySelector('#clPartnerFlowCard')
+        .appendChild(partner);
+
+    }
+
+
+    /*
+     * 古い「だれと、だれの会話？」入口だけ隠す。
+     *
+     * v72Page2 / v72Page3 は残す。
+     * 会話解析そのものは壊さない。
+     */
+
+    profile.style.display='none';
+
+    oldStart.style.display='none';
+
+
+    const dots=[
+      ...flow.querySelectorAll(
+        '.cl-flow-dot'
+      )
+    ];
+
+    const steps=[
+      ...flow.querySelectorAll(
+        '.cl-flow-step'
+      )
+    ];
+
 
     function showStep(n){
-      steps.forEach(s=>s.classList.toggle('is-active',s.dataset.step===String(n)));
-      dots.forEach((d,i)=>d.classList.toggle('on',i<n));
-      paneDisplay(myPane,n===1?'block':'none');
-      paneDisplay(partnerPane,n===2?'block':'none');
-      const target=n===1?mount1:mount2;
-      if(target && profile.parentNode!==target)target.appendChild(profile);
-      window.scrollTo({top:0,behavior:'smooth'});
+
+      steps.forEach(function(step){
+
+        step.classList.toggle(
+          'is-active',
+          step.dataset.step===String(n)
+        );
+
+      });
+
+
+      dots.forEach(function(dot,i){
+
+        dot.classList.toggle(
+          'on',
+          i<n
+        );
+
+      });
+
+
+      window.scrollTo({
+        top:0,
+        behavior:'smooth'
+      });
+
     }
 
-    /* 初期状態 */
-    showStep(1);
-    shell.style.display='none';
 
-    const myNext=document.getElementById('clMyNext');
-    if(myNext)myNext.addEventListener('click',function(){
-      const name=document.getElementById('myName');
-      if(!name||!name.value.trim()){
-        const status=document.getElementById('clMyStatus');
-        if(status)status.textContent='プロフィール名を入力してください';
-        if(name)name.focus();
-        return;
-      }
-      const save=document.getElementById('saveMy');
-      if(save)save.click();
-      showStep(2);
-    });
+    /*
+     * STEP 1
+     * 自分のプロフィール保存
+     */
 
-    const back=document.getElementById('clPartnerBack');
-    if(back)back.addEventListener('click',function(){showStep(1)});
+    const myNext=
+      document.getElementById(
+        'clMyNext'
+      );
 
-    const partnerNext=document.getElementById('clPartnerNext');
-    if(partnerNext)partnerNext.addEventListener('click',function(){
-      const name=document.getElementById('partnerName');
-      if(!name||!name.value.trim()){
-        const status=document.getElementById('clPartnerStatus');
-        if(status)status.textContent='プロフィール名を入力してください';
-        if(name)name.focus();
-        return;
-      }
-      const rel=window.CoreLingualRelationship&&typeof window.CoreLingualRelationship.get==='function'
-        ?window.CoreLingualRelationship.get():null;
-      if(!rel){
-        const status=document.getElementById('clPartnerStatus');
-        if(status)status.textContent='相手との関係を選択してね。';
-        return;
-      }
-      const save=document.getElementById('savePartner');
-      if(save)save.click();
 
-      /* 完了後だけ既存v72Shellを復帰。 */
-      flow.style.display='none';
-      profile.style.display='none';
-      shell.style.display='';
-      const diag=document.getElementById('v72OpenDiag');
-      if(diag)setTimeout(()=>{try{diag.click()}catch(e){}},120);
-    });
+    if(myNext){
+
+      myNext.addEventListener(
+        'click',
+        function(){
+
+          const name=
+            document.getElementById(
+              'myName'
+            );
+
+
+          if(!name || !name.value.trim()){
+
+            const status=
+              document.getElementById(
+                'clMyStatus'
+              );
+
+            if(status){
+              status.textContent=
+                '名前を入力してね。';
+            }
+
+            if(name){
+              name.focus();
+            }
+
+            return;
+
+          }
+
+
+          /*
+           * 既存の保存処理を呼ぶ。
+           */
+
+          const save=
+            document.getElementById(
+              'saveMy'
+            );
+
+          if(save){
+            save.click();
+          }
+
+
+          const status=
+            document.getElementById(
+              'clMyStatus'
+            );
+
+          if(status){
+            status.textContent=
+              '自分のプロフィールを保存しました。';
+          }
+
+
+          showStep(2);
+
+
+          /*
+           * 既存の相手タブ処理も利用する。
+           */
+
+          const partnerTab=
+            document.getElementById(
+              'profilePartnerTab'
+            );
+
+          if(partnerTab){
+
+            try{
+              partnerTab.click();
+            }catch(e){}
+
+          }
+
+        }
+      );
+
+    }
+
+
+    /*
+     * STEP 2 戻る
+     */
+
+    const partnerBack=
+      document.getElementById(
+        'clPartnerBack'
+      );
+
+
+    if(partnerBack){
+
+      partnerBack.addEventListener(
+        'click',
+        function(){
+
+          showStep(1);
+
+          const myTab=
+            document.getElementById(
+              'profileMyTab'
+            );
+
+          if(myTab){
+
+            try{
+              myTab.click();
+            }catch(e){}
+
+          }
+
+        }
+      );
+
+    }
+
+
+    /*
+     * STEP 2
+     * 相手プロフィール + 関係性
+     */
+
+    const partnerNext=
+      document.getElementById(
+        'clPartnerNext'
+      );
+
+
+    if(partnerNext){
+
+      partnerNext.addEventListener(
+        'click',
+        function(){
+
+          const name=
+            document.getElementById(
+              'partnerName'
+            );
+
+
+          if(!name || !name.value.trim()){
+
+            const status=
+              document.getElementById(
+                'clPartnerStatus'
+              );
+
+            if(status){
+              status.textContent=
+                '相手の名前を入力してね。';
+            }
+
+            if(name){
+              name.focus();
+            }
+
+            return;
+
+          }
+
+
+          /*
+           * relationship.js が持っている
+           * 現在の関係性を取得。
+           */
+
+          const rel=
+            window.CoreLingualRelationship &&
+            typeof window.CoreLingualRelationship.get==='function'
+              ? window.CoreLingualRelationship.get()
+              : null;
+
+
+          if(!rel){
+
+            const status=
+              document.getElementById(
+                'clPartnerStatus'
+              );
+
+            if(status){
+              status.textContent=
+                '相手との関係を選択してね。';
+            }
+
+            return;
+
+          }
+
+
+          /*
+           * 既存の相手プロフィール保存処理。
+           */
+
+          const save=
+            document.getElementById(
+              'savePartner'
+            );
+
+          if(save){
+            save.click();
+          }
+
+
+          const status=
+            document.getElementById(
+              'clPartnerStatus'
+            );
+
+          if(status){
+            status.textContent=
+              '相手のプロフィールを保存しました。';
+          }
+
+
+          /*
+           * 既存の36問入口を呼ぶ。
+           *
+           * relationship-check.js が
+           * #v72OpenDiag をフックしているため、
+           * ここから関係別18問 + 深掘り18問へ進む。
+           */
+
+          const diag=
+            document.getElementById(
+              'v72OpenDiag'
+            );
+
+
+          if(diag){
+
+            setTimeout(
+              function(){
+
+                try{
+                  diag.click();
+                }catch(e){}
+
+              },
+              120
+            );
+
+          }
+
+        }
+      );
+
+    }
+
 
     return true;
+
   }
+
 
   function start(){
-    if(inject())return;
+
+    if(inject()){
+      return;
+    }
+
+
+    /*
+     * profiles.js 等の初期化完了を待つ。
+     */
+
     let n=0;
-    const timer=setInterval(()=>{if(inject()||++n>=120)clearInterval(timer)},100);
+
+    const timer=setInterval(
+      function(){
+
+        if(
+          inject() ||
+          ++n>=120
+        ){
+
+          clearInterval(timer);
+
+        }
+
+      },
+      100
+    );
+
   }
 
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
-  else start();
+
+  if(
+    document.readyState===
+    'loading'
+  ){
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      start,
+      {once:true}
+    );
+
+  }else{
+
+    start();
+
+  }
+
 })();
