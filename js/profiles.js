@@ -159,7 +159,6 @@ function save(p,opts={}){
   const existing=a.findIndex(x=>x.name===name);
   const old=existing>=0?a[existing]:null;
 
-  // New profile names must not inherit a stale deep-check draft from a prior profile.
   if(existing<0){
     try{
       localStorage.removeItem('cl_extra_draft_'+p+'_'+encodeURIComponent(name));
@@ -227,12 +226,24 @@ function loadRelationshipFeature(){
   document.body.appendChild(s);
 }
 
+function loadOnboardingV2(){
+  if(document.querySelector('script[data-corelingual-onboarding-v2]'))return;
+  const s=document.createElement('script');
+  s.src='/js/onboarding-v2.js?v=2';
+  s.dataset.corelingualOnboardingV2='1';
+  s.onload=()=>window.dispatchEvent(new CustomEvent('corelingual:onboarding-v2-ready'));
+  s.onerror=()=>console.warn('CoreLingual onboarding v2 failed to load');
+  document.body.appendChild(s);
+}
+
 if(document.readyState==='loading'){
   document.addEventListener('DOMContentLoaded',()=>{
     bindProfileActions();
     loadRelationshipFeature();
+    loadOnboardingV2();
   },{once:true});
 }else{
   bindProfileActions();
   loadRelationshipFeature();
+  loadOnboardingV2();
 }
