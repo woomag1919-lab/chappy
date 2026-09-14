@@ -172,4 +172,7 @@ function save(p,opts={}){
   return true;
 }
 
-saveMy.onclick=()=>save("my");savePartner.onclick=()=>save("partner");
+const saveMyBtn=document.getElementById("saveMy");
+const savePartnerBtn=document.getElementById("savePartner");
+if(saveMyBtn)saveMyBtn.onclick=()=>save("my");
+if(savePartnerBtn)savePartnerBtn.onclick=()=>save("partner");
