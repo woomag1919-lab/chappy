@@ -1,4 +1,32 @@
 /* CoreLingual v108 — shared questionnaire / axis data */
+/* v147 — prevent the original two-person setup from flashing before v146 finishes */
+(function(){
+  const revealWhenReady=()=>{
+    const shell=document.getElementById('v72Shell');
+    if(!shell)return;
+    if(shell.dataset.v146Installed==='1'){
+      shell.style.visibility='';
+      return true;
+    }
+    shell.style.visibility='hidden';
+    return false;
+  };
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>{
+      if(revealWhenReady())return;
+      const shell=document.getElementById('v72Shell');
+      if(!shell)return;
+      const observer=new MutationObserver(()=>{
+        if(revealWhenReady())observer.disconnect();
+      });
+      observer.observe(shell,{attributes:true,attributeFilter:['data-v146-installed']});
+      setTimeout(()=>{observer.disconnect();revealWhenReady();},5000);
+    },{once:true});
+  }else{
+    revealWhenReady();
+  }
+})();
+
 const AXES={
  language:{label:"情報の受け取り方",left:"言葉を具体的に確認",right:"文脈や全体像から理解",icon:"🗣️"},
  thinking:{label:"考え方",left:"整理・根拠から考える",right:"直感・可能性から考える",icon:"🧠"},
