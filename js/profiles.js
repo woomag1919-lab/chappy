@@ -2,7 +2,7 @@ function state(p){return{traits:[...document.querySelectorAll("#"+p+"Traits .on"
 function apply(p,s){document.getElementById(p+"Free").value=s.free||"";document.querySelectorAll("#"+p+"Traits .chip").forEach(x=>x.classList.toggle("on",(s.traits||[]).includes(x.textContent)))}
 function list(p){try{return JSON.parse(localStorage.getItem("cl_"+p)||"[]")}catch{return[]}}
 function activeProfile(p){try{return JSON.parse(localStorage.getItem("cl_"+p+"_active")||"null")}catch{return null}}
-function setActiveProfile(p,name){localStorage.setItem("cl_"+p+"_active",JSON.stringify(name))}
+function setActiveProfile(p,name){localStorage.setItem("cl_"+p+"_active",JSON.stringify(name));if(typeof setNames==='function')setNames()}
 
 function setNames(){
   const my=typeof activeProfile==='function'?activeProfile('my'):null;
