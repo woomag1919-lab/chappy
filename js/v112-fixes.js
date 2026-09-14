@@ -86,12 +86,21 @@
 
         save(which,{close:false,toast:false});
         document.getElementById('v72DiagOverlay')?.classList.remove('show');
-        placeDiagButton(which);
         setNames();
         renderTwoPersonComparison();
       }catch(e){console.error('diagnosis save-close failed',e);alert(e.message||'特性チェック結果の保存に失敗しました。');}
     };
   }
+
+  /* 保存後は完了文ではなく、結果ボタン自体を保存済み表示にする。 */
+  document.addEventListener('click',e=>{
+    const btn=e.target?.closest?.('.v36-profile-apply button');
+    if(!btn)return;
+    setTimeout(()=>{
+      btn.textContent='✓ プロフィールに保存済み';
+      btn.dataset.saved='1';
+    },0);
+  });
 
   async function fixedDownloadCompareCard(){
     const data=window.getActiveCompareData?.();
