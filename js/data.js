@@ -1,30 +1,23 @@
 /* CoreLingual v108 — shared questionnaire / axis data */
 /* v147 — prevent the original two-person setup from flashing before v146 finishes */
 (function(){
-  const revealWhenReady=()=>{
-    const shell=document.getElementById('v72Shell');
-    if(!shell)return;
+  const shell=document.getElementById('v72Shell');
+  if(!shell || shell.dataset.v146Installed==='1')return;
+  shell.style.visibility='hidden';
+  const reveal=()=>{
     if(shell.dataset.v146Installed==='1'){
       shell.style.visibility='';
+      observer.disconnect();
       return true;
     }
-    shell.style.visibility='hidden';
     return false;
   };
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',()=>{
-      if(revealWhenReady())return;
-      const shell=document.getElementById('v72Shell');
-      if(!shell)return;
-      const observer=new MutationObserver(()=>{
-        if(revealWhenReady())observer.disconnect();
-      });
-      observer.observe(shell,{attributes:true,attributeFilter:['data-v146-installed']});
-      setTimeout(()=>{observer.disconnect();revealWhenReady();},5000);
-    },{once:true});
-  }else{
-    revealWhenReady();
-  }
+  const observer=new MutationObserver(reveal);
+  observer.observe(shell,{attributes:true,attributeFilter:['data-v146-installed']});
+  setTimeout(()=>{
+    observer.disconnect();
+    if(shell.dataset.v146Installed!=='1')shell.style.visibility='';
+  },5000);
 })();
 
 const AXES={
