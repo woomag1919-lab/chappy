@@ -4,6 +4,18 @@ function list(p){try{return JSON.parse(localStorage.getItem("cl_"+p)||"[]")}catc
 function activeProfile(p){try{return JSON.parse(localStorage.getItem("cl_"+p+"_active")||"null")}catch{return null}}
 function setActiveProfile(p,name){localStorage.setItem("cl_"+p+"_active",JSON.stringify(name))}
 
+/* v122: profiles.js / fixes.js からも安全に呼べる名前表示更新。app.js の setNames は IIFE 内なので外部公開されない。 */
+function setNames(){
+  const my=typeof activeProfile==='function'?activeProfile('my'):null;
+  const partner=typeof activeProfile==='function'?activeProfile('partner'):null;
+  const myEl=document.getElementById('v72MyName');
+  const partnerEl=document.getElementById('v72PartnerName');
+  const ctx=document.getElementById('v72ContextLine');
+  if(myEl)myEl.textContent=my||'未設定';
+  if(partnerEl)partnerEl.textContent=partner||'未設定';
+  if(ctx)ctx.textContent=(my||'自分')+' × '+(partner||'相手')+' の会話として解析します。プロフィールや特性チェックは後からでも設定できます。';
+}
+
 /* v110: プロフィール切替後、比較ページのDOMも即時再描画する */
 function syncDiagnosisForProfile(p,profile){
   const baseKey="cl_diag_result_"+p;
