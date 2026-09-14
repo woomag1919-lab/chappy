@@ -92,7 +92,7 @@
     };
   }
 
-  /* 保存後は完了文ではなく、結果ボタン自体を保存済み表示にする。 */
+  /* 保存完了はアラートではなく、押した結果ボタンをチェックマーク付きの保存済み表示にする。 */
   document.addEventListener('click',e=>{
     const btn=e.target?.closest?.('.v36-profile-apply button');
     if(!btn)return;
@@ -101,6 +101,18 @@
       btn.dataset.saved='1';
     },0);
   });
+
+  /* diagnosis.js 側の既存完了アラートだけを抑止する。未回答など他のエラー通知は残す。 */
+  document.addEventListener('click',e=>{
+    const btn=e.target?.closest?.('.v36-profile-apply button');
+    if(!btn)return;
+    const oldAlert=window.alert;
+    window.alert=(message)=>{
+      if(String(message||'').includes('特性チェック') && String(message||'').includes('プロフィールに反映'))return;
+      return oldAlert(message);
+    };
+    setTimeout(()=>{window.alert=oldAlert},0);
+  },true);
 
   async function fixedDownloadCompareCard(){
     const data=window.getActiveCompareData?.();
