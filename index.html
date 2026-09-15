@@ -2,7 +2,6 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<style id="cl-initial-hide">#v72Shell{visibility:hidden!important}#v72Shell[data-v146-installed="1"]{visibility:visible!important}</style>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CoreLingual</title>
@@ -10,10 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style id="cl-initial-hide">#coreLingualApp{visibility:hidden!important}#coreLingualApp:has(#v72Shell[data-v146-installed="1"]){visibility:visible!important}</style>
 </head>
 <body>
 <div id="v73DownloadAdOverlay" class="v73-ad-overlay" aria-hidden="true"><div class="v73-ad-box"><b>📺 広告表示中…</b><p>広告表示後、現在の比較結果を1枚の画像として保存できます。</p><div id="v73DownloadAdCount" class="v73-ad-count">5</div></div></div>
-<div class="app">
+<div class="app" id="coreLingualApp" style="visibility:hidden">
 <header><h1>CoreLingual</h1><div class="sub">会話と「特性」の違いを読み解くサポートアプリ</div></header>
 <nav><button id="talkTab" class="on">💬 会話を読み解く</button><button id="diagTab">🧩 特性チェック</button></nav>
 <main>
@@ -126,5 +126,6 @@
 <script src="/js/v112-fixes.js"></script>
 <script src="/js/v113-fixes.js"></script>
 <script src="/js/v120-fixes.js"></script>
+<script>(function(){var a=document.getElementById("coreLingualApp");if(!a)return;function show(){if(a.querySelector("#v72Shell[data-v146-installed=\"1\"]"))a.style.visibility="visible";else setTimeout(show,0)}show()})();</script>
 </body>
 </html>
