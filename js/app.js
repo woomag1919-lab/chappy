@@ -752,7 +752,7 @@ loadSharedFromUrl();
   if(!el)return;
   const ta=el.previousElementSibling;
   if(!ta || ta.tagName!=="TEXTAREA")return;
-  const max=60000;
+  const max=3000;
   function update(){
     const n=ta.value.length;
     el.textContent=n.toLocaleString()+" / "+max.toLocaleString()+"文字";
