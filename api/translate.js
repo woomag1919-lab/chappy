@@ -1,3 +1,6 @@
+import crypto from "crypto";
+import { neon } from "@neondatabase/serverless";
+
 const MODEL = process.env.GEMINI_MODEL || "gemini-3.7-flash";
 const FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || "gemini-3.6-flash";
 const FALLBACK_MODELS = [
@@ -8,10 +11,13 @@ const FALLBACK_MODELS = [
 ];
 const RETRY_DELAY_MS = 800;
 const API_KEY = process.env.GEMINI_API_KEY;
+const DATABASE_URL = process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.STORAGE_URL;
 const MAX_MESSAGE = 3000;
 const MAX_IMAGES = 3;
 const MAX_TOTAL_IMAGE_CHARS = 3200000;
 const TIMEOUT_MS = 45000;
+const COST_INPUT_USD_PER_1M = 0.75;
+const COST_OUTPUT_USD_PER_1M = 3.75;
 
 const json = (status, body) => ({ statusCode: status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" }, body: JSON.stringify(body) });
 
@@ -62,7 +68,6 @@ function parseJson(text) {
   if (start >= 0 && end > start) return JSON.parse(s.slice(start, end + 1));
   throw new Error("invalid_json");
 }
-
 
 function normalizeRelation(body) {
   const allowed = new Set(["romantic", "friend", "work"]);
@@ -173,6 +178,33 @@ function buildRequestPayload(parts) {
   };
 }
 
+function getDb() {
+  if (!DATABASE_URL) return null;
+  return neon(DATABASE_URL);
+}
+
+function estimateCostUsd(inputTokens, outputTokens) {
+  const input = Number(inputTokens) || 0;
+  const output = Number(outputTokens) || 0;
+  return Number(((input / 1000000) * COST_INPUT_USD_PER_1M + (output / 1000000) * COST_OUTPUT_USD_PER_1M).toFixed(8));
+}
+
+async function recordUsage(entry) {
+  const sql = getDb();
+  if (!sql) return;
+  try {
+    await sql`INSERT INTO corelingual_ai_usage
+      (request_id,operation,relation_key,model,attempt_reason,image_count,message_chars,input_tokens,output_tokens,total_tokens,estimated_cost_usd,success,error_code)
+      VALUES (
+        ${entry.requestId},${entry.operation},${entry.relationKey},${entry.model},${entry.reason},
+        ${entry.imageCount},${entry.messageChars},${entry.inputTokens},${entry.outputTokens},${entry.totalTokens},
+        ${entry.estimatedCostUsd},${entry.success},${entry.errorCode}
+      )`;
+  } catch (e) {
+    console.error("CoreLingual AI usage log failed", e?.message || e);
+  }
+}
+
 async function callGemini(model, parts) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -237,7 +269,15 @@ async function callGemini(model, parts) {
       err.model = model;
       throw err;
     }
-    return normalizeResult(parseJson(text));
+    const usage = data?.usageMetadata || {};
+    return {
+      result: normalizeResult(parseJson(text)),
+      usage: {
+        inputTokens: Number.isFinite(usage.promptTokenCount) ? usage.promptTokenCount : null,
+        outputTokens: Number.isFinite(usage.candidatesTokenCount) ? usage.candidatesTokenCount : null,
+        totalTokens: Number.isFinite(usage.totalTokenCount) ? usage.totalTokenCount : null
+      }
+    };
   } finally {
     clearTimeout(timer);
   }
@@ -245,6 +285,8 @@ async function callGemini(model, parts) {
 
 async function generate(body) {
   if (!API_KEY) throw new Error("missing_api_key");
+  const requestId = crypto.randomUUID();
+  const relationKey = normalizeRelation(body).key;
   const images = Array.isArray(body.images) ? body.images.slice(0, MAX_IMAGES) : [];
   let imageChars = 0;
   const parts = [{ text: buildPrompt(body) }];
@@ -260,8 +302,24 @@ async function generate(body) {
   const attempts = [];
   const tryModel = async (model, reason) => {
     try {
-      const result = await callGemini(model, parts);
-      return { result, model };
+      const call = await callGemini(model, parts);
+      const usage = call.usage || {};
+      await recordUsage({
+        requestId,
+        operation: "analysis",
+        relationKey,
+        model,
+        reason,
+        imageCount: images.length,
+        messageChars: String(body.message || "").length,
+        inputTokens: usage.inputTokens,
+        outputTokens: usage.outputTokens,
+        totalTokens: usage.totalTokens,
+        estimatedCostUsd: estimateCostUsd(usage.inputTokens, usage.outputTokens),
+        success: true,
+        errorCode: null
+      });
+      return { result: call.result, model };
     } catch (e) {
       attempts.push({
         model,
@@ -269,6 +327,21 @@ async function generate(body) {
         status: e?.httpStatus || "",
         providerStatus: e?.providerStatus || "",
         providerMessage: e?.providerMessage || ""
+      });
+      await recordUsage({
+        requestId,
+        operation: "analysis",
+        relationKey,
+        model,
+        reason,
+        imageCount: images.length,
+        messageChars: String(body.message || "").length,
+        inputTokens: null,
+        outputTokens: null,
+        totalTokens: null,
+        estimatedCostUsd: null,
+        success: false,
+        errorCode: e?.message || "gemini_error"
       });
       throw e;
     }
