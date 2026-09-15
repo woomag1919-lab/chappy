@@ -8,7 +8,7 @@ const FALLBACK_MODELS = [
 ];
 const RETRY_DELAY_MS = 800;
 const API_KEY = process.env.GEMINI_API_KEY;
-const MAX_MESSAGE = 60000;
+const MAX_MESSAGE = 3000;
 const MAX_IMAGES = 3;
 const MAX_TOTAL_IMAGE_CHARS = 3200000;
 const TIMEOUT_MS = 45000;
@@ -332,7 +332,7 @@ export default async function handler(req, res) {
     if (e?.message === "gemini_timeout") {
       const attempts = Array.isArray(e?.attempts) ? e.attempts : [];
       return res.status(504).json({
-        error: "AIの応答に時間がかかったため、自動で別のモデルへの切り替えを試しましたが完了しませんでした。スクショが多い場合は枚数を少し減らして、もう一度試してください。",
+        error: "AIの応答に時間がかかったため、自動で別のモデルへの切り替えを試しましたが完了しませんでした。スクショが多い場合は枚数を減らして、もう一度試してください。",
         code: "timeout",
         diagnostic: {
           providerCode: 504,
