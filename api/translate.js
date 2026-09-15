@@ -63,6 +63,21 @@ function parseJson(text) {
   throw new Error("invalid_json");
 }
 
+
+function normalizeRelation(body) {
+  const allowed = new Set(["romantic", "friend", "work"]);
+  const key = typeof body?.relation === "string" ? body.relation.trim() : "";
+  const safeKey = allowed.has(key) ? key : "friend";
+  const labels = {
+    romantic: "恋人・パートナー",
+    friend: "友人関係",
+    work: "仕事関係"
+  };
+  const fromBody = typeof body?.relationLabel === "string" ? body.relationLabel.trim() : "";
+  const label = fromBody || labels[safeKey];
+  return { key: safeKey, label };
+}
+
 function buildPrompt(body) {
   const meProfile = cleanProfile(body.diagnosisContext?.my);
   const partnerProfile = cleanProfile(body.diagnosisContext?.partner);
@@ -73,6 +88,7 @@ function buildPrompt(body) {
   const message = cleanText(body.message, MAX_MESSAGE);
   const speaker = cleanText(body.speaker, 80);
   const imageQuestion = cleanText(body.imageQuestion, 500);
+  const { key: relationKey, label: relationLabelJa } = normalizeRelation(body);
 
   return `あなたはCoreLingualの会話解析エンジンです。
 目的は、2人の会話のすれ違いを責めずに整理し、双方の意図を尊重しながら、次に伝えやすい言い方を提案することです。
@@ -80,6 +96,7 @@ function buildPrompt(body) {
 【最重要ルール】
 - 実際の会話・発言内容を最優先する。
 - 特性プロフィールは「解釈の補助材料」であり、発言より優先しない。
+- 今回の関係性は「会話を読むときの文脈」であり、関係性だけで意図や性格を決めつけない。
 - 特定の診断名・心理ラベル・愛着パターンなどの名称から、診断・病気・障害・性格を断定しない。
 - 特定のラベルだからという理由で因果関係を決めつけない。
 - プロフィールと会話が関係しているときだけ、「今回の場面では、その傾向が影響した可能性があります」と慎重に述べる。
@@ -100,6 +117,16 @@ JSONのみ。Markdownやコードフェンスは禁止。
   ],
   "caution": "断定できない点や、会話だけでは判断できない点"
 }
+
+【今回の関係性】
+${relationLabelJa}
+（内部キー: ${relationKey}）
+この関係性は、同じ言葉でも場面の意味が違うための文脈です。
+例:
+- 恋人・パートナー: 返信の間・距離の取り方・気持ちの確認を、親密な関係の文脈で読む
+- 友人関係: 連絡頻度や予定変更を、友人としての距離・ペースの文脈で読む
+- 仕事関係: 期限・役割・指示の明確さを、業務コミュニケーションの文脈で読む
+ただし関係性だけで「こう感じたはずだ」と断定しない。会話本文が矛盾する場合は会話を優先する。
 
 【自分の特性プロフィール】
 ${meProfile || "なし"}
