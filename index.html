@@ -12,7 +12,7 @@
 <style id="cl-initial-hide">#coreLingualApp{visibility:hidden!important}#coreLingualApp:has(#v72Shell[data-v146-installed="1"]){visibility:visible!important}</style>
 </head>
 <body>
-<div id="v73DownloadAdOverlay" class="v73-ad-overlay" aria-hidden="true"><div class="v73-ad-box"><b>📺 広告表示中…</b><p>広告表示後、現在の比較結果を1枚の画像として保存できます。</p><div id="v73DownloadAdCount" class="v73-ad-count">5</div></div></div>
+<div id="v73DownloadAdOverlay" class="v73-ad-overlay"><div class="v73-ad-box"><b>📺 広告表示中…</b><p>広告表示後、現在の比較結果を1枚の画像として保存できます。</p><div id="v73DownloadAdCount" class="v73-ad-count">5</div></div></div>
 <div class="app" id="coreLingualApp" style="visibility:hidden">
 <header><h1>CoreLingual</h1><div class="sub">会話と「特性」の違いを読み解くサポートアプリ</div></header>
 <nav><button id="talkTab" class="on">💬 会話を読み解く</button><button id="diagTab">🧩 特性チェック</button></nav>
@@ -42,8 +42,8 @@
 <section id="talk">
 <div class="panel">
 <div class="actions"><button id="textMode" class="action on">⌨️ テキスト入力</button><button id="imageMode" class="action">🖼️ スクショ送信</button></div>
-<div id="textArea"><label class="small">この文章は誰の発言？</label><div class="actions"><button id="speakerMe" class="action on">👤 自分</button><button id="speakerPartner" class="action">👥 相手</button><button id="speakerUnknown" class="action">❓ 不明</button></div><textarea id="message" placeholder="気になったメッセージや会話を入力…" maxlength="60000"></textarea>
-<div id="analysisCharCount" class="analysis-char-count">0 / 60,000文字</div></div>
+<div id="textArea"><label class="small">この文章は誰の発言？</label><div class="actions"><button id="speakerMe" class="action on">👤 自分</button><button id="speakerPartner" class="action">👥 相手</button><button id="speakerUnknown" class="action">❓ 不明</button></div><textarea id="message" placeholder="気になったメッセージや会話を入力…" maxlength="3000"></textarea>
+<div id="analysisCharCount" class="analysis-char-count">0 / 3,000文字</div></div>
 <div id="imageArea" style="display:none"><label class="upload" for="images">🖼️ <b>スクショを追加</b><br><small>LINE・DM・SMSなど、最大3枚</small></label><input id="images" type="file" accept="image/*" multiple style="display:none"><div id="thumbs" class="thumbs"></div><div id="imageControls" style="display:none;margin-top:8px"><button id="clearImages" class="action">🗑️ 選択したスクショを全部削除</button></div><label class="small">このスクショについて聞きたいこと</label><textarea id="imageQuestion" placeholder="例：最後の「了解」はどういうニュアンスに見える？"></textarea><div class="ad-slot small" id="imageAd"><strong>📺 スクショ分析前の広告枠</strong>短い広告を表示する場所です。現在は広告未接続。<div class="ad-countdown" id="imageAdCountdown"></div></div></div></div>
 <div class="panel v74-profile-panel">
 <div class="v73-hidden-compat" aria-hidden="true"><button type="button" id="profileMyTab">自分</button><button type="button" id="profilePartnerTab">相手</button></div>
