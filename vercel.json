@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    {"source":"/api/translate","destination":"/api/translate-guard"},
     {"source":"/share/:token","destination":"/?sharedToken=:token"}
   ],
   "crons": [
