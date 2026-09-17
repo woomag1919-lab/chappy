@@ -10,7 +10,8 @@ function buildAiProfileTextFromStorage(p){
 analyze.onclick=async()=>{analyze.disabled=true;const originalText=analyze.innerHTML;analyze.innerHTML='<span class="spinner"></span>準備中…';let note=document.getElementById("loadingNote");if(!note){note=document.createElement("div");note.id="loadingNote";note.className="loading-note";analyze.after(note)}note.textContent="会話を読み込んでいます…";try{const partnerName=(typeof activeProfile==="function"?activeProfile("partner"):null)||"";
   const relationKey=(typeof getProfileRelation==="function"?getProfileRelation(partnerName):"friend")||"friend";
   const relationLabelJa=(typeof relationLabel==="function"?relationLabel(relationKey):"友人関係");
-  let body={inputMode:textArea.style.display!=="none"?"text":"image",message:message.value,speaker:currentSpeaker,imageQuestion:(document.getElementById("imageQuestion")||{}).value||"",myTraits:state("my").traits,partnerTraits:state("partner").traits,myFree:myFree.value,partnerFree:partnerFree.value,relation:relationKey,relationLabel:relationLabelJa,diagnosisContext:{my:buildAiProfileTextFromStorage("my"),partner:buildAiProfileTextFromStorage("partner")},images:[]};
+  const clientId=(typeof getClientId==="function"?getClientId():null);
+  let body={inputMode:textArea.style.display!=="none"?"text":"image",message:message.value,speaker:currentSpeaker,imageQuestion:(document.getElementById("imageQuestion")||{}).value||"",myTraits:state("my").traits,partnerTraits:state("partner").traits,myFree:myFree.value,partnerFree:partnerFree.value,relation:relationKey,relationLabel:relationLabelJa,clientId:clientId,diagnosisContext:{my:buildAiProfileTextFromStorage("my"),partner:buildAiProfileTextFromStorage("partner")},images:[]};
   if(body.inputMode==="image"){
     if(!selectedImages.length)throw Error("スクショを1枚以上追加してね。");
     analyze.innerHTML='<span class="spinner"></span>広告を表示中…';
