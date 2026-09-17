@@ -147,6 +147,25 @@ const RELATION_Q={
 };;
 
 const RELATION_BASE_Q=Q.slice();
+
+const CL_CLIENT_ID_KEY = 'cl_client_id';
+/** Anonymous client id for usage analytics (not invite ownerToken). */
+function getClientId(){
+  try{
+    let id = localStorage.getItem(CL_CLIENT_ID_KEY);
+    if(id && /^[A-Za-z0-9_-]{20,80}$/.test(id)) return id;
+    if(typeof crypto !== 'undefined' && crypto.randomUUID){
+      id = (crypto.randomUUID() + crypto.randomUUID()).replace(/-/g, '').slice(0, 48);
+    }else{
+      id = ('cl' + Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 48);
+    }
+    localStorage.setItem(CL_CLIENT_ID_KEY, id);
+    return id;
+  }catch{
+    return 'anon_' + String(Date.now());
+  }
+}
+
 function getProfileRelation(name){
   if(!name)return 'friend';
   try{return localStorage.getItem('cl_relation_partner_'+encodeURIComponent(name))||'friend'}catch{return 'friend'}
