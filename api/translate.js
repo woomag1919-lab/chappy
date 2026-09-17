@@ -69,6 +69,16 @@ function parseJson(text) {
   throw new Error("invalid_json");
 }
 
+function normalizeClientId(body) {
+  const raw = typeof body?.clientId === "string" ? body.clientId
+    : (typeof body?.client_id === "string" ? body.client_id : "");
+  const id = String(raw || "").trim();
+  if (!id) return null;
+  if (id.length < 20 || id.length > 80) return null;
+  if (!/^[A-Za-z0-9_-]+$/.test(id)) return null;
+  return id;
+}
+
 function normalizeRelation(body) {
   const allowed = new Set(["romantic", "friend", "work"]);
   const key = typeof body?.relation === "string" ? body.relation.trim() : "";
@@ -194,11 +204,11 @@ async function recordUsage(entry) {
   if (!sql) return;
   try {
     await sql`INSERT INTO corelingual_ai_usage
-      (request_id,operation,relation_key,model,attempt_reason,image_count,message_chars,input_tokens,output_tokens,total_tokens,estimated_cost_usd,success,error_code)
+      (request_id,operation,relation_key,model,attempt_reason,image_count,message_chars,input_tokens,output_tokens,total_tokens,estimated_cost_usd,success,error_code,client_id)
       VALUES (
         ${entry.requestId},${entry.operation},${entry.relationKey},${entry.model},${entry.reason},
         ${entry.imageCount},${entry.messageChars},${entry.inputTokens},${entry.outputTokens},${entry.totalTokens},
-        ${entry.estimatedCostUsd},${entry.success},${entry.errorCode}
+        ${entry.estimatedCostUsd},${entry.success},${entry.errorCode},${entry.clientId || null}
       )`;
   } catch (e) {
     console.error("CoreLingual AI usage log failed", e?.message || e);
@@ -286,6 +296,7 @@ async function callGemini(model, parts) {
 async function generate(body) {
   if (!API_KEY) throw new Error("missing_api_key");
   const requestId = crypto.randomUUID();
+  const clientId = body.clientId || null;
   const relationKey = normalizeRelation(body).key;
   const images = Array.isArray(body.images) ? body.images.slice(0, MAX_IMAGES) : [];
   let imageChars = 0;
@@ -306,6 +317,7 @@ async function generate(body) {
       const usage = call.usage || {};
       await recordUsage({
         requestId,
+        clientId,
         operation: "analysis",
         relationKey,
         model,
@@ -330,6 +342,7 @@ async function generate(body) {
       });
       await recordUsage({
         requestId,
+        clientId,
         operation: "analysis",
         relationKey,
         model,
@@ -399,7 +412,8 @@ export default async function handler(req, res) {
     const images = Array.isArray(body.images) ? body.images : [];
     if (!message && !images.length) return res.status(400).json({ error: "会話内容を入力してください。" });
     if (images.length > MAX_IMAGES) return res.status(400).json({ error: "画像が多すぎます。" });
-    const result = await generate({ ...body, message, images });
+    const clientId = normalizeClientId(body);
+    const result = await generate({ ...body, message, images, clientId });
     return res.status(200).json(result);
   } catch (e) {
     if (e?.message === "gemini_timeout") {
