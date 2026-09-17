@@ -150,3 +150,95 @@
 
   if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=80)clearInterval(timer)},50)}
 })();
+
+/* CoreLingual v147 — clear empty state when one profile has no trait-check result */
+(function(){
+  'use strict';
+
+  function getCompareState(){
+    try{
+      const d=window.getActiveCompareData?.();
+      const my=!!(d?.my?.scores?.length);
+      const partner=!!(d?.partner?.scores?.length);
+      return {my,partner,both:my&&partner};
+    }catch(e){
+      console.warn('v147 compare state failed',e);
+      return {my:false,partner:false,both:false};
+    }
+  }
+
+  function renderMissingNotice(){
+    const mount=document.getElementById('v72CompareMount');
+    if(!mount)return false;
+
+    const state=getCompareState();
+    const existing=mount.querySelector('.v147-compare-missing');
+    const card=mount.querySelector('#v21CompareCard, .v82-pair-card');
+
+    if(state.both){
+      if(existing)existing.remove();
+      return true;
+    }
+
+    if(card)card.remove();
+    if(existing)return true;
+
+    const box=document.createElement('section');
+    box.className='v147-compare-missing';
+    box.setAttribute('role','status');
+    box.innerHTML=`
+      <div class="v147-compare-missing-icon">🧩</div>
+      <h3>2人の比較には、2人とも特性チェックが必要です</h3>
+      <p>現在、どちらかのプロフィールには<br>特性チェックの結果がありません。</p>
+      <p class="v147-compare-missing-note">2人とも特性チェックをすると、<br>2人の違いや共通点を比較できるようになります。</p>
+    `;
+    const style=document.createElement('style');
+    style.textContent=`
+      .v147-compare-missing{
+        margin:18px 0 12px;
+        padding:28px 20px;
+        border:1px dashed #d9dde3;
+        border-radius:20px;
+        background:#fff;
+        text-align:center;
+        color:#303640;
+      }
+      .v147-compare-missing-icon{font-size:30px;margin-bottom:10px}
+      .v147-compare-missing h3{margin:0 0 12px;font-size:18px;line-height:1.55;font-weight:700}
+      .v147-compare-missing p{margin:0;color:#707780;font-size:14px;line-height:1.8}
+      .v147-compare-missing-note{margin-top:14px!important;color:#505762!important;font-weight:600}
+    `;
+    box.appendChild(style);
+    mount.prepend(box);
+    return true;
+  }
+
+  function install(){
+    const btn=document.getElementById('v72ToCompare');
+    const mount=document.getElementById('v72CompareMount');
+    if(!btn||!mount)return false;
+
+    if(!btn.__v147){
+      btn.__v147=true;
+      btn.addEventListener('click',()=>setTimeout(renderMissingNotice,80));
+    }
+
+    if(!mount.__v147Observer){
+      mount.__v147Observer=new MutationObserver(()=>{
+        if(!getCompareState().both)renderMissingNotice();
+      });
+      mount.__v147Observer.observe(mount,{childList:true,subtree:true});
+    }
+
+    renderMissingNotice();
+    return true;
+  }
+
+  if(!install()){
+    let tries=0;
+    const timer=setInterval(()=>{
+      if(install()||++tries>=120)clearInterval(timer);
+    },100);
+  }
+  window.addEventListener('load',renderMissingNotice);
+})();
