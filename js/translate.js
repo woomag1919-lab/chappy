@@ -69,7 +69,6 @@ function parseJson(text) {
   throw new Error("invalid_json");
 }
 
-
 function normalizeClientId(body) {
   const raw = typeof body?.clientId === "string" ? body.clientId
     : (typeof body?.client_id === "string" ? body.client_id : "");
@@ -297,7 +296,7 @@ async function callGemini(model, parts) {
 async function generate(body) {
   if (!API_KEY) throw new Error("missing_api_key");
   const requestId = crypto.randomUUID();
-  const clientId = body.clientId || normalizeClientId(body);
+  const clientId = body.clientId || null;
   const relationKey = normalizeRelation(body).key;
   const images = Array.isArray(body.images) ? body.images.slice(0, MAX_IMAGES) : [];
   let imageChars = 0;
