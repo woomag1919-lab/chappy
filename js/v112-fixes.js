@@ -145,25 +145,18 @@
   }
 })();
 
-/* CoreLingual v148 — keep the "後半18問を始める" action in view after applying the first-half result. */
+/* CoreLingual v149 — keep the deep-check continuation in view after applying the first-half result. */
 (function(){
   'use strict';
-  function install(){
-    const btn=document.querySelector('.v36-profile-apply button');
-    const more=document.getElementById('moreDiag');
-    if(!btn||!more||btn.__v148ScrollBound)return !!btn;
-    btn.__v148ScrollBound=true;
-    btn.addEventListener('click',()=>{
-      setTimeout(()=>{
-        if(more.style.display==='none')return;
-        more.style.scrollMarginTop='24px';
-        more.scrollIntoView({behavior:'smooth',block:'center'});
-      },120);
-    });
-    return true;
-  }
-  if(!install()){
-    let tries=0;
-    const timer=setInterval(()=>{if(install()||++tries>=120)clearInterval(timer)},100);
-  }
+  document.addEventListener('click',e=>{
+    if(!e.target?.closest?.('.v36-profile-apply button'))return;
+    const scroll=()=>{
+      const more=document.getElementById('moreDiag');
+      const sheet=document.querySelector('#v72DiagOverlay .v72-sheet');
+      if(!more||!sheet||more.style.display==='none')return;
+      const top=Math.max(0,more.offsetTop-80);
+      sheet.scrollTo({top,behavior:'smooth'});
+    };
+    [150,350,700].forEach(t=>setTimeout(scroll,t));
+  },true);
 })();
