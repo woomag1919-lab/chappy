@@ -215,6 +215,101 @@ async function recordUsage(entry) {
   }
 }
 
+function emptyUsageMetrics() {
+  return {
+    h24: { analysisCount: 0, imageAnalysisCount: 0, costSum: 0 },
+    d7: { analysisCount: 0, imageAnalysisCount: 0, costSum: 0 }
+  };
+}
+
+/**
+ * Aggregate usage for a client. Analysis counts = DISTINCT request_id with success=true.
+ * primary/retry/fallback rows for the same request_id count as one analysis.
+ */
+async function getClientUsageMetrics(clientId) {
+  const empty = emptyUsageMetrics();
+  if (!clientId) return empty;
+  const sql = getDb();
+  if (!sql) return empty;
+  try {
+    const [h24Analysis] = await sql`
+      SELECT COUNT(*)::int AS n FROM (
+        SELECT request_id FROM corelingual_ai_usage
+        WHERE client_id = ${clientId}
+          AND operation = 'analysis'
+          AND success = true
+          AND created_at >= NOW() - INTERVAL '24 hours'
+        GROUP BY request_id
+      ) t`;
+    const [h24Image] = await sql`
+      SELECT COUNT(*)::int AS n FROM (
+        SELECT request_id FROM corelingual_ai_usage
+        WHERE client_id = ${clientId}
+          AND operation = 'analysis'
+          AND success = true
+          AND image_count > 0
+          AND created_at >= NOW() - INTERVAL '24 hours'
+        GROUP BY request_id
+      ) t`;
+    const [h24Cost] = await sql`
+      SELECT COALESCE(SUM(estimated_cost_usd), 0)::float AS s
+      FROM corelingual_ai_usage
+      WHERE client_id = ${clientId}
+        AND operation = 'analysis'
+        AND created_at >= NOW() - INTERVAL '24 hours'`;
+    const [d7Analysis] = await sql`
+      SELECT COUNT(*)::int AS n FROM (
+        SELECT request_id FROM corelingual_ai_usage
+        WHERE client_id = ${clientId}
+          AND operation = 'analysis'
+          AND success = true
+          AND created_at >= NOW() - INTERVAL '7 days'
+        GROUP BY request_id
+      ) t`;
+    const [d7Image] = await sql`
+      SELECT COUNT(*)::int AS n FROM (
+        SELECT request_id FROM corelingual_ai_usage
+        WHERE client_id = ${clientId}
+          AND operation = 'analysis'
+          AND success = true
+          AND image_count > 0
+          AND created_at >= NOW() - INTERVAL '7 days'
+        GROUP BY request_id
+      ) t`;
+    const [d7Cost] = await sql`
+      SELECT COALESCE(SUM(estimated_cost_usd), 0)::float AS s
+      FROM corelingual_ai_usage
+      WHERE client_id = ${clientId}
+        AND operation = 'analysis'
+        AND created_at >= NOW() - INTERVAL '7 days'`;
+    return {
+      h24: {
+        analysisCount: Number(h24Analysis?.n) || 0,
+        imageAnalysisCount: Number(h24Image?.n) || 0,
+        costSum: Number(h24Cost?.s) || 0
+      },
+      d7: {
+        analysisCount: Number(d7Analysis?.n) || 0,
+        imageAnalysisCount: Number(d7Image?.n) || 0,
+        costSum: Number(d7Cost?.s) || 0
+      }
+    };
+  } catch (e) {
+    console.error("CoreLingual usage metrics failed", e?.message || e);
+    return empty;
+  }
+}
+
+/**
+ * Map metrics → L0–L3. Thresholds not set yet.
+ * Stage 2A: always "L1" — no ads, grants, or analysis blocks.
+ */
+function resolveUsageLevel(metrics) {
+  void metrics;
+  return "L1";
+}
+
+
 async function callGemini(model, parts) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -413,8 +508,14 @@ export default async function handler(req, res) {
     if (!message && !images.length) return res.status(400).json({ error: "会話内容を入力してください。" });
     if (images.length > MAX_IMAGES) return res.status(400).json({ error: "画像が多すぎます。" });
     const clientId = normalizeClientId(body);
+    // Stage 2A: level from past usage BEFORE this analysis (no limits/ads yet)
+    const usageMetrics = await getClientUsageMetrics(clientId);
+    const usageLevel = resolveUsageLevel(usageMetrics);
     const result = await generate({ ...body, message, images, clientId });
-    return res.status(200).json(result);
+    return res.status(200).json({
+      ...result,
+      usage: { level: usageLevel }
+    });
   } catch (e) {
     if (e?.message === "gemini_timeout") {
       const attempts = Array.isArray(e?.attempts) ? e.attempts : [];
