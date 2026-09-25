@@ -566,7 +566,13 @@ export default async function handler(req, res) {
       });
     }
     if (e?.message === "gemini_bad_request") return res.status(400).json({ error: "送信した内容をAIが受け取れませんでした。スクショを減らすか、画像を小さくしてもう一度試してください。", code: "bad_request" });
-    if (e?.message === "empty_model_response" || e?.message === "invalid_json") return res.status(422).json({ error: "AIから解析結果を受け取れませんでした。スクショの文字が読み取りにくい可能性があります。画像を減らすか、文字が見やすいスクショで試してください。", code: "read_failed" });
+    if (e?.message === "empty_model_response" || e?.message === "invalid_json") {
+      const isImageRequest = images.length > 0 || body?.inputMode === "image";
+      const errorMessage = isImageRequest
+        ? "AIから解析結果を受け取れませんでした。スクショの文字を読み取れなかった可能性があります。画像を減らすか、文字が見やすいスクショで試してください。"
+        : "AIから解析結果を受け取れませんでした。会話の内容をもう一度確認して、しばらくしてから再試行してください。";
+      return res.status(422).json({ error: errorMessage, code: "read_failed" });
+    }
     console.error("translate error", e?.message || e);
     return res.status(500).json({ error: "会話の解析に失敗しました。しばらくしてからもう一度試してください。", code: "unknown" });
   }
